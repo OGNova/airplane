@@ -1,7 +1,18 @@
-token: ''
+token: 'discord bot token'
 
 manhole_enable: true
 manhole_bind: 127.0.0.1:7171
+
+DSN: 'sentry DSN'
+
+web:
+  SECRET_KEY: 'enter some random safe value here'
+  DISCORD_CLIENT_ID: ''
+  DISCORD_REDIRECT_URI: 'http://WEBSITE.com/api/auth/discord/callback'
+  DISCORD_CLIENT_SECRET: ''
+  DISCORD_API_BASE_URL: 'https://discordapp.com/api'
+  DISCORD_TOKEN_URL: 'https://discordapp.com/api/oauth2/token'
+  DISCORD_AUTH_URL: 'https://discordapp.com/oauth2/authorize'
 
 state:
   sync_guild_members: false
@@ -12,7 +23,6 @@ bot:
     - rowboat.plugins.core
     - rowboat.plugins.modlog
     - rowboat.plugins.admin
-    - rowboat.plugins.infractions
     - rowboat.plugins.spam
     - rowboat.plugins.censor
     - rowboat.plugins.reddit
@@ -21,3 +31,4 @@ bot:
     - rowboat.plugins.sql
     - rowboat.plugins.internal
     - rowboat.plugins.stats
+    - rowboat.plugins.tags
