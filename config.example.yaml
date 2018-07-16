@@ -32,3 +32,4 @@ bot:
     - rowboat.plugins.internal
     - rowboat.plugins.stats
     - rowboat.plugins.tags
+    - rowboat.plugins.latency
