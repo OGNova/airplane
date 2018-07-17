@@ -3,8 +3,8 @@ import logging
 import subprocess
 
 from disco.util.logging import LOG_FORMAT
-# from raven import Client
-# from raven.transport.gevent import GeventedHTTPTransport
+from raven import Client
+from raven.transport.gevent import GeventedHTTPTransport
 
 ENV = os.getenv('ENV', 'local')
 DSN = os.getenv('DSN')
@@ -12,15 +12,7 @@ REV = subprocess.check_output(['git', 'rev-parse', 'HEAD']).strip()
 
 VERSION = '1.3.0'
 
-# raven_client = Client(
-#     DSN,
-#     ignore_exceptions=[
-#         'KeyboardInterrupt',
-#     ],
-#     release=REV,
-#     environment=ENV,
-#     transport=GeventedHTTPTransport,
-# )
+raven_client = Client()
 
 # Log things to file
 file_handler = logging.FileHandler('rowboat.log')
