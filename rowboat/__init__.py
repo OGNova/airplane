@@ -12,7 +12,15 @@ REV = subprocess.check_output(['git', 'rev-parse', 'HEAD']).strip()
 
 VERSION = '1.3.0'
 
-raven_client = Client()
+raven_client = Client(
+    DSN,
+    ignore_exceptions=[
+        'KeyboardInterrupt',
+    ],
+    release=REV,
+    environment=ENV,
+    transport=GeventedHTTPTransport,
+)
 
 # Log things to file
 file_handler = logging.FileHandler('rowboat.log')
