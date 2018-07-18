@@ -7,7 +7,9 @@ import inspect
 import humanize
 import functools
 import contextlib
+import emoji
 
+from emoji.unicode_codes import UNICODE_EMOJI
 from datetime import datetime, timedelta
 from holster.emitter import Priority, Emitter
 from disco.bot import Bot
@@ -37,7 +39,7 @@ from rowboat.constants import (
 PY_CODE_BLOCK = u'```py\n{}\n```'
 
 BOT_INFO = '''
-Rowboat is a moderation and utilitarian bot built for large Discord servers.
+Airplane is a clone of the bot Rowboat, made to work for large Discord servers.
 '''
 
 GUILDS_WAITING_SETUP_KEY = 'gws'
@@ -342,13 +344,13 @@ class CorePlugin(Plugin):
         try:
             guild = Guild.with_id(event.id)
         except Guild.DoesNotExist:
-            # If the guild is not awaiting setup, leave it now
-            if not rdb.sismember(GUILDS_WAITING_SETUP_KEY, str(event.id)) and event.id != ROWBOAT_GUILD_ID:
-                self.log.warning(
-                    'Leaving guild %s (%s), not within setup list',
-                    event.id, event.name
-                )
-                event.guild.leave()
+#            # If the guild is not awaiting setup, leave it now
+#            if not rdb.sismember(GUILDS_WAITING_SETUP_KEY, str(event.id)) and event.id != ROWBOAT_GUILD_ID:
+#                self.log.warning(
+#                    'Leaving guild %s (%s), not within setup list',
+#                    event.id, event.name
+#                )
+#                event.guild.leave()
             return
 
         if not guild.enabled:
@@ -533,13 +535,14 @@ class CorePlugin(Plugin):
 
     @Plugin.command('about')
     def command_about(self, event):
-        embed = MessageEmbed()
-        embed.set_author(name='Rowboat', icon_url=self.client.state.me.avatar_url, url='https://rowboat.party/')
+        embed = MessageEmbed(title="Dashboard", url='https://air.aetherya.stream', color=0xff0000)
         embed.description = BOT_INFO
+        embed.set_author(name='Airplane', icon_url=self.client.state.me.avatar_url, url='https://air.aetherya.stream')
         embed.add_field(name='Servers', value=str(Guild.select().count()), inline=True)
         embed.add_field(name='Uptime', value=humanize.naturaldelta(datetime.utcnow() - self.startup), inline=True)
+        embed.set_footer(text='Airplane. Made to work by OGNovuh#0003')
         event.msg.reply(embed=embed)
-
+        
     @Plugin.command('uptime', level=-1)
     def command_uptime(self, event):
         event.msg.reply('Rowboat was started {}'.format(
@@ -558,45 +561,11 @@ class CorePlugin(Plugin):
         code = cmd.func.__code__
         lines, firstlineno = inspect.getsourcelines(code)
 
-        event.msg.reply('<https://github.com/b1naryth1ef/rowboat/blob/master/{}#L{}-{}>'.format(
+        event.msg.reply('<https://github.com/OGNova/airplane/blob/master/{}#L{}-{}>'.format(
             code.co_filename,
             firstlineno,
             firstlineno + len(lines)
         ))
-
-
-    @Plugin.command('nuke', '<user:snowflake> <reason:str...>', level=-1)
-    def nuke(self, event, user, reason):
-        contents = []
-
-        for gid, guild in self.guilds.items():
-            guild = self.state.guilds[gid]
-            perms = guild.get_permissions(self.state.me)
-
-            if not perms.ban_members and not perms.administrator:
-                contents.append(u':x: {} - No Permissions'.format(
-                    guild.name
-                ))
-                continue
-
-            try:
-                Infraction.ban(
-                    self.bot.plugins.get('AdminPlugin'),
-                    event,
-                    user,
-                    reason,
-                    guild=guild)
-            except:
-                contents.append(u':x: {} - Unknown Error'.format(
-                    guild.name
-                ))
-                self.log.exception('Failed to force ban %s in %s', user, gid)
-
-            contents.append(u':white_check_mark: {} - :regional_indicator_f:'.format(
-                guild.name
-            ))
-
-        event.msg.reply('Results:\n' + '\n'.join(contents))
 
     @Plugin.command('eval', level=-1)
     def command_eval(self, event):
