@@ -57,6 +57,7 @@ class LatencyPlugin(Plugin):
             '  Max: `{}ms`\n'.format(max(self.heartbeats)) +
             '  Min: `{}ms`\n'.format(min(self.heartbeats)))
 
+    @Plugin.command('ping')
     @Plugin.command('rtt')
     def rtt(self, event):
         """
