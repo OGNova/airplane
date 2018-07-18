@@ -7,9 +7,7 @@ import inspect
 import humanize
 import functools
 import contextlib
-import emoji
 
-from emoji.unicode_codes import UNICODE_EMOJI
 from datetime import datetime, timedelta
 from holster.emitter import Priority, Emitter
 from disco.bot import Bot
@@ -27,6 +25,7 @@ from rowboat.sql import init_db
 from rowboat.redis import rdb
 
 import rowboat.models
+from rowboat.models.user import Infraction
 from rowboat.models.guild import Guild, GuildBan
 from rowboat.models.message import Command
 from rowboat.models.notification import Notification
@@ -36,10 +35,12 @@ from rowboat.constants import (
     ROWBOAT_CONTROL_CHANNEL
 )
 
+from yaml import load
+
 PY_CODE_BLOCK = u'```py\n{}\n```'
 
 BOT_INFO = '''
-Airplane is a clone of the bot Rowboat, made to work for large Discord servers.
+Airplane is a moderation and utilitarian bot.
 '''
 
 GUILDS_WAITING_SETUP_KEY = 'gws'
@@ -61,6 +62,11 @@ class CorePlugin(Plugin):
 
         if ENV != 'prod':
             self.spawn(self.wait_for_plugin_changes)
+
+        self.global_config = None
+
+        with open('config.yaml', 'r') as f:
+            self.global_config = load(f)
 
         self._wait_for_actions_greenlet = self.spawn(self.wait_for_actions)
 
@@ -157,7 +163,7 @@ class CorePlugin(Plugin):
         if not rb_guild:
             return
 
-        self.log.info('Updating rowboat guild access')
+        self.log.info('Updating Airplane guild access')
 
         guilds = Guild.select(
             Guild.guild_id,
@@ -274,6 +280,10 @@ class CorePlugin(Plugin):
     def on_guild_update(self, event):
         self.log.info('Got guild update for guild %s (%s)', event.guild.id, event.guild.channels)
 
+    @Plugin.listen('GuildMembersChunk')
+    def on_guild_members_chunk(self, event):
+        self.log.info('Got members chunk for guild %s', event.guild_id)
+
     @Plugin.listen('GuildBanAdd')
     def on_guild_ban_add(self, event):
         GuildBan.ensure(self.client.state.guilds.get(event.guild_id), event.user)
@@ -288,7 +298,7 @@ class CorePlugin(Plugin):
     @contextlib.contextmanager
     def send_control_message(self):
         embed = MessageEmbed()
-        embed.set_footer(text='Rowboat {}'.format(
+        embed.set_footer(text='Airplane {}'.format(
             'Production' if ENV == 'prod' else 'Testing'
         ))
         embed.timestamp = datetime.utcnow().isoformat()
@@ -301,6 +311,24 @@ class CorePlugin(Plugin):
             )
         except:
             self.log.exception('Failed to send control message:')
+            return
+
+    @contextlib.contextmanager
+    def send_spam_control_message(self):
+        embed = MessageEmbed()
+        embed.set_footer(text='Airplane {}'.format(
+            'Production' if ENV == 'prod' else 'Testing'
+        ))
+        embed.timestamp = datetime.utcnow().isoformat()
+        embed.color = 0x779ecb
+        try:
+            yield embed
+            self.bot.client.api.channels_messages_create(
+                ROWBOAT_SPAM_CONTROL_CHANNEL,
+                embed=embed
+            )
+        except:
+            self.log.exception('Failed to send spam control message:')
             return
 
     @Plugin.listen('Resumed')
@@ -344,13 +372,13 @@ class CorePlugin(Plugin):
         try:
             guild = Guild.with_id(event.id)
         except Guild.DoesNotExist:
-#            # If the guild is not awaiting setup, leave it now
-#            if not rdb.sismember(GUILDS_WAITING_SETUP_KEY, str(event.id)) and event.id != ROWBOAT_GUILD_ID:
-#                self.log.warning(
-#                    'Leaving guild %s (%s), not within setup list',
-#                    event.id, event.name
-#                )
-#                event.guild.leave()
+            # If the guild is not awaiting setup, leave it now
+            if not rdb.sismember(GUILDS_WAITING_SETUP_KEY, str(event.id)) and event.id != ROWBOAT_GUILD_ID:
+                self.log.warning(
+                    'Leaving guild %s (%s), not within setup list',
+                    event.id, event.name
+                )
+                event.guild.leave()
             return
 
         if not guild.enabled:
@@ -403,6 +431,9 @@ class CorePlugin(Plugin):
         """
         # Ignore messages sent by bots
         if event.message.author.bot:
+            return
+
+        if rdb.sismember('ignored_channels', event.message.channel_id):
             return
 
         # If this is message for a guild, grab the guild object
@@ -521,7 +552,7 @@ class CorePlugin(Plugin):
         # Make sure this is the owner of the server
         if not global_admin:
             if not event.guild.owner_id == event.author.id:
-                return event.msg.reply(':warning: only the server owner can setup rowboat')
+                return event.msg.reply(':warning: only the server owner can setup Jetski')
 
         # Make sure we have admin perms
         m = event.guild.members.select_one(id=self.state.me.id)
@@ -533,19 +564,51 @@ class CorePlugin(Plugin):
         self.guilds[event.guild.id] = guild
         event.msg.reply(':ok_hand: successfully loaded configuration')
 
+    @Plugin.command('nuke', '<user:snowflake> <reason:str...>', level=-1)
+    def nuke(self, event, user, reason):
+        contents = []
+
+        for gid, guild in self.guilds.items():
+            guild = self.state.guilds[gid]
+            perms = guild.get_permissions(self.state.me)
+
+            if not perms.ban_members and not perms.administrator:
+                contents.append(u':x: {} - No Permissions'.format(
+                    guild.name
+                ))
+                continue
+
+            try:
+                Infraction.ban(
+                    self.bot.plugins.get('AdminPlugin'),
+                    event,
+                    user,
+                    reason,
+                    guild=guild)
+            except:
+                contents.append(u':x: {} - Unknown Error'.format(
+                    guild.name
+                ))
+                self.log.exception('Failed to force ban %s in %s', user, gid)
+
+            contents.append(u':white_check_mark: {} - :regional_indicator_f:'.format(
+                guild.name
+            ))
+
+        event.msg.reply('Results:\n' + '\n'.join(contents))
+
     @Plugin.command('about')
     def command_about(self, event):
-        embed = MessageEmbed(title="Dashboard", url='https://air.aetherya.stream', color=0xff0000)
+        embed = MessageEmbed()
+        embed.set_author(name='Airplane', icon_url=self.client.state.me.avatar_url, url='https://air.aetherya.stream/')
         embed.description = BOT_INFO
-        embed.set_author(name='Airplane', icon_url=self.client.state.me.avatar_url, url='https://air.aetherya.stream')
         embed.add_field(name='Servers', value=str(Guild.select().count()), inline=True)
         embed.add_field(name='Uptime', value=humanize.naturaldelta(datetime.utcnow() - self.startup), inline=True)
-        embed.set_footer(text='Airplane. Made to work by OGNovuh#0003')
         event.msg.reply(embed=embed)
-        
+
     @Plugin.command('uptime', level=-1)
     def command_uptime(self, event):
-        event.msg.reply('Rowboat was started {}'.format(
+        event.msg.reply('Jetski was started {}'.format(
             humanize.naturaldelta(datetime.utcnow() - self.startup)
         ))
 
@@ -561,7 +624,7 @@ class CorePlugin(Plugin):
         code = cmd.func.__code__
         lines, firstlineno = inspect.getsourcelines(code)
 
-        event.msg.reply('<https://github.com/OGNova/airplane/blob/master/{}#L{}-{}>'.format(
+        event.msg.reply('<https://github.com/ThaTiemsz/jetski/blob/master/{}#L{}-{}>'.format(
             code.co_filename,
             firstlineno,
             firstlineno + len(lines)
@@ -637,7 +700,7 @@ class CorePlugin(Plugin):
             guild.name,
         ))
 
-        general_channel = guild.channels.itervalues().next()
+        general_channel = guild.channels[guild.id]
 
         try:
             invite = general_channel.create_invite(
