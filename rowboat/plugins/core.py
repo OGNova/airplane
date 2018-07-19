@@ -32,7 +32,7 @@ from rowboat.models.notification import Notification
 from rowboat.plugins.modlog import Actions
 from rowboat.constants import (
     GREEN_TICK_EMOJI, RED_TICK_EMOJI, ROWBOAT_GUILD_ID, ROWBOAT_USER_ROLE_ID,
-    ROWBOAT_CONTROL_CHANNEL
+    ROWBOAT_LAUNCH_CHANNEL, ROWBOAT_CONFIG_CHANNEL, ROWBOAT_ERROR_CHANNEL
 )
 
 from yaml import load
@@ -115,7 +115,7 @@ class CorePlugin(Plugin):
 
             data = json.loads(item['data'])
             if data['type'] == 'GUILD_UPDATE' and data['id'] in self.guilds:
-                with self.send_control_message() as embed:
+                with self.send_config_message() as embed:
                     embed.title = u'Reloaded config for {}'.format(
                         self.guilds[data['id']].name
                     )
@@ -141,7 +141,7 @@ class CorePlugin(Plugin):
                 self.log.info('Restart requested, signaling parent')
                 os.kill(os.getppid(), signal.SIGUSR1)
             elif data['type'] == 'GUILD_DELETE' and data['id'] in self.guilds:
-                with self.send_control_message() as embed:
+                with self.send_config_message() as embed:
                     embed.color = 0xff6961
                     embed.title = u'Guild Force Deleted {}'.format(
                         self.guilds[data['id']].name,
@@ -296,7 +296,7 @@ class CorePlugin(Plugin):
         )
 
     @contextlib.contextmanager
-    def send_control_message(self):
+    def send_launch_message(self):
         embed = MessageEmbed()
         embed.set_footer(text='Airplane {}'.format(
             'Production' if ENV == 'prod' else 'Testing'
@@ -306,7 +306,7 @@ class CorePlugin(Plugin):
         try:
             yield embed
             self.bot.client.api.channels_messages_create(
-                ROWBOAT_CONTROL_CHANNEL,
+                ROWBOAT_LAUNCH_CHANNEL,
                 embed=embed
             )
         except:
@@ -314,7 +314,7 @@ class CorePlugin(Plugin):
             return
 
     @contextlib.contextmanager
-    def send_spam_control_message(self):
+    def send_config_message(self):
         embed = MessageEmbed()
         embed.set_footer(text='Airplane {}'.format(
             'Production' if ENV == 'prod' else 'Testing'
@@ -324,7 +324,25 @@ class CorePlugin(Plugin):
         try:
             yield embed
             self.bot.client.api.channels_messages_create(
-                ROWBOAT_SPAM_CONTROL_CHANNEL,
+                ROWBOAT_CONFIG_CHANNEL,
+                embed=embed
+            )
+        except:
+            self.log.exception('Failed to send spam control message:')
+            return
+    
+    @contextlib.contextmanager
+    def send_error_message(self):
+        embed = MessageEmbed()
+        embed.set_footer(text='Airplane {}'.format(
+            'Production' if ENV == 'prod' else 'Testing'
+        ))
+        embed.timestamp = datetime.utcnow().isoformat()
+        embed.color = 0x779ecb
+        try:
+            yield embed
+            self.bot.client.api.channels_messages_create(
+                ROWBOAT_ERROR_CHANNEL,
                 embed=embed
             )
         except:
@@ -339,7 +357,7 @@ class CorePlugin(Plugin):
             env=ENV,
         )
 
-        with self.send_control_message() as embed:
+        with self.send_launch_message() as embed:
             embed.title = 'Resumed'
             embed.color = 0xffb347
             embed.add_field(name='Gateway Server', value=event.trace[0], inline=False)
@@ -356,7 +374,7 @@ class CorePlugin(Plugin):
             env=ENV,
         )
 
-        with self.send_control_message() as embed:
+        with self.send_launch_message() as embed:
             if reconnects:
                 embed.title = 'Reconnected'
                 embed.color = 0xffb347
@@ -509,7 +527,7 @@ class CorePlugin(Plugin):
                     tracked = Command.track(event, command, exception=True)
                     self.log.exception('Command error:')
 
-                    with self.send_control_message() as embed:
+                    with self.send_error_message() as embed:
                         embed.title = u'Command Error: {}'.format(command.name)
                         embed.color = 0xff6961
                         embed.add_field(
@@ -552,7 +570,7 @@ class CorePlugin(Plugin):
         # Make sure this is the owner of the server
         if not global_admin:
             if not event.guild.owner_id == event.author.id:
-                return event.msg.reply(':warning: only the server owner can setup Jetski')
+                return event.msg.reply(':warning: only the server owner can setup Airplane')
 
         # Make sure we have admin perms
         m = event.guild.members.select_one(id=self.state.me.id)
@@ -608,7 +626,7 @@ class CorePlugin(Plugin):
 
     @Plugin.command('uptime', level=-1)
     def command_uptime(self, event):
-        event.msg.reply('Jetski was started {}'.format(
+        event.msg.reply('Airplane was started {}'.format(
             humanize.naturaldelta(datetime.utcnow() - self.startup)
         ))
 
