@@ -755,7 +755,7 @@ class AdminPlugin(Plugin):
         self.unlocked_roles[role_id] = time.time() + 300
         raise CommandSuccess('role is unlocked for 5 minutes')
 
-    @Plugin.command('nickname', aliases=['nick'], '<user:user|snowflake> [newname:str...]', level=CommandLevels.MOD)
+    @Plugin.command('nickname', '<user:user|snowflake> [newname:str...]', aliases=['nick'], level=CommandLevels.MOD)
     def nickname(self, event, user, newname=None):
       member = event.guild.get_member(user)
       if member:
