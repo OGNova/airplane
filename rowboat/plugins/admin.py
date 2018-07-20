@@ -755,7 +755,7 @@ class AdminPlugin(Plugin):
         self.unlocked_roles[role_id] = time.time() + 300
         raise CommandSuccess('role is unlocked for 5 minutes')
 
-    @Plugin.command('nickname', '<user:user|snowflake> [newname:str...]', aliases=['nick'], level=CommandLevels.MOD)
+    @Plugin.command('nickname', aliases=['nick'], '<user:user|snowflake> [newname:str...]', level=CommandLevels.MOD)
     def nickname(self, event, user, newname=None):
       member = event.guild.get_member(user)
       if member:
@@ -763,17 +763,17 @@ class AdminPlugin(Plugin):
           user_id = member.user.id
           kwargs = {}
           if newname == None:
-              kwargs['nick'] = member.username
+              kwargs['nick'] = ''
+              member.modify(**kwargs)
+              raise CommandSuccess('reset {}\'s nickname.'.format(member.user))
+              return
           elif (len(newname)>32):
               raise CommandFail('invalid nickname. Nicknames must be <= 32 chars')
               return
           else:
               kwargs['nick'] = newname
-          member.modify(**kwargs)
-          self.confirm_action(event, maybe_string(
-              newname,
-              u':ok_hand: updated {}\'s nickname to (`{}`)'.format(member.user, newname),
-              u':ok_hand: reset {}\'s nickname.'.format(member.user),
-          ))
+              member.modify(**kwargs)
+              raise CommandSuccess('updated {}\'s nickname to (`{}`)'.format(member.user, newname))
+              return
       else:
           raise CommandFail('invalid user')
