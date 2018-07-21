@@ -784,5 +784,5 @@ class AdminPlugin(Plugin):
                     raise CommandSuccess('updated <@!{}>\'s nickname to (`{}`)'.format(member.user.id, newname))
                     return
 
-      else:
-          raise CommandFail('invalid user')
+        else:
+            raise CommandFail('invalid user')
