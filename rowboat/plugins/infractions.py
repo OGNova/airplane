@@ -560,14 +560,20 @@ class InfractionsPlugin(Plugin):
     @Plugin.parser.add_argument('-r', '--reason', default='', help='reason for modlog')
     def mkick(self, event, args):
         members = []
+        failed_ids = []
         for user_id in args.users:
             member = event.guild.get_member(user_id)
             if not member:
-                TODO: this sucks, batch these
-                raise CommandFail('failed to kick {}, user not found'.format(user_id))
+                #TODO: this sucks, batch these
+                # raise CommandFail('failed to kick {}, user not found'.format(user_id))
+                failed_ids.append(member)
+                continue
 
             if not self.can_act_on(event, member, throw=False):
-                raise CommandFail('failed to kick {}, invalid permissions'.format(user_id))
+                # raise CommandFail('failed to kick {}, invalid permissions'.format(user_id))
+                failed_ids.append(member)
+                continue
+
 
             members.append(member)
 
@@ -595,7 +601,7 @@ class InfractionsPlugin(Plugin):
         for member in members:
             Infraction.kick(self, event, member, args.reason)
 
-        raise CommandSuccess('kicked {} users'.format(len(members)))
+        raise CommandSuccess('kicked {} users. Was unable to remove {} users.'.format(len(members, len(failed_ids))))
 
     @Plugin.command('ban', '<user:user|snowflake> [reason:str...]', level=CommandLevels.MOD)
     @Plugin.command('forceban', '<user:snowflake> [reason:str...]', level=CommandLevels.MOD)
@@ -625,14 +631,20 @@ class InfractionsPlugin(Plugin):
     @Plugin.parser.add_argument('-r', '--reason', default='', help='reason for modlog')
     def mban(self, event, args):
         members = []
+        failed_ids = []
         for user_id in args.users:
             member = event.guild.get_member(user_id)
             if not member:
-                TODO: this sucks, batch these
-                raise CommandFail('failed to kick {}, user not found'.format(user_id))
+                # TODO: this sucks, batch these
+                # raise CommandFail('failed to kick {}, user not found'.format(user_id))
+                failed_ids.append(member)
+                continue
 
             if not self.can_act_on(event, member, throw=False):
-                raise CommandFail('failed to kick {}, invalid permissions'.format(user_id))
+                # raise CommandFail('failed to kick {}, invalid permissions'.format(user_id))
+                failed_ids.append(member)
+                continue               
+
 
             members.append(member)
 
@@ -660,7 +672,7 @@ class InfractionsPlugin(Plugin):
         for member in members:
             Infraction.ban(self, event, member, args.reason, guild=event.guild)
 
-        raise CommandSuccess('banned {} users'.format(len(members)))
+        raise CommandSuccess('banned {} users and failed to ban {} users.'.format(len(members), len(failed_ids)))
 
     @Plugin.command('softban', '<user:user|snowflake> [reason:str...]', level=CommandLevels.MOD)
     def softban(self, event, user, reason=None):
