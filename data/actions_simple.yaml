@@ -149,3 +149,7 @@ MEMBER_TEMPBAN_EXPIRE:
 MEMBER_KICK:
   emoji: boot
   format: '{member!s} (`{member.id}`) was kicked by **{actor!s}**: `{reason!s}`'
+
+INFRACTION_REMOVE:
+  emoji: pencil
+  format: 'Infraction id **{infraction_id}**, `{infraction_reason}`, was removed by **{actor}**: `{reason}`'
