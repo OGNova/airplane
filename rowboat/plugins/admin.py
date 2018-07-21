@@ -768,7 +768,7 @@ class AdminPlugin(Plugin):
                 try:
                     raise CommandSuccess('reset {}\'s nickname.'.format(member.user))
                     return
-                return:
+                except:
                     raise CommandSuccess('reset <@!{}>\'s nickname.'.format(member.user.id))
                     return
             elif (len(newname)>32):
