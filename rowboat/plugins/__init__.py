@@ -125,8 +125,8 @@ class CommandResponse(Exception):
 
 
 class CommandFail(CommandResponse):
-    EMOJI = 'no_entry_sign'
+    EMOJI = '<:deny:470285164313051138>'
 
 
 class CommandSuccess(CommandResponse):
-    EMOJI = 'ballot_box_with_check'
+    EMOJI = '<:approve:470283598600208394>'
