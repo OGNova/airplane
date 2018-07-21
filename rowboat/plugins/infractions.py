@@ -560,16 +560,27 @@ class InfractionsPlugin(Plugin):
     @Plugin.parser.add_argument('-r', '--reason', default='', help='reason for modlog')
     def mkick(self, event, args):
         members = []
+        members_failed = []
+        members_noperms = []
         for user_id in args.users:
             member = event.guild.get_member(user_id)
             if not member:
                 # TODO: this sucks, batch these
-                raise CommandFail('failed to kick {}, user not found'.format(user_id))
+                # raise CommandFail('failed to kick {}, user not found'.format(user_id))
+                members_failed.append(member)
 
             if not self.can_act_on(event, member.id, throw=False):
-                raise CommandFail('failed to kick {}, invalid permissions'.format(user_id))
+                # raise CommandFail('failed to kick {}, invalid permissions'.format(user_id))
+                members_noperms.append(member)
 
             members.append(member)
+        if (len(members) == 0):
+            if (len(members_failed) != 0) & (len(members_failed != 0)):
+                raise CommandFail('failed to kick {}, users not found.\nfailed to kick {}, invalid permissions.'.format((', '.join(members_failed), ', '.join(members_noperms))))
+            elif (len(members_noperms) == 0):
+                raise CommandFail('failed to kick {}, invalid permissions'.format(', '.join(members_failed)))
+            elif (len(member_failed) == 0):    
+                raise CommandFail('failed to kick {}, users not found.\nfailed to kick {}, invalid permissions.'.format(', '.join(members_noperms)))
 
         msg = event.msg.reply('Ok, kick {} users for `{}`?'.format(len(members), args.reason or 'no reason'))
         msg.chain(False).\
@@ -625,15 +636,28 @@ class InfractionsPlugin(Plugin):
     @Plugin.parser.add_argument('-r', '--reason', default='', help='reason for modlog')
     def mban(self, event, args):
         members = []
+        members_failed = []
+        members_noperms = []
         for user_id in args.users:
             member = event.guild.get_member(user_id)
             if not member:
-                raise CommandFail('failed to ban {}, user not found'.format(user_id))
+                # TODO: this sucks, batch these
+                # raise CommandFail('failed to kick {}, user not found'.format(user_id))
+                members_failed.append(member)
 
             if not self.can_act_on(event, member.id, throw=False):
-                raise CommandFail('failed to ban {}, invalid permissions'.format(user_id))
+                # raise CommandFail('failed to kick {}, invalid permissions'.format(user_id))
+                members_noperms.append(member)
 
             members.append(member)
+        if (len(members) == 0):
+            if (len(members_failed) != 0) & (len(members_failed != 0)):
+                raise CommandFail('failed to kick {}, users not found.\nfailed to kick {}, invalid permissions.'.format((', '.join(members_failed), ', '.join(members_noperms))))
+            elif (len(members_noperms) == 0):
+                raise CommandFail('failed to kick {}, invalid permissions'.format(', '.join(members_failed)))
+            elif (len(member_failed) == 0):    
+                raise CommandFail('failed to kick {}, users not found.\nfailed to kick {}, invalid permissions.'.format(', '.join(members_noperms)))
+
 
         msg = event.msg.reply('Ok, ban {} users for `{}`?'.format(len(members), args.reason or 'no reason'))
         msg.chain(False).\
