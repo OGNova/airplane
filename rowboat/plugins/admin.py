@@ -757,23 +757,32 @@ class AdminPlugin(Plugin):
 
     @Plugin.command('nickname', '<user:user|snowflake> [newname:str...]', aliases=['nick'], level=CommandLevels.MOD)
     def nickname(self, event, user, newname=None):
-      member = event.guild.get_member(user)
-      if member:
-          self.can_act_on(event, member.id)
-          user_id = member.user.id
-          kwargs = {}
-          if newname == None:
-              kwargs['nick'] = ''
-              member.modify(**kwargs)
-              raise CommandSuccess('reset {}\'s nickname.'.format(member.user))
-              return
-          elif (len(newname)>32):
-              raise CommandFail('invalid nickname. Nicknames must be <= 32 chars')
-              return
-          else:
-              kwargs['nick'] = newname
-              member.modify(**kwargs)
-              raise CommandSuccess('updated {}\'s nickname to (`{}`)'.format(member.user, newname))
-              return
-      else:
-          raise CommandFail('invalid user')
+        member = event.guild.get_member(user)
+        if member:
+            self.can_act_on(event, member.id)
+            user_id = member.user.id
+            kwargs = {}
+            if newname == None:
+                kwargs['nick'] = ''
+                member.modify(**kwargs)
+                try:
+                    raise CommandSuccess('reset {}\'s nickname.'.format(member.user))
+                    return
+                except:
+                    raise CommandSuccess('reset <@!{}>\'s nickname.'.format(member.user.id))
+                    return
+            elif (len(newname)>32):
+                raise CommandFail('invalid nickname. Nicknames must be <= 32 chars')
+                return
+            else:
+                kwargs['nick'] = newname
+                member.modify(**kwargs)
+                try:
+                    raise CommandSuccess('updated {}\'s nickname to (`{}`)'.format(member.user, newname))
+                    return
+                except:
+                    raise CommandSuccess('updated <@!{}>\'s nickname to (`{}`)'.format(member.user.id, newname))
+                    return
+
+        else:
+            raise CommandFail('invalid user')
