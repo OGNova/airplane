@@ -76,7 +76,7 @@ class InfractionsPlugin(Plugin):
     def clear_infractions(self):
         expired = list(Infraction.select().where(
             (Infraction.active == 1) &
-            (Infraction.expires_at < datetime.utcnow())
+            ((Infraction.expires_at - datetime.utcnow()) <= 0) #testing to fix temp inf counting up
         ))
 
         self.log.info('[INF] attempting to clear %s expired infractions', len(expired))
