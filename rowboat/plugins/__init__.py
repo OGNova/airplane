@@ -120,7 +120,7 @@ class CommandResponse(Exception):
 
     def __init__(self, response):
         if self.EMOJI:
-            response = u':{}: {}'.format(self.EMOJI, response)
+            response = u'{} {}'.format(self.EMOJI, response)
         self.response = response
 
 
