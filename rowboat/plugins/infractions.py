@@ -569,7 +569,7 @@ class InfractionsPlugin(Plugin):
                 # raise CommandFail('failed to kick {}, user not found'.format(user_id))
                 members_failed.append(member)
 
-            if not self.can_act_on(event, member.id, throw=False):
+            if not self.can_act_on(event, member, throw=False):
                 # raise CommandFail('failed to kick {}, invalid permissions'.format(user_id))
                 members_noperms.append(member)
 
@@ -645,7 +645,7 @@ class InfractionsPlugin(Plugin):
                 # raise CommandFail('failed to kick {}, user not found'.format(user_id))
                 members_failed.append(member)
 
-            if not self.can_act_on(event, member.id, throw=False):
+            if not self.can_act_on(event, member, throw=False):
                 # raise CommandFail('failed to kick {}, invalid permissions'.format(user_id))
                 members_noperms.append(member)
 
