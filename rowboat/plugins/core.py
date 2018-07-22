@@ -531,13 +531,16 @@ class CorePlugin(Plugin):
                         embed.title = u'Command Error: {}'.format(command.name)
                         embed.color = 0xff6961
                         embed.add_field(
-                            name='Author', value='({}) `{}`'.format(event.author, event.author.id), inline=True)
-                        embed.add_field(name='Channel', value='({}) `{}`'.format(
-                            event.channel.name,
-                            event.channel.id
-                        ), inline=True)
-                        embed.add_field(
                             name='Guild', value='({}) `{}`'.format(event.guild.name, event.guild.id), inline=True
+                        )
+                        embed.add_field(
+                            name='Channel', value='({}) `{}`'.format(event.channel.name, event.channel.id), inline=True
+                        )
+                        embed.add_field(
+                            name='Author', value='({}) `{}`'.format(event.author, event.author.id), inline=True
+                        )
+                        embed.add_field(
+                            name='Full Command', value='{}'.format(event.message), inline=True
                         )
                         embed.description = '```{}```'.format(u'\n'.join(tracked.traceback.split('\n')[-8:]))
 
