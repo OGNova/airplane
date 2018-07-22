@@ -671,8 +671,8 @@ class InfractionsPlugin(Plugin):
 
         for member in members:
             Infraction.ban(self, event, member, args.reason, guild=event.guild)
-        for member in failed_ids:
-            Infraction.ban(self, event, member, args.reason, guild=event.guild)
+        for user in failed_ids:
+            Infraction.ban(self, event, user, args.reason, guild=event.guild)
 
         raise CommandSuccess('banned {} users and force-banned {} users.'.format(len(members), len(failed_ids)))
 
