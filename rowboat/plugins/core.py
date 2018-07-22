@@ -649,7 +649,7 @@ class CorePlugin(Plugin):
                     contents.append(u'<:deny:470285164313051138> {} - Unknown Error'.format(
                         guild.name
                     ))
-                contents.append(u'<:approve:470283598600208394> {} - :regional_indicator_f:'.cormat(
+                contents.append(u'<:approve:470283598600208394> {} - :regional_indicator_f:'.format(
                     guild.name
                 ))
         event.msg.reply('Results:\n' + '\n'.join(contents))
