@@ -640,7 +640,7 @@ class CorePlugin(Plugin):
                     continue
                 try:
                     Infraction.ban(
-                        self.bot.plugins.get('AdminPlugin')
+                        self.bot.plugins.get('AdminPlugin'),
                         event,
                         member,
                         args.reason,
