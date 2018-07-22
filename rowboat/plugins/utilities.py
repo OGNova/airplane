@@ -94,7 +94,7 @@ class UtilitiesPlugin(Plugin):
 
         event.msg.reply(str(random.randint(start, end)))
 
-    @Plugin.command('cat', global_=True)
+    @Plugin.command('cat', group='animals', global_=True)
     def cat(self, event):
         # Sometimes random.cat gives us gifs (smh)
         for _ in range(3):
@@ -114,7 +114,7 @@ class UtilitiesPlugin(Plugin):
         r.raise_for_status()
         event.msg.reply('', attachments=[('cat.jpg', r.content)])
     
-    @Plugin.command('dog', global_=True)
+    @Plugin.command('dog', group='animals', global_=True)
     def dog(self, event):
         # Sometimes random.dog gives us gifs or mp4s (smh)
         for _ in range(3):
@@ -134,7 +134,7 @@ class UtilitiesPlugin(Plugin):
         r.raise_for_status()
         event.msg.reply('', attachments=[('dog.jpg', r.content)])
 
-    @Plugin.command('bird', aliases=['birb'], global_=True)
+    @Plugin.command('bird', group='animals', aliases=['birb'], global_=True)
     def bird(self, event):
         # Sometimes random.birb gives us gifs or mp4s (smh)
         for _ in range(3):
