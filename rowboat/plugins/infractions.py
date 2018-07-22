@@ -670,11 +670,9 @@ class InfractionsPlugin(Plugin):
             return
 
         for member in members:
-            Infraction.ban(self, event, member, args.reason)
-        for user in failed_ids:
-            Infraction.ban(self, event, user, args.reason)
+            Infraction.ban(self, event, member, args.reason, guild=event.guild)
 
-        raise CommandSuccess('banned {} users and force-banned {} users.'.format(len(members), len(failed_ids)))
+        raise CommandSuccess('banned {} users and failed to ban {} users.'.format(len(members), len(failed_ids)))
 
     @Plugin.command('softban', '<user:user|snowflake> [reason:str...]', level=CommandLevels.MOD)
     def softban(self, event, user, reason=None):
