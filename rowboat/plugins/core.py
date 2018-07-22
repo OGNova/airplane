@@ -627,6 +627,7 @@ class CorePlugin(Plugin):
     def mnuke(self, event, args):
         members = []
         contents = []
+        final_results = []
         for user_id in args.users:
             member = event.guild.get_member(user_id)
             for gid, guild in self.guilds.items():
@@ -652,7 +653,19 @@ class CorePlugin(Plugin):
                 contents.append(u'<:approve:470283598600208394> {} - :regional_indicator_f:'.format(
                     guild.name
                 ))
-        event.msg.reply('Results:\n' + '\n'.join(contents))
+        for gid, guild in self.guilds.items():
+            guild = self.state.guilds[gid]
+            perms = guild.get_permissions(self.state.me)
+            if not perms.ban_members and not perms.administrator:
+                final_results.append(u'<:deny:470285164313051138> {} - No Permissions'.format(
+                    guild.name
+                ))
+                continue
+            else: 
+                final_results.append(u'<:approve:470283598600208394> {} - :regional_indicator_f:'.format(
+                    guild.name
+                ))
+        event.msg.reply('Results:\n' + '\n'.join(final_results))
 
     @Plugin.command('about')
     def command_about(self, event):
