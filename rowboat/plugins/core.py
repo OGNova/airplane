@@ -536,6 +536,9 @@ class CorePlugin(Plugin):
                             event.channel.name,
                             event.channel.id
                         ), inline=True)
+                        embed.add_field(
+                            name='Guild', value='({}) `{}`'.format(event.guild.name, event.guild.id), inline=True
+                        )
                         embed.description = '```{}```'.format(u'\n'.join(tracked.traceback.split('\n')[-8:]))
 
                     return event.reply('<:{}> something went wrong, perhaps try again later'.format(RED_TICK_EMOJI))
