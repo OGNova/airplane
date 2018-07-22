@@ -134,7 +134,7 @@ class UtilitiesPlugin(Plugin):
         r.raise_for_status()
         event.msg.reply('', attachments=[('dog.jpg', r.content)])
 
-    @Plugin.command('bird', aliases=['birb'] global_=True)
+    @Plugin.command('bird', aliases=['birb'], global_=True)
     def dog(self, event):
         # Sometimes random.birb gives us gifs or mp4s (smh)
         for _ in range(3):
