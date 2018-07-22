@@ -647,17 +647,20 @@ class CorePlugin(Plugin):
                         guild.name
                     ))
                     continue
+
                 try:
                     Infraction.ban(
                         self.bot.plugins.get('AdminPlugin'),
                         event,
-                        member,
-                        args.reason,
+                        user,
+                        reason,
                         guild=guild)
                 except:
                     contents.append(u'<:deny:470285164313051138> {} - Unknown Error'.format(
                         guild.name
                     ))
+                    self.log.exception('Failed to force ban %s in %s', user, gid)
+
                 contents.append(u'<:approve:470283598600208394> {} - :regional_indicator_f:'.format(
                     guild.name
                 ))
