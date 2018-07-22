@@ -150,7 +150,7 @@ class UtilitiesPlugin(Plugin):
         else:
             return event.msg.reply('404 bird not found :(')
 
-        r = requests.get(https://random.birb.pw/img/ + name)
+        r = requests.get('https://random.birb.pw/img/' + name)
         r.raise_for_status()
         event.msg.reply('', attachments=[('bird.jpg', r.content)])
 
