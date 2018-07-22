@@ -145,7 +145,7 @@ class UtilitiesPlugin(Plugin):
                 continue
             
             name = r.json()['file']
-            if not url.endswith('.gif') or not url.endswith('.mp4'):
+            if not name.endswith('.gif') or not name.endswith('.mp4'):
                 break
         else:
             return event.msg.reply('404 bird not found :(')
