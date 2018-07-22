@@ -24,6 +24,14 @@ from rowboat.plugins import CommandResponse
 from rowboat.sql import init_db
 from rowboat.redis import rdb
 
+#adding to try and make work
+from rowboat.plugins import RowboatPlugin as Plugin, CommandFail, CommandSuccess
+from rowboat.util.input import parse_duration #fingers crossed this is the one that fixes
+from rowboat.types import Field, snowflake
+from rowboat.types.plugin import PluginConfig
+from rowboat.plugins.modlog import Actions
+from rowboat.models.user import User, Infraction
+
 import rowboat.models
 from rowboat.models.user import Infraction
 from rowboat.models.guild import Guild, GuildBan
