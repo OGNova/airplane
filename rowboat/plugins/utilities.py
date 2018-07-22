@@ -134,6 +134,26 @@ class UtilitiesPlugin(Plugin):
         r.raise_for_status()
         event.msg.reply('', attachments=[('dog.jpg', r.content)])
 
+    @Plugin.command('bird', aliases=['birb'] global_=True)
+    def dog(self, event):
+        # Sometimes random.birb gives us gifs or mp4s (smh)
+        for _ in range(3):
+            try:
+                r = requests.get('https://random.birb.pw/tweet.json/')
+                r.raise_for_status()
+            except:
+                continue
+            
+            name = r.json()['file']
+            if not url.endswith('.gif') or not url.endswith('.mp4'):
+                break
+        else:
+            return event.msg.reply('404 bird not found :(')
+
+        r = requests.get(https://random.birb.pw/img/ + name)
+        r.raise_for_status()
+        event.msg.reply('', attachments=[('bird.jpg', r.content)])
+
     @Plugin.command('emoji', '<emoji:str>', global_=True)
     def emoji(self, event, emoji):
         if not EMOJI_RE.match(emoji):
