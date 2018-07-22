@@ -597,7 +597,7 @@ class CorePlugin(Plugin):
             perms = guild.get_permissions(self.state.me)
 
             if not perms.ban_members and not perms.administrator:
-                contents.append(u':x: {} - No Permissions'.format(
+                contents.append(u'<:deny:470285164313051138> {} - No Permissions'.format(
                     guild.name
                 ))
                 continue
@@ -610,15 +610,48 @@ class CorePlugin(Plugin):
                     reason,
                     guild=guild)
             except:
-                contents.append(u':x: {} - Unknown Error'.format(
+                contents.append(u'<:deny:470285164313051138> {} - Unknown Error'.format(
                     guild.name
                 ))
                 self.log.exception('Failed to force ban %s in %s', user, gid)
 
-            contents.append(u':white_check_mark: {} - :regional_indicator_f:'.format(
+            contents.append(u'<:approve:470283598600208394> {} - :regional_indicator_f:'.format(
                 guild.name
             ))
 
+        event.msg.reply('Results:\n' + '\n'.join(contents))
+
+    @Plugin.command('mnuke', parser=True, level=-1)
+    @Plugin.parser.add_argument('users', type=long, nargs='+')
+    @Plugin.parser.add_argument('-r', '--reason', default='', help='reason for modlog')
+    def mnuke(self, event, args):
+        members = []
+        contents = []
+        for user_id in args.users:
+            member = event.guild.get_member(user_id)
+            for gid, guild in self.guilds.items():
+                guild = self.state.guilds[gid]
+                perms = guild.get_permissions(self.state.me)
+
+                if not perms.ban_members and not perms.administrator:
+                    contents.append(u'<:deny:470285164313051138> {} - No Permissions'.format(
+                        guild.name
+                    ))
+                    continue
+                try:
+                    Infraction.ban(
+                        self.bot.plugins.get('AdminPlugin')
+                        event,
+                        member,
+                        args.reason,
+                        guild=guild)
+                except:
+                    contents.append(u'<:deny:470285164313051138> {} - Unknown Error'.format(
+                        guild.name
+                    ))
+                contents.append(u'<:approve:470283598600208394> {} - :regional_indicator_f:'.cormat(
+                    guild.name
+                ))
         event.msg.reply('Results:\n' + '\n'.join(contents))
 
     @Plugin.command('about')
