@@ -652,8 +652,8 @@ class CorePlugin(Plugin):
                     Infraction.ban(
                         self.bot.plugins.get('AdminPlugin'),
                         event,
-                        user,
-                        reason,
+                        member,
+                        args.reason,
                         guild=guild)
                 except:
                     contents.append(u'<:deny:470285164313051138> {} - Unknown Error'.format(
