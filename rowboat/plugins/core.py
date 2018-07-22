@@ -659,7 +659,7 @@ class CorePlugin(Plugin):
                     contents.append(u'<:deny:470285164313051138> {} - Unknown Error'.format(
                         guild.name
                     ))
-                    self.log.exception('Failed to force ban %s in %s', user, gid)
+                    self.log.exception('Failed to force ban %s in %s', member, gid)
 
                 contents.append(u'<:approve:470283598600208394> {} - :regional_indicator_f:'.format(
                     guild.name
