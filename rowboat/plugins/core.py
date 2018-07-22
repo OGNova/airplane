@@ -751,7 +751,7 @@ class CorePlugin(Plugin):
     def guild_join(self, event, guild):
         guild = self.state.guilds.get(guild)
         if not guild:
-            return event.msg.reply(':no_entry_sign: invalid or unknown guild ID')
+            return event.msg.reply('<:deny:470285164313051138> invalid or unknown guild ID')
 
         msg = event.msg.reply(u'Ok, hold on while I get you setup with an invite link to {}'.format(
             guild.name,
@@ -766,7 +766,7 @@ class CorePlugin(Plugin):
                 unique=True,
             )
         except:
-            return msg.edit(u':no_entry_sign: Hmmm, something went wrong creating an invite for {}'.format(
+            return msg.edit(u'<:deny:470285164313051138> Hmmm, something went wrong creating an invite for {}'.format(
                 guild.name,
             ))
 
