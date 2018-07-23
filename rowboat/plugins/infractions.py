@@ -417,13 +417,11 @@ class InfractionsPlugin(Plugin):
             # Run this in a greenlet so we dont block event execution
             self.spawn(f)
 
-    @Plugin.command('delete', '<infraction:int>', group='infractions', level=-1)
+    @Plugin.command('delete', '<infraction:int> [reason:str...]', group='infractions', level=-1)
     def infraction_delete(self, event, infraction):
-        # inf = Infraction.get(id=infraction)
         query = "DELETE FROM infractions WHERE id=%s RETURNING *;"
         conn = database.obj.get_conn()
         try:
-            # inf.delete().sql() # - gave me a success but didn't work
             c = conn.cursor()
             c.execute(query, (infraction,))
             conn.commit()
@@ -431,11 +429,11 @@ class InfractionsPlugin(Plugin):
         except Infraction.DoesNotExist:
             raise CommandFail('invalid infraction (try `!infractions recent`)')
         except:
-            raise CommandFail('Failed to delete infraction #{}'.format(infraction))
+            raise CommandFail('Failed to delete infraction #`{}`'.format(infraction))
         self.queue_infractions()
         c.close()
         conn.close()
-        raise CommandSuccess('Successfully deleted inf #{}.'.format(infraction))
+        raise CommandSuccess('Successfully deleted inf #`{}`.'.format(infraction))
 
 
         # if inf.actor_id != event.author.id and event.user_level < CommandLevels.ADMIN:
