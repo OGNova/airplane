@@ -420,7 +420,7 @@ class InfractionsPlugin(Plugin):
     def infraction_delete(self, event, infraction):
         inf = Infraction.get(id=infraction)
         try:
-            inf.delete().sql() - gave me a success but didn't work
+            inf.delete().sql() # - gave me a success but didn't work
         except Infraction.DoesNotExist:
             raise CommandFail('invalid infraction (try `!infractions recent`)')
         except:
