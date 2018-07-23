@@ -19,6 +19,7 @@ from rowboat.types.plugin import PluginConfig
 from rowboat.plugins.modlog import Actions
 from rowboat.models.user import User, Infraction
 from rowboat.models.guild import GuildMemberBackup, GuildBan
+from rowboat.sql import database
 from rowboat.constants import (
     GREEN_TICK_EMOJI_ID, RED_TICK_EMOJI_ID, GREEN_TICK_EMOJI, RED_TICK_EMOJI
 )
@@ -418,9 +419,14 @@ class InfractionsPlugin(Plugin):
 
     @Plugin.command('delete', '<infraction:int>', group='infractions', level=-1)
     def infraction_delete(self, event, infraction):
-        inf = Infraction.get(id=infraction)
+        # inf = Infraction.get(id=infraction)
         try:
-            inf.delete().sql() # - gave me a success but didn't work
+            # inf.delete().sql() # - gave me a success but didn't work
+            conn = database.obj.get_conn()
+            c = conn.cursor()
+            c.execute("DELETE FROM Zoznam WHERE Name=?", (infraction,))
+            conn.commit()
+            c.close    
         except Infraction.DoesNotExist:
             raise CommandFail('invalid infraction (try `!infractions recent`)')
         except:
