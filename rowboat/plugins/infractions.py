@@ -416,6 +416,22 @@ class InfractionsPlugin(Plugin):
             # Run this in a greenlet so we dont block event execution
             self.spawn(f)
 
+    @Plugin.command('delete', '<infraction:int>', group='infractions', level=-1)
+    def infraction_delete(self, event, infraction):
+        try:
+            inf = Infraction.get(id=infraction)
+        except Infraction.DoesNotExist:
+            raise CommandFail('invalid infraction (try `!infractions recent`)')
+
+        inf.delete()
+        self.queue_infractions()
+        raise CommandSuccess('Successfully deleted inf # {}.'.format(inf))
+
+
+        # if inf.actor_id != event.author.id and event.user_level < CommandLevels.ADMIN:
+        #     raise CommandFail('only administrators can modify the duration of infractions created by other moderators')
+
+
     @Plugin.command('mute', '<user:user|snowflake> [reason:str...]', level=CommandLevels.MOD)
     @Plugin.command('tempmute', '<user:user|snowflake> <duration:str> [reason:str...]', level=CommandLevels.MOD)
     def tempmute(self, event, user, duration=None, reason=None):
@@ -633,13 +649,6 @@ class InfractionsPlugin(Plugin):
         members = []
         failed_ids = []
         for user_id in args.users:
-            member = event.guild.get_member(user_id)
-            if not member:
-                # TODO: this sucks, batch these
-                # raise CommandFail('failed to kick {}, user not found'.format(user_id))
-                failed_ids.append(member)
-                continue
-
             if not self.can_act_on(event, member, throw=False):
                 # raise CommandFail('failed to kick {}, invalid permissions'.format(user_id))
                 failed_ids.append(member)
