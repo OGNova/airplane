@@ -419,13 +419,13 @@ class InfractionsPlugin(Plugin):
     @Plugin.command('delete', '<infraction:int>', group='infractions', level=-1)
     def infraction_delete(self, event, infraction):
         try:
-            inf = Infraction.get(id=infraction)
+            Infraction.delete().where(id=infraction).execute()
         except Infraction.DoesNotExist:
             raise CommandFail('invalid infraction (try `!infractions recent`)')
-
-        inf.delete()
+        except:
+            raise CommandFail('Failed to delete infraction #{}'.format(infraction))
         self.queue_infractions()
-        raise CommandSuccess('Successfully deleted inf # {}.'.format(infraction))
+        raise CommandSuccess('Successfully deleted inf #{}.'.format(infraction))
 
 
         # if inf.actor_id != event.author.id and event.user_level < CommandLevels.ADMIN:
