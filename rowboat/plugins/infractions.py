@@ -422,7 +422,7 @@ class InfractionsPlugin(Plugin):
         try:
             # Infraction.delete().where(id=infraction).execute()
             # inf.delete().sql() - gave me a success but didn't work
-            Infraction.delete().where(id=infraction).sql()
+            Infraction.where(id=infraction).delete().sql()
         except Infraction.DoesNotExist:
             raise CommandFail('invalid infraction (try `!infractions recent`)')
         except:
