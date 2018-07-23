@@ -636,8 +636,32 @@ class CorePlugin(Plugin):
         members = []
         contents = []
         final_results = []
+
+
+        msg = event.msg.reply('Ok, nuke {} users on {} servers for `{}`?'.format(len(members), len(args.users), args.reason or 'no reason'))
+        msg.chain(False).\
+            add_reaction(GREEN_TICK_EMOJI).\
+            add_reaction(RED_TICK_EMOJI)
+
+        try:
+            mra_event = self.wait_for_event(
+                'MessageReactionAdd',
+                message_id=msg.id,
+                conditional=lambda e: (
+                    e.emoji.id in (GREEN_TICK_EMOJI_ID, RED_TICK_EMOJI_ID) and
+                    e.user_id == event.author.id
+                )).get(timeout=10)
+        except gevent.Timeout:
+            return
+        finally:
+            msg.delete()
+
+        if mra_event.emoji.id != GREEN_TICK_EMOJI_ID:
+            return
+
+
+
         for user_id in args.users:
-            member = event.guild.get_member(user_id)
             for gid, guild in self.guilds.items():
                 guild = self.state.guilds[gid]
                 perms = guild.get_permissions(self.state.me)
@@ -647,23 +671,13 @@ class CorePlugin(Plugin):
                         guild.name
                     ))
                     continue
+            try:
+                Infraction.ban(self, event, user_id, reason, guild=event.guild)
 
-                try:
-                    Infraction.ban(
-                        self.bot.plugins.get('AdminPlugin'),
-                        event,
-                        member,
-                        args.reason,
-                        guild=guild)
-                except:
-                    contents.append(u'<:deny:470285164313051138> {} - Unknown Error'.format(
-                        guild.name
-                    ))
-                    self.log.exception('Failed to force ban %s in %s', member, gid)
+            except Exception:
+                pass
 
-                contents.append(u'<:approve:470283598600208394> {} - :regional_indicator_f:'.format(
-                    guild.name
-                ))
+
         for gid, guild in self.guilds.items():
             guild = self.state.guilds[gid]
             perms = guild.get_permissions(self.state.me)
