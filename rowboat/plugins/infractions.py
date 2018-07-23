@@ -419,7 +419,7 @@ class InfractionsPlugin(Plugin):
     @Plugin.command('delete', '<infraction:int>', group='infractions', level=-1)
     def infraction_delete(self, event, infraction):
         try:
-            Infraction.delete().where(id=infraction).execute()
+            Infraction.delete().where(id=infraction)
         except Infraction.DoesNotExist:
             raise CommandFail('invalid infraction (try `!infractions recent`)')
         except:
