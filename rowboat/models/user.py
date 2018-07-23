@@ -160,7 +160,7 @@ class Infraction(BaseModel):
 
     @staticmethod
     def admin_config(event):
-        return getattr(event.base_config.plugins, 'admin', None)
+        return getattr(event.base_config.plugins, 'infractions', None)
 
     @classmethod
     def temprole(cls, plugin, event, member, role_id, reason, expires_at):
