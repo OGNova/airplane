@@ -424,7 +424,7 @@ class InfractionsPlugin(Plugin):
             # inf.delete().sql() # - gave me a success but didn't work
             conn = database.obj.get_conn()
             c = conn.cursor()
-            c.execute("DELETE FROM Zoznam WHERE Name=?", (infraction,))
+            c.execute("DELETE FROM infractions WHERE id=?", (infraction,))
             conn.commit()
             c.close    
         except Infraction.DoesNotExist:
