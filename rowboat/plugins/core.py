@@ -548,7 +548,7 @@ class CorePlugin(Plugin):
                             name='Author', value='({}) `{}`'.format(event.author, event.author.id), inline=True
                         )
                         embed.add_field(
-                            name='Full Command', value='{}'.format(event.message), inline=True
+                            name='Full Command', value='{}'.format(event.msg), inline=True
                         )
                         embed.description = '```{}```'.format(u'\n'.join(tracked.traceback.split('\n')[-8:]))
 
