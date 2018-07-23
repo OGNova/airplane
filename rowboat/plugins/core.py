@@ -40,7 +40,7 @@ from rowboat.models.notification import Notification
 from rowboat.plugins.modlog import Actions
 from rowboat.constants import (
     GREEN_TICK_EMOJI, RED_TICK_EMOJI, ROWBOAT_GUILD_ID, ROWBOAT_USER_ROLE_ID,
-    ROWBOAT_LAUNCH_CHANNEL, ROWBOAT_CONFIG_CHANNEL, ROWBOAT_ERROR_CHANNEL
+    ROWBOAT_LAUNCH_CHANNEL, ROWBOAT_CONFIG_CHANNEL, ROWBOAT_ERROR_CHANNEL, ROWBOAT_JOIN_CHANNEL
 )
 
 from yaml import load
@@ -356,6 +356,24 @@ class CorePlugin(Plugin):
         except:
             self.log.exception('Failed to send spam control message:')
             return
+        
+    @contextlib.contextmanager
+    def send_join_message(self):
+        embed = MessageEmbed()
+        embed.set_footer(text='Airplane {}'.format(
+            'Production' if ENV == 'prod' else 'Testing'
+        ))
+        embed.timestamp = datetime.utcnow().isoformat()
+        embed.color = 0x779ecb
+        try:
+            yield embed
+            self.bot.client.api.channels_messages_create(
+                ROWBOAT_JOIN_CHANNEL,
+                embed=embed
+            )
+        except:
+            self.log.exception('Failed to send spam control message:')
+            return
 
     @Plugin.listen('Resumed')
     def on_resumed(self, event):
@@ -395,6 +413,19 @@ class CorePlugin(Plugin):
 
     @Plugin.listen('GuildCreate', priority=Priority.BEFORE, conditional=lambda e: not e.created)
     def on_guild_create(self, event):
+        if not rdb.sismemember(GUILDS_WAITING_SETUP_KEY, str(event.id)) and event.id != ROWBOAT_GUILD_ID:
+            with self.send_join_message() as embed:
+                embed.title='New Guild Joined'
+                embed.color=0x7289da
+                embed.add_field(name='Guild ID', value='{}'.format(event.id), inline=True)
+                embed.add_field(name='Whitelisted', value='False')
+        
+        with self.send_join_message() as embed:
+            embed.title='New Guild Joined'
+            embed.color=0x7289da
+            embed.add_field(name='Guild ID', value='{}'.format(event.id), inline=True)
+            embed.add_field(name='Whitelisted', value='True')
+
         try:
             guild = Guild.with_id(event.id)
         except Guild.DoesNotExist:
