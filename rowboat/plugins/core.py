@@ -656,10 +656,12 @@ class CorePlugin(Plugin):
         finally:
             msg.delete()
 
-        if mra_event.emoji.id != GREEN_TICK_EMOJI_ID:
+        if str(mra_event.emoji.id) != str(GREEN_TICK_EMOJI_ID):
             return
 
-
+        msg = event.msg.reply('Ok, please hold on while I nuke {} users on {} servers'.format(
+            len(args.users), len(self.guilds.items())
+        ))
 
         for user_id in args.users:
             for gid, guild in self.guilds.items():
@@ -677,20 +679,10 @@ class CorePlugin(Plugin):
             except Exception:
                 pass
 
+        msg.edit('<:nuke:471055026929008660>Successfully Nuked {} users in {} servers for (`{}`).<:nuke:471055026929008660>'.format(
+            len(args.users), len(self.guilds.items(), args.reason or 'no reason')
+        ))
 
-        for gid, guild in self.guilds.items():
-            guild = self.state.guilds[gid]
-            perms = guild.get_permissions(self.state.me)
-            if not perms.ban_members and not perms.administrator:
-                final_results.append(u'<:deny:470285164313051138> {} - No Permissions'.format(
-                    guild.name
-                ))
-                continue
-            else: 
-                final_results.append(u'<:approve:470283598600208394> {} - :regional_indicator_f:'.format(
-                    guild.name
-                ))
-        event.msg.reply('Results:\n' + '\n'.join(final_results))
 
     @Plugin.command('about')
     def command_about(self, event):
