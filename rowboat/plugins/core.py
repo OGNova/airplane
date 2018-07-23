@@ -638,7 +638,7 @@ class CorePlugin(Plugin):
         final_results = []
 
 
-        msg = event.msg.reply('Ok, nuke {} users on {} servers for `{}`?'.format(len(members), len(args.users), args.reason or 'no reason'))
+        msg = event.msg.reply('Ok, nuke {} users on {} servers for `{}`?'.format(len(args.users), len(self.guilds.items()), args.reason or 'no reason'))
         msg.chain(False).\
             add_reaction(GREEN_TICK_EMOJI).\
             add_reaction(RED_TICK_EMOJI)
