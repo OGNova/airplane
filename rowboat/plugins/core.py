@@ -413,19 +413,6 @@ class CorePlugin(Plugin):
 
     @Plugin.listen('GuildCreate', priority=Priority.BEFORE, conditional=lambda e: not e.created)
     def on_guild_create(self, event):
-        if not rdb.sismemember(GUILDS_WAITING_SETUP_KEY, str(event.id)) and event.id != ROWBOAT_GUILD_ID:
-            with self.send_join_message() as embed:
-                embed.title='New Guild Joined'
-                embed.color=0x7289da
-                embed.add_field(name='Guild ID', value='{}'.format(event.id), inline=True)
-                embed.add_field(name='Whitelisted', value='False')
-        
-        with self.send_join_message() as embed:
-            embed.title='New Guild Joined'
-            embed.color=0x7289da
-            embed.add_field(name='Guild ID', value='{}'.format(event.id), inline=True)
-            embed.add_field(name='Whitelisted', value='True')
-
         try:
             guild = Guild.with_id(event.id)
         except Guild.DoesNotExist:
