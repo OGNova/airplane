@@ -420,11 +420,12 @@ class InfractionsPlugin(Plugin):
     @Plugin.command('delete', '<infraction:int>', group='infractions', level=-1)
     def infraction_delete(self, event, infraction):
         # inf = Infraction.get(id=infraction)
+        query = "DELETE FROM infractions WHERE id=%s RETURNING *;"
+        conn = database.obj.get_conn()
         try:
             # inf.delete().sql() # - gave me a success but didn't work
-            conn = database.obj.get_conn()
             c = conn.cursor()
-            c.execute("DELETE FROM infractions WHERE id=?", (infraction,))
+            c.execute(query, (infraction,))
             conn.commit()
             c.close    
         except Infraction.DoesNotExist:
@@ -432,6 +433,8 @@ class InfractionsPlugin(Plugin):
         except:
             raise CommandFail('Failed to delete infraction #{}'.format(infraction))
         self.queue_infractions()
+        c.close()
+        conn.close()
         raise CommandSuccess('Successfully deleted inf #{}.'.format(infraction))
 
 
