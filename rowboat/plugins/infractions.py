@@ -425,7 +425,7 @@ class InfractionsPlugin(Plugin):
 
         inf.delete()
         self.queue_infractions()
-        raise CommandSuccess('Successfully deleted inf # {}.'.format(inf))
+        raise CommandSuccess('Successfully deleted inf # {}.'.format(infraction))
 
 
         # if inf.actor_id != event.author.id and event.user_level < CommandLevels.ADMIN:
