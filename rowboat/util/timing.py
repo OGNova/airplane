@@ -17,6 +17,7 @@ class Eventual(object):
         self._next_execution_time = None
         self._waiter_greenlet = None
         self._mutex = Semaphore()
+        self._mutex.release()
 
     def _execute(self):
         """
