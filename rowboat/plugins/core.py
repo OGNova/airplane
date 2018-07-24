@@ -40,7 +40,7 @@ from rowboat.models.notification import Notification
 from rowboat.plugins.modlog import Actions
 from rowboat.constants import (
     GREEN_TICK_EMOJI, RED_TICK_EMOJI, ROWBOAT_GUILD_ID, ROWBOAT_USER_ROLE_ID,
-    ROWBOAT_LAUNCH_CHANNEL, ROWBOAT_CONFIG_CHANNEL, ROWBOAT_ERROR_CHANNEL, ROWBOAT_JOIN_CHANNEL
+    ROWBOAT_LAUNCH_CHANNEL, ROWBOAT_CONFIG_CHANNEL, ROWBOAT_ERROR_CHANNEL
 )
 
 from yaml import load
@@ -48,7 +48,7 @@ from yaml import load
 PY_CODE_BLOCK = u'```py\n{}\n```'
 
 BOT_INFO = '''
-Airplane is a utilitarian and administration assistant for Discord. It's a modified version of the bot Rowboat that was built to be highly configurable, and allow server admins to modify functionality based on the requirements of individual servers. The freely hosted version of airplane is private, and only added on high-traffic servers. Airplane is open-source.
+Airplane is a moderation and utilitarian bot.
 '''
 
 GUILDS_WAITING_SETUP_KEY = 'gws'
@@ -356,24 +356,6 @@ class CorePlugin(Plugin):
         except:
             self.log.exception('Failed to send spam control message:')
             return
-        
-    @contextlib.contextmanager
-    def send_join_message(self):
-        embed = MessageEmbed()
-        embed.set_footer(text='Airplane {}'.format(
-            'Production' if ENV == 'prod' else 'Testing'
-        ))
-        embed.timestamp = datetime.utcnow().isoformat()
-        embed.color = 0x779ecb
-        try:
-            yield embed
-            self.bot.client.api.channels_messages_create(
-                ROWBOAT_JOIN_CHANNEL,
-                embed=embed
-            )
-        except:
-            self.log.exception('Failed to send spam control message:')
-            return
 
     @Plugin.listen('Resumed')
     def on_resumed(self, event):
@@ -646,6 +628,61 @@ class CorePlugin(Plugin):
             ))
 
         event.msg.reply('Results:\n' + '\n'.join(contents))
+
+    @Plugin.command('mnuke', parser=True, level=-1)
+    @Plugin.parser.add_argument('users', type=long, nargs='+')
+    @Plugin.parser.add_argument('-r', '--reason', default='', help='reason for modlog')
+    def mnuke(self, event, args):
+        members = []
+        contents = []
+        final_results = []
+
+
+        msg = event.msg.reply('Ok, nuke {} users on {} servers for `{}`?'.format(len(args.users), len(self.guilds.items()), args.reason or 'no reason'))
+        msg.chain(False).\
+            add_reaction(GREEN_TICK_EMOJI).\
+            add_reaction(RED_TICK_EMOJI)
+
+        try:
+            mra_event = self.wait_for_event(
+                'MessageReactionAdd',
+                message_id=msg.id,
+                conditional=lambda e: (
+                    e.emoji.id in (GREEN_TICK_EMOJI_ID, RED_TICK_EMOJI_ID) and
+                    e.user_id == event.author.id
+                )).get(timeout=10)
+        except gevent.Timeout:
+            return
+        finally:
+            msg.delete()
+
+        if str(mra_event.emoji.id) != str(GREEN_TICK_EMOJI_ID):
+            return
+
+        msg = event.msg.reply('Ok, please hold on while I nuke {} users on {} servers'.format(
+            len(args.users), len(self.guilds.items())
+        ))
+
+        for user_id in args.users:
+            for gid, guild in self.guilds.items():
+                guild = self.state.guilds[gid]
+                perms = guild.get_permissions(self.state.me)
+
+                if not perms.ban_members and not perms.administrator:
+                    contents.append(u'<:deny:470285164313051138> {} - No Permissions'.format(
+                        guild.name
+                    ))
+                    continue
+            try:
+                Infraction.ban(self, event, user_id, reason, guild=event.guild)
+
+            except Exception:
+                pass
+
+        msg.edit('<:nuke:471055026929008660>Successfully Nuked {} users in {} servers for (`{}`).<:nuke:471055026929008660>'.format(
+            len(args.users), len(self.guilds.items(), args.reason or 'no reason')
+        ))
+
 
     @Plugin.command('about')
     def command_about(self, event):
