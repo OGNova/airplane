@@ -420,6 +420,27 @@ class InfractionsPlugin(Plugin):
     @Plugin.command('delete', '<infraction:int> [reason:str...]', group='infractions', level=-1)
     def infraction_delete(self, event, infraction):
         query = "DELETE FROM infractions WHERE id=%s RETURNING *;"
+
+        msg = event.msg.reply('Ok, delete infraction #`{}`?'.format(infraction))
+        msg.chain(False).\
+            add_reaction(GREEN_TICK_EMOJI).\
+            add_reaction(RED_TICK_EMOJI)
+
+        try:
+            mra_event = self.wait_for_event(
+                'MessageReactionAdd',
+                message_id=msg.id,
+                conditional=lambda e: (
+                    e.emoji.id in (GREEN_TICK_EMOJI_ID, RED_TICK_EMOJI_ID) and
+                    e.user_id == event.author.id
+                )).get(timeout=10)
+        except gevent.Timeout:
+            return
+        finally:
+            msg.delete()
+
+        if mra_event.emoji.id != GREEN_TICK_EMOJI_ID:
+            return
         conn = database.obj.get_conn()
         try:
             c = conn.cursor()
@@ -657,13 +678,13 @@ class InfractionsPlugin(Plugin):
         members = []
         failed_ids = []
         for user_id in args.users:
-            if not self.can_act_on(event, member, throw=False):
+            if not self.can_act_on(event, user_id, throw=False):
                 # raise CommandFail('failed to kick {}, invalid permissions'.format(user_id))
                 failed_ids.append(member)
                 continue               
 
 
-            members.append(member)
+            members.append(user_id)
 
         msg = event.msg.reply('Ok, ban {} users for `{}`?'.format(len(members), args.reason or 'no reason'))
         msg.chain(False).\
@@ -686,8 +707,8 @@ class InfractionsPlugin(Plugin):
         if mra_event.emoji.id != GREEN_TICK_EMOJI_ID:
             return
 
-        for member in members:
-            Infraction.ban(self, event, member, args.reason, guild=event.guild)
+        for user_id in members:
+            Infraction.ban(self, event, user_id, args.reason, guild=event.guild)
 
         raise CommandSuccess('banned {} users and failed to ban {} users.'.format(len(members), len(failed_ids)))
 
