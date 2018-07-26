@@ -98,7 +98,10 @@ class InfractionsPlugin(Plugin):
                     user_id=item.user_id,
                 )
 
-                guild.delete_ban(item.user_id)
+                try:
+                    guild.delete_ban(item.user_id)
+                except:
+                    pass
 
                 # TODO: perhaps join on users above and use username from db
                 self.call(
@@ -121,7 +124,10 @@ class InfractionsPlugin(Plugin):
                             role_id=item.metadata['role'],
                         )
 
-                        member.remove_role(item.metadata['role'])
+                        try:
+                            member.remove_role(item.metadata['role'])
+                        except:
+                            pass
 
                         self.call(
                             'ModLogPlugin.log_action_ext',
