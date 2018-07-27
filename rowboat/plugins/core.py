@@ -653,6 +653,8 @@ class CorePlugin(Plugin):
                     e.emoji.id in (GREEN_TICK_EMOJI_ID, RED_TICK_EMOJI_ID) and
                     e.user_id == event.author.id
                 )).get(timeout=10)
+            event.msg.reply(mra_event.emoji.id)
+            event.msg.reply(GREEN_TICK_EMOJI_ID)
             if mra_event.emoji.id != GREEN_TICK_EMOJI_ID:
                 return
         except gevent.Timeout:
