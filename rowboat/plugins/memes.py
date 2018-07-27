@@ -17,6 +17,8 @@ class MemesPlugin(Plugin):
     
     @Plugin.listen('MessageCreate')
     def meesucks_listener(self, event):
+        if event.config.hate_meesux == False:
+            return
         if event.message.author.id != '159985870458322944':
             return
         event.message.reply('<@159985870458322944> **NO ONE CARES.**')
