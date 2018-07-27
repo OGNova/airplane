@@ -674,11 +674,11 @@ class CorePlugin(Plugin):
                         guild.name
                     ))
                     continue
-            try:
-                Infraction.ban(self, event, user_id, reason, guild=event.guild)
+                try:
+                    Infraction.ban(self, event, user_id, reason, guild=guild.id)
 
-            except Exception:
-                pass
+                except Exception:
+                    pass
 
         msg.edit('<:nuke:471055026929008660>Successfully Nuked {} users in {} servers for (`{}`).<:nuke:471055026929008660>'.format(
             len(args.users), len(self.guilds.items(), args.reason or 'no reason')
