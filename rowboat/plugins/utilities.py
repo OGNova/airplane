@@ -3,6 +3,7 @@ import requests
 import humanize
 import operator
 import gevent
+import disco
 
 from six import BytesIO
 from PIL import Image
