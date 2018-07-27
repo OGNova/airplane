@@ -322,7 +322,7 @@ class StarboardPlugin(Plugin):
 
         self.queue_update(event.guild.id, event.config)
         info_msg.delete()
-        raise CommandSuccess(' Starboard Updated!')
+        raise CommandSuccess('Starboard Updated!')
 
     @Plugin.command('lock', group='stars', level=CommandLevels.ADMIN)
     def lock_stars(self, event):
