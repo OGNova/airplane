@@ -7,7 +7,7 @@ from disco.bot import CommandLevels
 from disco.api.http import APIException
 from disco.types.message import MessageEmbed
 
-from rowboat.plugins import RowboatPlugin as Plugin, CommandFail
+from rowboat.plugins import RowboatPlugin as Plugin, CommandFail, CommandSuccess
 from rowboat.types.plugin import PluginConfig
 from rowboat.types import ChannelField, Field, SlottedModel, ListField, DictField
 from rowboat.models.user import StarboardBlock, User
@@ -322,7 +322,7 @@ class StarboardPlugin(Plugin):
 
         self.queue_update(event.guild.id, event.config)
         info_msg.delete()
-        event.msg.reply(GREEN_TICK_EMOJI + ' Starboard Updated!')
+        raise CommandSuccess(' Starboard Updated!')
 
     @Plugin.command('lock', group='stars', level=CommandLevels.ADMIN)
     def lock_stars(self, event):
