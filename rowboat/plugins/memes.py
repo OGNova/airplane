@@ -16,13 +16,15 @@ class MemesPlugin(Plugin):
     def load(self, ctx):
         super(MemesPlugin, self).load(ctx)
     
-    # @Plugin.listen('MessageCreate')
-    # def meesucks_listener(self, event):
-    #     if event.config.hate_meesux == False:
-    #         return
-    #     if event.message.author.id != '159985870458322944':
-    #         return
-    #     event.message.reply('<@159985870458322944> **NO ONE CARES.**')
+    @Plugin.listen('MessageCreate')
+    def meesucks_listener(self, event):
+        if event.config.hate_meesux:
+            if event.message.author.id != '159985870458322944':
+                return
+            event.message.reply('<@159985870458322944> **NO ONE CARES.**')
+        else:
+            return
+
     # @Plugin.listen('alexa play despacito')
     # def alexa_play_despacito_listener(self, event):
     #     if event.message.author.id != '191793155685744640':
@@ -43,9 +45,3 @@ class MemesPlugin(Plugin):
                 gevent.sleep(.5)
                 event.message.reply('cito')
             gevent.spawn(f)
-
-    @disco.bot.plugin.BasePluginDeco.listen("MessageCreate")
-    if event.config.hate_meesux == False:
-        return
-    if event.message.author.id == 159985870458322944:
-        event.message.reply('<@!159985870458322944> **NO ONE CARES.**')
