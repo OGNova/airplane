@@ -1,14 +1,15 @@
 from disco.bot import Plugin
 from disco.bot import CommandLevels
 from rowboat.types.plugin import PluginConfig
+from rowboat.redis import rdb
 from disco.types.user import User as DiscoUser
 from disco.types.message import MessageTable, MessageEmbed
-from rowboat.types import Field, snowflake
+from rowboat.types import Field, DictField, ListField, snowflake, SlottedModel, snowflake
 
 
 class MemesConfig(PluginConfig):
     #auto-reply to meesux
-    hate_mee6 = Field(bool, default=False)
+    hate_meesux = Field(bool, default=False)
 @Plugin.with_config(MemesConfig)
 class MemesPlugin(Plugin):
     def load(self, ctx):
