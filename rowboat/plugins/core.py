@@ -18,6 +18,7 @@ from disco.util.sanitize import S
 
 from rowboat import ENV
 from rowboat.util import LocalProxy
+from rowboat.util.timing import Eventual
 from rowboat.util.stats import timed
 from rowboat.plugins import BasePlugin as Plugin
 from rowboat.plugins import CommandResponse
@@ -631,64 +632,8 @@ class CorePlugin(Plugin):
 
         event.msg.reply('Results:\n' + '\n'.join(contents))
 
-    @Plugin.command('mnuke', parser=True, level=-1)
-    @Plugin.parser.add_argument('users', type=long, nargs='+')
-    @Plugin.parser.add_argument('-r', '--reason', default='', help='reason for modlog')
-    def mnuke(self, event, args):
-        members = []
-        contents = []
-        final_results = []
-
-
-        msg = event.msg.reply('Ok, nuke {} users on {} servers for `{}`?'.format(len(args.users), len(self.guilds.items()), args.reason or 'no reason'))
-        msg.chain(False).\
-            add_reaction(GREEN_TICK_EMOJI).\
-            add_reaction(RED_TICK_EMOJI)
-
-        try:
-            mra_event = self.wait_for_event(
-                'MessageReactionAdd',
-                message_id=msg.id,
-                conditional=lambda e: (
-                    e.emoji.id in (GREEN_TICK_EMOJI_ID, RED_TICK_EMOJI_ID) and
-                    e.user_id == event.author.id
-                )).get(timeout=10)
-            event.msg.reply(mra_event.emoji.id)
-            event.msg.reply(GREEN_TICK_EMOJI_ID)
-            if mra_event.emoji.id != GREEN_TICK_EMOJI_ID:
-                return
-        except gevent.Timeout:
-            return
-        finally:
-            msg.delete()
-
-        
-
-        msg = event.msg.reply('Ok, please hold on while I nuke {} users on {} servers'.format(
-            len(args.users), len(self.guilds.items())
-        ))
-
-        for user_id in args.users:
-            for gid, guild in self.guilds.items():
-                guild = self.state.guilds[gid]
-                perms = guild.get_permissions(self.state.me)
-
-                if not perms.ban_members and not perms.administrator:
-                    contents.append(u'<:deny:470285164313051138> {} - No Permissions'.format(
-                        guild.name
-                    ))
-                    continue
-                try:
-                    Infraction.ban(self, event, user_id, reason, guild=guild.id)
-
-                except Exception:
-                    pass
-
-        msg.edit('<:nuke:471055026929008660>Successfully Nuked {} users in {} servers for (`{}`).<:nuke:471055026929008660>'.format(
-            len(args.users), len(self.guilds.items(), args.reason or 'no reason')
-        ))
-
-
+    
+    
     @Plugin.command('about')
     def command_about(self, event):
         embed = MessageEmbed()
