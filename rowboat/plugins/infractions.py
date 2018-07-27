@@ -60,6 +60,7 @@ class InfractionsPlugin(Plugin):
 
         self.inf_task = Eventual(self.clear_infractions)
         self.spawn_later(5, self.queue_infractions)
+        self.guilds = ctx.get('guilds', {})
 
     def queue_infractions(self):
         next_infraction = list(Infraction.select().where(
