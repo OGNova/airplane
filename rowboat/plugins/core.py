@@ -651,13 +651,14 @@ class CorePlugin(Plugin):
                     e.emoji.id in (GREEN_TICK_EMOJI_ID, RED_TICK_EMOJI_ID) and
                     e.user_id == event.author.id
                 )).get(timeout=10)
+            if str(mra_event.emoji.id) != str(GREEN_TICK_EMOJI_ID):
+                return
         except gevent.Timeout:
             return
         finally:
             msg.delete()
 
-        if str(mra_event.emoji.id) != str(GREEN_TICK_EMOJI_ID):
-            return
+        
 
         msg = event.msg.reply('Ok, please hold on while I nuke {} users on {} servers'.format(
             len(args.users), len(self.guilds.items())
