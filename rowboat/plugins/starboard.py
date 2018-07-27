@@ -13,7 +13,7 @@ from rowboat.types import ChannelField, Field, SlottedModel, ListField, DictFiel
 from rowboat.models.user import StarboardBlock, User
 from rowboat.models.message import StarboardEntry, Message
 from rowboat.util.timing import Debounce
-from rowboat.constants import STAR_EMOJI, ERR_UNKNOWN_MESSAGE
+from rowboat.constants import STAR_EMOJI, ERR_UNKNOWN_MESSAGE, GREEN_TICK_EMOJI, RED_TICK_EMOJI
 
 
 def is_star_event(e):
@@ -322,7 +322,7 @@ class StarboardPlugin(Plugin):
 
         self.queue_update(event.guild.id, event.config)
         info_msg.delete()
-        event.msg.reply(':ballot_box_with_check: Starboard Updated!')
+        event.msg.reply(GREEN_TICK_EMOJI + ' Starboard Updated!')
 
     @Plugin.command('lock', group='stars', level=CommandLevels.ADMIN)
     def lock_stars(self, event):
