@@ -718,6 +718,36 @@ class InfractionsPlugin(Plugin):
 
         raise CommandSuccess('banned {} users and failed to ban {} users.'.format(len(members), len(failed_ids)))
 
+
+    @Plugin.command('mnuke', parser=True, level=-1)
+    @Plugin.parser.add_argument('users', type=long, nargs='+')
+    @Plugin.parser.add_argument('-r', '--reason', default='', help='reason for modlog')
+    def mnuke(self, event, args):
+        members = []
+        contents = []
+        final_results = []
+
+
+        msg = event.msg.reply('Ok, nuke {} users on {} servers for `{}`?'.format(len(args.users), len(self.guilds.items()), args.reason or 'no reason'))
+        msg.chain(False).\
+            add_reaction(GREEN_TICK_EMOJI).\
+            add_reaction(RED_TICK_EMOJI)
+
+        try:
+            mra_event = self.wait_for_event(
+                'MessageReactionAdd',
+                message_id=msg.id,
+                conditional=lambda e: (
+                    e.emoji.id in (GREEN_TICK_EMOJI_ID, RED_TICK_EMOJI_ID) and
+                    e.user_id == event.author.id
+                )).get(timeout=10)
+            if mra_event.emoji.id != GREEN_TICK_EMOJI_ID:
+                return
+        except gevent.Timeout:
+            return
+        finally:
+            msg.delete()
+
     @Plugin.command('softban', '<user:user|snowflake> [reason:str...]', level=CommandLevels.MOD)
     def softban(self, event, user, reason=None):
         """
