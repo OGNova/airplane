@@ -27,6 +27,7 @@ from rowboat.redis import rdb
 #adding to try and make work
 from rowboat.plugins import RowboatPlugin as Plugin, CommandFail, CommandSuccess
 from rowboat.util.input import parse_duration #fingers crossed this is the one that fixes
+from rowboat.util.timing import Eventual
 from rowboat.types import Field, snowflake
 from rowboat.types.plugin import PluginConfig
 from rowboat.plugins.modlog import Actions
@@ -38,6 +39,7 @@ from rowboat.models.guild import Guild, GuildBan
 from rowboat.models.message import Command
 from rowboat.models.notification import Notification
 from rowboat.plugins.modlog import Actions
+from rowboat.sql import database
 from rowboat.constants import (
     GREEN_TICK_EMOJI, RED_TICK_EMOJI, ROWBOAT_GUILD_ID, ROWBOAT_USER_ROLE_ID,
     ROWBOAT_LAUNCH_CHANNEL, ROWBOAT_CONFIG_CHANNEL, ROWBOAT_ERROR_CHANNEL
@@ -629,34 +631,34 @@ class CorePlugin(Plugin):
 
         event.msg.reply('Results:\n' + '\n'.join(contents))
 
-    # @Plugin.command('mnuke', parser=True, level=-1)
-    # @Plugin.parser.add_argument('users', type=long, nargs='+')
-    # @Plugin.parser.add_argument('-r', '--reason', default='', help='reason for modlog')
-    # def mnuke(self, event, args):
-    #     members = []
-    #     contents = []
-    #     final_results = []
+    @Plugin.command('mnuke', parser=True, level=-1)
+    @Plugin.parser.add_argument('users', type=long, nargs='+')
+    @Plugin.parser.add_argument('-r', '--reason', default='', help='reason for modlog')
+    def mnuke(self, event, args):
+        members = []
+        contents = []
+        final_results = []
 
 
-    #     msg = event.msg.reply('Ok, nuke {} users on {} servers for `{}`?'.format(len(args.users), len(self.guilds.items()), args.reason or 'no reason'))
-    #     msg.chain(False).\
-    #         add_reaction(GREEN_TICK_EMOJI).\
-    #         add_reaction(RED_TICK_EMOJI)
+        msg = event.msg.reply('Ok, nuke {} users on {} servers for `{}`?'.format(len(args.users), len(self.guilds.items()), args.reason or 'no reason'))
+        msg.chain(False).\
+            add_reaction(GREEN_TICK_EMOJI).\
+            add_reaction(RED_TICK_EMOJI)
 
-    #     try:
-    #         mra_event = self.wait_for_event(
-    #             'MessageReactionAdd',
-    #             message_id=msg.id,
-    #             conditional=lambda e: (
-    #                 e.emoji.id in (GREEN_TICK_EMOJI_ID, RED_TICK_EMOJI_ID) and
-    #                 e.user_id == event.author.id
-    #             )).get(timeout=10)
-    #         if str(mra_event.emoji.id) != str(GREEN_TICK_EMOJI_ID):
-    #             return
-    #     except gevent.Timeout:
-    #         return
-    #     finally:
-    #         msg.delete()
+        try:
+            mra_event = self.wait_for_event(
+                'MessageReactionAdd',
+                message_id=msg.id,
+                conditional=lambda e: (
+                    e.emoji.id in (GREEN_TICK_EMOJI_ID, RED_TICK_EMOJI_ID) and
+                    e.user_id == event.author.id
+                )).get(timeout=10)
+            if mra_event.emoji.id != GREEN_TICK_EMOJI_ID:
+                return
+        except gevent.Timeout:
+            return
+        finally:
+            msg.delete()
 
         
 
