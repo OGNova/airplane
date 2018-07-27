@@ -13,7 +13,7 @@ class MemesConfig(PluginConfig):
 @Plugin.with_config(MemesConfig)
 class MemesPlugin(Plugin):
     def load(self, ctx):
-        super(InfractionsPlugin, self).load(ctx)
+        super(MemesPlugin, self).load(ctx)
     
 
     @Plugin.listen('MessageCreate')
