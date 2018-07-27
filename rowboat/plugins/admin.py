@@ -766,7 +766,7 @@ class AdminPlugin(Plugin):
                 kwargs['nick'] = ''
                 member.modify(**kwargs)
                 try:
-                    raise CommandSuccess('reset {}\'s nickname.'.format(member.user))
+                    raise CommandSuccess('reset {}\'s nickname.'.format(member.username))
                     return
                 except:
                     raise CommandSuccess('reset <@!{}>\'s nickname.'.format(member.user.id))
@@ -778,7 +778,7 @@ class AdminPlugin(Plugin):
                 kwargs['nick'] = newname
                 member.modify(**kwargs)
                 try:
-                    raise CommandSuccess('updated {}\'s nickname to (`{}`)'.format(member.user, newname))
+                    raise CommandSuccess('updated {}\'s nickname to (`{}`)'.format(member.username, newname))
                     return
                 except:
                     raise CommandSuccess('updated <@!{}>\'s nickname to (`{}`)'.format(member.user.id, newname))
