@@ -1,5 +1,5 @@
-from disco.bot import Plugin
 import disco
+from disco.bot import Plugin
 from disco.bot import CommandLevels
 from rowboat.types.plugin import PluginConfig
 from rowboat.redis import rdb
@@ -22,22 +22,21 @@ class MemesPlugin(Plugin):
     def meesucks_listener(self, event):
         if event.config.hate_meesux is False:
             return
-        if event.message.author.id != '159985870458322944':
+        if event.message.author.id != 159985870458322944:
             return
         event.message.reply('<@159985870458322944> **NO ONE CARES.**')
         
 
-    @Plugin.listen('alexa play despacito')
+    @Plugin.listen('MessageCreate')
     def alexa_play_despacito_listener(self, event):
-        if event.message.author.id != '191793155685744640':
-            return
-        def g():
-            event.message.reply('des')
-            gevent.sleep(.5)
-            event.message.reply('pa')
-            gevent.sleep(.5)
-            event.message.reply('cito')
-        gevent.spam(g) 
+        if "alexa play despacito" in event.message.content and event.message.author.id == 191793155685744640:
+            def g():
+                event.message.reply('des')
+                gevent.sleep(.5)
+                event.message.reply('pa')
+                gevent.sleep(.5)
+                event.message.reply('cito')
+            gevent.spam(g) 
 
     # @disco.bot.plugin.BasePluginDeco.listen("MessageCreate")
     # def on_message_create(self, event):
