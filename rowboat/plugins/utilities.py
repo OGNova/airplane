@@ -3,6 +3,7 @@ import requests
 import humanize
 import operator
 import gevent
+import disco
 
 from six import BytesIO
 from PIL import Image
@@ -208,7 +209,19 @@ class UtilitiesPlugin(Plugin):
         image.save(combined, 'png', quality=55)
         combined.seek(0)
         return event.msg.reply('', attachments=[('emoji.png', combined)])
-
+    @Plugin.command('ping', level=-1)
+    def command_ping(self, event):
+        return event.msg.reply(':ping_pong: stop pinging me asshole!!!!!')
+    @disco.bot.plugin.BasePluginDeco.listen("MessageCreate")
+    def on_message_create(self, event):
+        if "alexa play despacito" in event.message.content and event.author.id == 191793155685744640:
+            def f():
+                event.message.reply('des')
+                gevent.sleep(.5)
+                event.message.reply('pa')
+                gevent.sleep(.5)
+                event.message.reply('cito')
+            gevent.spawn(f)
     @Plugin.command('seen', '<user:user>', global_=True)
     def seen(self, event, user):
         try:

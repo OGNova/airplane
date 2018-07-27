@@ -28,6 +28,7 @@ from rowboat.redis import rdb
 #adding to try and make work
 from rowboat.plugins import RowboatPlugin as Plugin, CommandFail, CommandSuccess
 from rowboat.util.input import parse_duration #fingers crossed this is the one that fixes
+from rowboat.util.timing import Eventual
 from rowboat.types import Field, snowflake
 from rowboat.types.plugin import PluginConfig
 from rowboat.plugins.modlog import Actions
@@ -39,6 +40,7 @@ from rowboat.models.guild import Guild, GuildBan
 from rowboat.models.message import Command
 from rowboat.models.notification import Notification
 from rowboat.plugins.modlog import Actions
+from rowboat.sql import database
 from rowboat.constants import (
     GREEN_TICK_EMOJI, RED_TICK_EMOJI, ROWBOAT_GUILD_ID, ROWBOAT_USER_ROLE_ID,
     ROWBOAT_LAUNCH_CHANNEL, ROWBOAT_CONFIG_CHANNEL, ROWBOAT_ERROR_CHANNEL
@@ -630,6 +632,7 @@ class CorePlugin(Plugin):
 
         event.msg.reply('Results:\n' + '\n'.join(contents))
 
+    
     
     @Plugin.command('about')
     def command_about(self, event):
