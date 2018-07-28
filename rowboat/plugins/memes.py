@@ -1,4 +1,5 @@
 import disco
+import gevent
 from disco.bot import Plugin
 from disco.bot import CommandLevels
 from rowboat.types.plugin import PluginConfig
@@ -26,8 +27,6 @@ class MemesPlugin(Plugin):
             return
         event.msg.reply('<@159985870458322944> **NO ONE CARES.**')
         
-
-    @Plugin.listen('MessageCreate')
     def alexa_play_despacito_listener(self, event):
         if "alexa play despacito" in event.msg.content and event.author.id == 191793155685744640:
             def g():
