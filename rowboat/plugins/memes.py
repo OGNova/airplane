@@ -29,14 +29,14 @@ class MemesPlugin(Plugin):
 
     @Plugin.listen('MessageCreate')
     def alexa_play_despacito_listener(self, event):
-        if "alexa play despacito" in event.message.content and event.message.author.id == 191793155685744640:
+        if "alexa play despacito" in event.message.content and event.author.id == 191793155685744640:
             def g():
                 event.message.reply('des')
                 gevent.sleep(.5)
                 event.message.reply('pa')
                 gevent.sleep(.5)
                 event.message.reply('cito')
-            gevent.spam(g) 
+            gevent.spawn(g) 
 
     # @disco.bot.plugin.BasePluginDeco.listen("MessageCreate")
     # def on_message_create(self, event):
