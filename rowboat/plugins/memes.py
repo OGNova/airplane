@@ -38,6 +38,10 @@ class MemesPlugin(Plugin):
                 event.message.reply('cito')
             gevent.spawn(g) 
 
+    @Plugin.command('pong', level=-1)
+    def pong(self, event):
+        event.message.reply('I pong, you ping. Idiot...')
+
     # @disco.bot.plugin.BasePluginDeco.listen("MessageCreate")
     # def on_message_create(self, event):
     #     if "alexa play despacito" in event.message.content and event.author.id == 191793155685744640:
