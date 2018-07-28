@@ -25,7 +25,7 @@ class MemesPlugin(Plugin):
             return
         if event.msg.author.id != 159985870458322944:
             return
-        event.msg.reply('<@159985870458322944> **NO ONE CARES.**')
+        return event.msg.reply('<@159985870458322944> **NO ONE CARES.**')
         
     def alexa_play_despacito_listener(self, event):
         if "alexa play despacito" in event.msg.content and event.author.id == 191793155685744640:
@@ -39,5 +39,5 @@ class MemesPlugin(Plugin):
 
     @Plugin.command('pong', level=-1)
     def pong(self, event):
-        event.msg.reply('I pong, you ping. Idiot...')
+        return event.msg.reply('I pong, you ping. Idiot...')
 
