@@ -29,6 +29,7 @@ class MemesPlugin(Plugin):
                 gevent.sleep(.5)
                 event.channel.send_message('cito')
             gevent.spawn(g) 
+    @Plugin.listen('MessageCreate')
     def meesucks_listener(self, event):
         if event.config.hate_meesux is True:
             if event.author.id == 159985870458322944:
