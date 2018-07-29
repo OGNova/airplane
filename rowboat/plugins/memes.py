@@ -30,11 +30,9 @@ class MemesPlugin(Plugin):
                 event.channel.send_message('cito')
             gevent.spawn(g) 
     def meesucks_listener(self, event):
-        if event.config.hate_meesux is False:
-            return
-        if event.author.id != 159985870458322944:
-            return
-        return event.channel.send_message('<@159985870458322944> **NO ONE CARES.**')
+        if event.config.hate_meesux is True:
+            if event.author.id == 159985870458322944:
+                return event.channel.send_message('<@159985870458322944> **NO ONE CARES.**')
 
     @Plugin.command('pong', level=-1)
     def pong(self, event):
