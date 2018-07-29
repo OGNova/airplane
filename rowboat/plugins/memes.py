@@ -21,7 +21,7 @@ class MemesPlugin(Plugin):
     
     @Plugin.listen('MessageCreate')
     def alexa_play_despacito_listener(self, event):
-        if "alexa play despacito" in event.content and event.author.id == 191793155685744640:
+        if "alexa play despacito" in event.content.lower() and event.author.id == 191793155685744640:
             def g():
                 event.channel.send_message('des')
                 gevent.sleep(.5)
