@@ -538,21 +538,19 @@ class CorePlugin(Plugin):
                     tracked = Command.track(event, command, exception=True)
                     self.log.exception('Command error:')
 
-                    with self.send_error_message() as embed:
+                    with self.send_control_message() as embed:
                         embed.title = u'Command Error: {}'.format(command.name)
                         embed.color = 0xff6961
                         embed.add_field(
-                            name='Guild', value='({}) `{}`'.format(event.guild.name, event.guild.id), inline=True
+                            name='Server', value='({}) `{}`'.format(event.guild.name, event.guild.id), inline=False
                         )
+                        embed.add_field(name='Exact Command Ran', value='`{}`'.format(event.content))
                         embed.add_field(
-                            name='Channel', value='({}) `{}`'.format(event.channel.name, event.channel.id), inline=True
-                        )
-                        embed.add_field(
-                            name='Author', value='({}) `{}`'.format(event.author, event.author.id), inline=True
-                        )
-                        embed.add_field(
-                            name='Full Command', value='{}'.format(event.msg), inline=True
-                        )
+                            name='Author', value='(`{}`) `{}`'.format(unicode(event.author).encode('utf-8'), event.author.id), inline=True)
+                        embed.add_field(name='Channel', value='({}) `{}`'.format(
+                            event.channel.name,
+                            event.channel.id
+                        ), inline=True)
                         embed.description = '```{}```'.format(u'\n'.join(tracked.traceback.split('\n')[-8:]))
 
                     return event.reply('<:{}> something went wrong, perhaps try again later'.format(RED_TICK_EMOJI))
