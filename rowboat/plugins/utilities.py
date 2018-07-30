@@ -114,6 +114,26 @@ class UtilitiesPlugin(Plugin):
         r = requests.get(url)
         r.raise_for_status()
         event.msg.reply('', attachments=[('cat.jpg', r.content)])
+
+    @Plugin.command('duck',aliases=['quack'], global_=True)
+    def duck(self, event):
+        # Sometimes random.cat gives us gifs (smh)
+        for _ in range(3):
+            try:
+                r = requests.get('https://random-d.uk/api/v1/random?type=jpg')
+                r.raise_for_status()
+            except:
+                continue
+
+            url = r.json()['file']
+            if not url.endswith('.gif'):
+                break
+        else:
+            return event.msg.reply('404 duck not found :(')
+
+        r = requests.get(url)
+        r.raise_for_status()
+        event.msg.reply('', attachments=[('duck.jpg', r.content)])
     
     @Plugin.command('dog', global_=True)
     def dog(self, event):
