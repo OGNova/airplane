@@ -10,7 +10,6 @@ from rowboat.types import Field, DictField, ListField, snowflake, SlottedModel, 
 from gevent.pool import Pool
 from rowboat.util.gevent import wait_many
 
-
 class MemesConfig(PluginConfig):
     #auto-reply to meesux
     hate_meesux = Field(bool, default=False)
@@ -29,8 +28,13 @@ class MemesPlugin(Plugin):
                     conditional=lambda e: (
                         e.author.id == event.author.id
                     )).get(timeout=10)
-                #  despacito
-                if "play despacito" in alexa_event.content:
+
+                # cancel
+                if "cancel" in alexa_event.content.lower():
+                    msg.delete()
+                    return
+                # despacito
+                if "play despacito" in alexa_event.content.lower():
                     msg.delete()
                     event.channel.send_message('Ok, playing Despacito on <:spotify:473223054831517727>')
                     def g():
@@ -40,6 +44,20 @@ class MemesPlugin(Plugin):
                         gevent.sleep(.5)
                         event.channel.send_message('cito')
                     gevent.spawn(g)
+
+                # Ligma LOL SO FUNNY HAHAHA
+                if "what is ligma" in alexa_event.content.lower():
+                    msg.delete()
+                    event.channel.send_message('<@!' + alexa_event.authro.id + '> your ignorance is amusing.')
+
+                # sugma haha funny too
+                if "what is sugma" in alexa_event.content.lower():
+                    msg.delete()
+                    def h():
+                        new_msg = event.channel.send_message('Shutting down...')
+                        gevent.sleep(1.5)
+                        new_msg.edit('Godbye.')
+                    gevent.spawn(h)
 
                 # timer
                 # if "set a timer for" in alexa_event.content.lower():
