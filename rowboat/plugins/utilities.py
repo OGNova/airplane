@@ -125,7 +125,7 @@ class UtilitiesPlugin(Plugin):
             except:
                 continue
 
-            url = r.json()['file']
+            url = r.json()['url']
             if not url.endswith('.gif'):
                 break
         else:
