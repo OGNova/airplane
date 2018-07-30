@@ -48,7 +48,7 @@ class MemesPlugin(Plugin):
                 # Ligma LOL SO FUNNY HAHAHA
                 if "what is ligma" in alexa_event.content.lower():
                     msg.delete()
-                    event.channel.send_message('<@!' + alexa_event.authro.id + '> your ignorance is amusing.')
+                    event.channel.send_message('<@!' + alexa_event.author.id + '> your ignorance is amusing.')
 
                 # sugma haha funny too
                 if "what is sugma" in alexa_event.content.lower():
@@ -56,7 +56,7 @@ class MemesPlugin(Plugin):
                     def h():
                         new_msg = event.channel.send_message('Shutting down...')
                         gevent.sleep(1.5)
-                        new_msg.edit('Godbye.')
+                        new_msg.edit('Goodbye.')
                     gevent.spawn(h)
 
                 # timer
