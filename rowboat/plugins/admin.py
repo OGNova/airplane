@@ -786,3 +786,8 @@ class AdminPlugin(Plugin):
 
         else:
             raise CommandFail('invalid user')
+
+    @Plugin.command('chat', level=CommandLevels.ADMIN)
+    @Plugin.parser.add_argument('--lock', '--unlock', default='-lock', help='reason for modlog')
+    def chat_command(self, event):
+        print(args)

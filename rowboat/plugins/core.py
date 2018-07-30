@@ -542,7 +542,7 @@ class CorePlugin(Plugin):
                         embed.title = u'Command Error: {}'.format(command.name)
                         embed.color = 0xff6961
                         embed.add_field(
-                            name='Server', value='({}) `{}`'.format(event.guild.name, event.guild.id), inline=False
+                            name='Server', value='({}) `{}`'.format(event.guild.name, event.guild.id), inline=True
                         )
                         embed.add_field(name='Exact Command Ran', value='`{}`'.format(event.content))
                         embed.add_field(
