@@ -21,7 +21,7 @@ class MemesPlugin(Plugin):
     
     @Plugin.listen('MessageCreate')
     def alexa_play_despacito_listener(self, event):
-        if "hey alexa" in event.content.lower() and event.author.id == 191793155685744640:
+        if "hey alexa" in event.content and event.author.id == 191793155685744640:
             msg = event.channel.send_message('<a:hey_alexa:473213508171989023>')
             try:
                 alexa_event = self.wait_for_event(
@@ -30,7 +30,7 @@ class MemesPlugin(Plugin):
                         e.author.id == event.author.id
                     )).get(timeout=10)
                 #  despacito
-                if "play despacito" in alexa_event.content.lower():
+                if "play despacito" in alexa_event.content:
                     msg.delete()
                     event.channel.send_message('Ok, playing Despacito on <:spotify:473223054831517727>')
                     def g():
@@ -40,6 +40,11 @@ class MemesPlugin(Plugin):
                         gevent.sleep(.5)
                         event.channel.send_message('cito')
                     gevent.spawn(g)
+
+                # timer
+                # if "set a timer for" in alexa_event.content.lower():
+                #     msg.delete()
+
             except gevent.Timeout:
                 msg.delete()
                 return
