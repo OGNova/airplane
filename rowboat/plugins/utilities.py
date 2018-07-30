@@ -115,7 +115,7 @@ class UtilitiesPlugin(Plugin):
         r.raise_for_status()
         event.msg.reply('', attachments=[('cat.jpg', r.content)])
 
-    @Plugin.command('duck',aliases=['quack'], global_=True)
+    @Plugin.command('duck', aliases=['quack'], global_=True)
     def duck(self, event):
         # Sometimes random.cat gives us gifs (smh)
         for _ in range(3):
