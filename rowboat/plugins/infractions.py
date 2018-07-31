@@ -726,6 +726,20 @@ class InfractionsPlugin(Plugin):
             return
 
         for member in members:
+            if event.config.notify_action_on.kicks:
+                if not event.config.notify_action_on.invite_back:
+                    try:
+                        event.guild.get_member(user.id).user.open_dm().send_message('You have been **Kicked** from the guild **{}** for `{}`'.format(event.guild.name, reason or 'no reason'))
+                    except:
+                        pass
+                else:    
+                    guild_invite = invite_finder(event.guild.id)
+                    try:
+                        event.guild.get_member(user.id).user.open_dm().send_message('You have been **Kicked** from the guild **{}** for `{}`\nYou can join back with this invite link: {}'.format(event.guild.name, reason or 'no reason', guild_invite))
+                    except:
+                        pass                   
+            else:
+                pass
             Infraction.kick(self, event, member, args.reason)
 
         raise CommandSuccess('kicked {} users. Was unable to remove {} users.'.format(len(members, len(failed_ids))))
@@ -807,6 +821,13 @@ class InfractionsPlugin(Plugin):
             return
 
         for user_id in members:
+            if event.config.notify_action_on.bans:    
+                try:
+                    event.guild.get_member(user.id).user.open_dm().send_message('You have been **Permanently Banned** from the guild **{}** for `{}`.'.format(event.guild.name, reason or 'no reason specified.'))
+                except:
+                    pass
+            else:
+                pass
             Infraction.ban(self, event, user_id, args.reason, guild=event.guild)
 
         raise CommandSuccess('banned {} users and failed to ban {} users.'.format(len(members), len(failed_ids)))
