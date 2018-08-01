@@ -51,6 +51,7 @@ class CensorSubConfig(SlottedModel):
 class CensorConfig(PluginConfig):
     levels = DictField(int, CensorSubConfig)
     channels = DictField(ChannelField, CensorSubConfig)
+    ignored_users = ListField(snowflake, default=[])
 
 
 # It's bad kids!
@@ -121,6 +122,8 @@ class CensorPlugin(Plugin):
     def on_message_update(self, event):
         try:
             msg = Message.get(id=event.id)
+            if msg.author.id in event.config.ignored_users:
+                return
         except Message.DoesNotExist:
             self.log.warning('Not censoring MessageUpdate for id %s, %s, no stored message', event.channel_id, event.id)
             return
@@ -135,7 +138,8 @@ class CensorPlugin(Plugin):
     @Plugin.listen('MessageCreate')
     def on_message_create(self, event, author=None):
         author = author or event.author
-
+        if author.id in event.config.ignored_users:
+            return
         if author.id == self.state.me.id:
             return
 
@@ -191,7 +195,8 @@ class CensorPlugin(Plugin):
 
     def filter_invites(self, event, config):
         invites = INVITE_LINK_RE.findall(event.content)
-
+        if event.author.id in event.config.ignored_users:
+            return
         for _, invite in invites:
             invite_info = self.get_invite_info(invite)
 
@@ -222,7 +227,8 @@ class CensorPlugin(Plugin):
 
     def filter_domains(self, event, config):
         urls = URL_RE.findall(INVITE_LINK_RE.sub('', event.content))
-
+        if event.author.id in event.config.ignored_users:
+            return
         for url in urls:
             try:
                 parsed = urlparse.urlparse(url)
@@ -245,7 +251,8 @@ class CensorPlugin(Plugin):
 
     def filter_blocked_words(self, event, config):
         blocked_words = config.blocked_re.findall(event.content)
-
+        if event.author.id in event.config.ignored_users:
+            return
         if blocked_words:
             raise Censorship(CensorReason.WORD, event, ctx={
                 'words': blocked_words,
