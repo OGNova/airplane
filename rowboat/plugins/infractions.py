@@ -641,7 +641,8 @@ class InfractionsPlugin(Plugin):
     def unmute(self, event, user, reason=None):
         # TOOD: eventually we should pull the role from the GuildMemberBackup if they arent in server
         member = event.guild.get_member(user)
-
+        cmd = event.msg.content
+        suffix = ('-s', '--silent')
         if member:
             self.can_act_on(event, member.id)
             if not event.config.mute_role:
@@ -671,14 +672,20 @@ class InfractionsPlugin(Plugin):
             )
 
             self.confirm_action(event, u':ok_hand: {} is now unmuted'.format(member.user))
-            if event.config.notify_action_on.mutes:
-                try:
-                    event.guild.get_member(user.id).user.open_dm().send_message('You have been **Un-Muted** in the guild **{}**'.format(event.guild.name))
-                    event.msg.reply('Dm was successfully sent. <:'+GREEN_TICK_EMOJI+'>')
-                except:
-                    event.msg.reply('Unable to send a DM to this user.')
-            else:
-                pass
+            if cmd.endswith(suffix) is True:
+                if event.user_level < event.config.notify_action_on.silent_level:
+                    raise CommandFail('only administrators can silently issue infractions.')
+                else:
+                    raise CommandSuccess('silently unmuted the user.')
+            else:    
+                if event.config.notify_action_on.mutes:
+                    try:
+                        event.guild.get_member(user.id).user.open_dm().send_message('You have been **Un-Muted** in the guild **{}**'.format(event.guild.name))
+                        event.msg.reply('Dm was successfully sent. <:'+GREEN_TICK_EMOJI+'>')
+                    except:
+                        event.msg.reply('Unable to send a DM to this user.')
+                else:
+                    pass
         else:
             raise CommandFail('invalid user')
 
