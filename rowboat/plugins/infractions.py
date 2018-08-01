@@ -969,6 +969,36 @@ class InfractionsPlugin(Plugin):
         """
         member = event.guild.get_member(user)
         if member:
+            if event.config.notify_action_on.kicks:
+                if cmd.endswith(suffix) is True:
+                    if event.user_level < event.config.notify_action_on.silent_level:
+                        raise CommandFail('only administrators can silently issue infractions.')
+                    else:
+                        self.can_act_on(event, member.id)
+                        Infraction.softban(self, event, member, reason)
+                        self.confirm_action(event, maybe_string(
+                            reason,
+                            u':ok_hand: soft-banned {u} (`{o}`)',
+                            u':ok_hand: soft-banned {u}',
+                            u=member.user,
+                        ))
+                        raise CommandSuccess('silently kicked the user.')
+                else:
+                    if not event.config.notify_action_on.invite_back:
+                        try:
+                            event.guild.get_member(user.id).user.open_dm().send_message('You have been **Kicked** from the guild **{}** for `{}`'.format(event.guild.name, reason or 'no reason'))
+                            event.msg.reply('Dm was successfully sent. <:'+GREEN_TICK_EMOJI+'>')
+                        except:
+                            event.msg.reply('Unable to send a DM to this user.')
+                    else:    
+                        guild_invite = invite_finder(event.guild.id)
+                        try:
+                            event.guild.get_member(user.id).user.open_dm().send_message('You have been **Kicked** from the guild **{}** for `{}`\nYou can join back with this invite link: {}'.format(event.guild.name, reason or 'no reason', guild_invite))
+                            event.msg.reply('Dm was successfully sent. <:'+GREEN_TICK_EMOJI+'>')
+                        except:
+                            event.msg.reply('Unable to send a DM to this user.')                    
+            else:
+                pass
             self.can_act_on(event, member.id)
             Infraction.softban(self, event, member, reason)
             self.confirm_action(event, maybe_string(
