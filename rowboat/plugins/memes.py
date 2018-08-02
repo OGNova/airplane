@@ -13,7 +13,6 @@ from rowboat.util.gevent import wait_many
 class MemesConfig(PluginConfig):
     #auto-reply to meesux
     hate_meesux = Field(bool, default=False)
-    justin_smells = Field(bool, default=False)
 @Plugin.with_config(MemesConfig)
 class MemesPlugin(Plugin):
     def load(self, ctx):
@@ -77,12 +76,6 @@ class MemesPlugin(Plugin):
         if event.config.hate_meesux is True:
             if event.author.id == 159985870458322944:
                 return event.channel.send_message('<@159985870458322944> **NO ONE CARES.**')
-
-    @Plugin.listen('MessageCreate')
-    def justin_listener(self, event):
-        if event.config.justin_smells is True:
-            if event.author.id == 104376018222972928:
-                return event.channel.send_message('<@104376018222972928> **smells.**')
 
     @Plugin.command('pong', level=-1)
     def pong(self, event):
