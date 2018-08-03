@@ -1085,14 +1085,21 @@ class InfractionsPlugin(Plugin):
                     if event.user_level < event.config.notify_action_on.silent_level:
                         raise CommandFail('only administrators can silently issue infractions.')
                     else:
+                        Infraction.warn(self, event, member, reason, guild=event.guild)
+                        self.confirm_action(event, maybe_string(
+                        reason,
+                        u':ok_hand: warned {u} (`{o}`)',
+                        u':ok_hand: warned {u}',
+                        u=member.user if member else user,
+                        ))
                         raise CommandSuccess('silently warned the user.')
                 else:
                     
-                        try:
-                            event.guild.get_member(user.id).user.open_dm().send_message('You have been **Warned** in the guild **{}** for the reason: `{}`'.format(event.guild.name, reason or 'no reason specified.'))
-                            event.msg.reply('Dm was successfully sent. <:'+GREEN_TICK_EMOJI+'>')
-                        except:
-                            event.msg.reply('Unable to send a DM to this user.')
+                    try:
+                        event.guild.get_member(user.id).user.open_dm().send_message('You have been **Warned** in the guild **{}** for the reason: `{}`'.format(event.guild.name, reason or 'no reason specified.'))
+                        event.msg.reply('Dm was successfully sent. <:'+GREEN_TICK_EMOJI+'>')
+                    except:
+                        event.msg.reply('Unable to send a DM to this user.')
             else:
                 pass
             Infraction.warn(self, event, member, reason, guild=event.guild)
