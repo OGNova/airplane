@@ -1,6 +1,7 @@
 import csv
 import gevent
 import humanize
+import gevent
 
 from StringIO import StringIO
 from holster.emitter import Priority
@@ -42,6 +43,10 @@ class NotifyConfig(SlottedModel):
     invite_back = Field(bool, default=False)
     silent_level = Field(int, default=int(CommandLevels.ADMIN))
 
+class LimitTempConfig(SlottedModel):
+    duration_limit_level = Field(int, default=0)
+    maximum_limited_duration = Field(str, default='1d')
+
 class InfractionsConfig(PluginConfig):
     # Whether to confirm actions in the channel they are executed
     confirm_actions = Field(bool, default=True)
@@ -53,6 +58,10 @@ class InfractionsConfig(PluginConfig):
 
     # The mute role
     mute_role = Field(snowflake, default=None)
+
+    # manage tempban
+    limit_temp = Field(LimitTempConfig, default=None)
+    
 
     # Level required to edit reasons
     reason_edit_level = Field(int, default=int(CommandLevels.ADMIN))
@@ -368,7 +377,13 @@ class InfractionsPlugin(Plugin):
             raise CommandFail('that infraction is not active and cannot be updated')
 
         expires_dt = parse_duration(duration, inf.created_at)
-
+        if inf.type_ == Infraction.Types.TEMPBAN.index:
+            if event.config.limit_temp.duration_limit_level:
+                if event.user_level <= event.config.limit_temp.duration_limit_level:
+                    if expires_dt > parse_duration(event.config.limit_temp.maximum_limited_duration):
+                        raise CommandFail('You cannot temp ban users for longer than ' + event.config.limit_temp.maximum_limited_duration)
+        
+        
         converted = False
         if inf.type_ in [Infraction.Types.MUTE.index, Infraction.Types.BAN.index]:
             inf.type_ = (
@@ -382,7 +397,6 @@ class InfractionsPlugin(Plugin):
                 Infraction.Types.TEMPBAN.index,
                 Infraction.Types.TEMPROLE.index]:
             raise CommandFail('cannot set the duration for that type of infraction')
-
         inf.expires_at = expires_dt
         inf.save()
         self.queue_infractions()
@@ -1026,6 +1040,12 @@ class InfractionsPlugin(Plugin):
         if member:
             self.can_act_on(event, member.id)
             expires_dt = parse_duration(duration)
+            if event.config.limit_temp.duration_limit_level:
+                if event.user_level <= event.config.limit_temp.duration_limit_level:
+                    if expires_dt > parse_duration(event.config.limit_temp.maximum_limited_duration):
+                        raise CommandFail('You cannot temp ban users for longer than ' + event.config.limit_temp.maximum_limited_duration)
+
+
             if event.config.notify_action_on.bans:
                 if cmd.endswith(suffix) is True:
                     if event.user_level < event.config.notify_action_on.silent_level:
@@ -1044,20 +1064,21 @@ class InfractionsPlugin(Plugin):
                 else:
                     if not event.config.notify_action_on.invite_back:
                         try:
-                            event.guild.get_member(user.id).user.open_dm().send_message('You have been **Temporarily Banned** from the guild **{}** for `{}`'.format(event.guild.name, reason or 'no reason'))
+                            event.guild.get_member(user.id).user.open_dm().send_message('You have been **Temporarily Banned** in the guild **{}** for **{}** for `{}`'.format(event.guild.name, humanize.naturaldelta(expires_dt - datetime.utcnow()), reason or 'no reason specified.'))
                             event.msg.reply('Dm was successfully sent. <:'+GREEN_TICK_EMOJI+'>')
                         except:
                             event.msg.reply('Unable to send a DM to this user.')
                     else:    
                         guild_invite = invite_finder(event.guild.id)
                         try:
-                            event.guild.get_member(user.id).user.open_dm().send_message('You have been **Temporarily Banned** from the guild **{}** for `{}`\nYou can join back with this invite link: {}'.format(event.guild.name, reason or 'no reason', guild_invite))
+                            event.guild.get_member(user.id).user.open_dm().send_message('You have been **Temporarily Banned** in the guild **{}** for **{}** for `{}`.\nYou can join the server again with this link after your temp-ban has expired:\n{}'.format(event.guild.name, humanize.naturaldelta(expires_dt - datetime.utcnow()), reason or 'no reason specified.', guild_invite))
                             event.msg.reply('Dm was successfully sent. <:'+GREEN_TICK_EMOJI+'>')
                         except:
                             event.msg.reply('Unable to send a DM to this user.')                       
 
             else:
                 pass
+              
             Infraction.tempban(self, event, member, reason, expires_dt)
             self.queue_infractions()
             self.confirm_action(event, maybe_string(
