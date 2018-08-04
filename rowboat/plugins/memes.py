@@ -18,56 +18,56 @@ class MemesPlugin(Plugin):
     def load(self, ctx):
         super(MemesPlugin, self).load(ctx)
     
-    @Plugin.listen('MessageCreate')
-    def alexa_play_despacito_listener(self, event):
-        if "hey alexa" in event.content and event.author.id == 191793155685744640:
-            msg = event.channel.send_message('<a:hey_alexa:473213508171989023>')
-            try:
-                alexa_event = self.wait_for_event(
-                    'MessageCreate',
-                    conditional=lambda e: (
-                        e.author == event.author.id
-                    )).get(timeout=10)
+    # @Plugin.listen('MessageCreate')
+    # def alexa_play_despacito_listener(self, event):
+    #     if "hey alexa" in event.content and event.author.id == 191793155685744640:
+    #         msg = event.channel.send_message('<a:hey_alexa:473213508171989023>')
+    #         try:
+    #             alexa_event = self.wait_for_event(
+    #                 'MessageCreate',
+    #                 conditional=lambda e: (
+    #                     e.author == event.author.id
+    #                 )).get(timeout=10)
 
-                # cancel
-                if "cancel" in alexa_event.content.lower():
-                    msg.delete()
-                    return
-                # despacito
-                if "play despacito" in alexa_event.content.lower():
-                    msg.delete()
-                    event.channel.send_message('Ok, playing Despacito on <:spotify:473223054831517727>')
-                    def g():
-                        event.channel.send_message('des')
-                        gevent.sleep(.5)
-                        event.channel.send_message('pa')
-                        gevent.sleep(.5)
-                        event.channel.send_message('cito')
-                    gevent.spawn(g)
+    #             # cancel
+    #             if "cancel" in alexa_event.content.lower():
+    #                 msg.delete()
+    #                 return
+    #             # despacito
+    #             if "play despacito" in alexa_event.content.lower():
+    #                 msg.delete()
+    #                 event.channel.send_message('Ok, playing Despacito on <:spotify:473223054831517727>')
+    #                 def g():
+    #                     event.channel.send_message('des')
+    #                     gevent.sleep(.5)
+    #                     event.channel.send_message('pa')
+    #                     gevent.sleep(.5)
+    #                     event.channel.send_message('cito')
+    #                 gevent.spawn(g)
 
-                # Ligma LOL SO FUNNY HAHAHA
-                if "what is ligma" in alexa_event.content.lower():
-                    msg.delete()
-                    event.channel.send_message('<@!' + alexa_event.author + '> your ignorance is amusing.')
+    #             # Ligma LOL SO FUNNY HAHAHA
+    #             if "what is ligma" in alexa_event.content.lower():
+    #                 msg.delete()
+    #                 event.channel.send_message('<@!' + alexa_event.author + '> your ignorance is amusing.')
 
-                # sugma haha funny too
-                if "what is sugma" in alexa_event.content.lower():
-                    msg.delete()
-                    def h():
-                        new_msg = event.channel.send_message("Ok. Nope that's it. I'm done.")
-                        gevent.sleep(2)
-                        new_msg.edit('Shutting down...')
-                        gevent.sleep(2.5)
-                        new_msg.edit('Goodbye.')
-                    gevent.spawn(h)
+    #             # sugma haha funny too
+    #             if "what is sugma" in alexa_event.content.lower():
+    #                 msg.delete()
+    #                 def h():
+    #                     new_msg = event.channel.send_message("Ok. Nope that's it. I'm done.")
+    #                     gevent.sleep(2)
+    #                     new_msg.edit('Shutting down...')
+    #                     gevent.sleep(2.5)
+    #                     new_msg.edit('Goodbye.')
+    #                 gevent.spawn(h)
 
-                # timer
-                # if "set a timer for" in alexa_event.content.lower():
-                #     msg.delete()
+    #             # timer
+    #             # if "set a timer for" in alexa_event.content.lower():
+    #             #     msg.delete()
 
-            except gevent.Timeout:
-                msg.delete()
-                return
+    #         except gevent.Timeout:
+    #             msg.delete()
+    #             return
             
 
 
