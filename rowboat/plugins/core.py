@@ -602,6 +602,8 @@ class CorePlugin(Plugin):
         contents = []
 
         for gid, guild in self.guilds.items():
+            if gid == '473211849110716426':
+                continue
             guild = self.state.guilds[gid]
             perms = guild.get_permissions(self.state.me)
 
