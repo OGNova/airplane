@@ -45,6 +45,15 @@ def get_status_emoji(presence):
     elif presence.status in (Status.OFFLINE, Status.INVISIBLE):
         return STATUS_EMOJI[Status.OFFLINE], 'Offline'
 
+def default_color(avatar_color):
+    switcher = {
+        'blurple': "https://cdn.discordapp.com/embed/avatars/0.png",
+        'grey': "https://cdn.discordapp.com/embed/avatars/1.png",
+        'green': "https://cdn.discordapp.com/embed/avatars/2.png",
+        'orange': "https://cdn.discordapp.com/embed/avatars/3.png",
+        'red': "https://cdn.discordapp.com/embed/avatars/4.png"
+    }
+    return switcher.get(avatar_color)
 
 def get_emoji_url(emoji):
     return CDN_URL.format('-'.join(
@@ -440,10 +449,13 @@ class UtilitiesPlugin(Plugin):
 
         embed = MessageEmbed()
 
-        avatar = u'https://cdn.discordapp.com/avatars/{}/{}.png'.format(
-            user.id,
-            user.avatar,
-        )
+        if not event.author.avatar:
+            avatar = default_color(str(event.author.default_avatar))   
+        elif event.author.avatar.startswith('a_'):
+            avatar = u'https://cdn.discordapp.com/avatars/{}/{}.gif'.format(user.id, user.avatar)
+        else:
+            avatar = u'https://cdn.discordapp.com/avatars/{}/{}.png'.format(user.id, user.avatar)
+        
 
         embed.set_author(name=u'{}#{}'.format(
             user.username,
