@@ -449,9 +449,9 @@ class UtilitiesPlugin(Plugin):
 
         embed = MessageEmbed()
 
-        if not event.author.avatar:
-            avatar = default_color(str(event.author.default_avatar))   
-        elif event.author.avatar.startswith('a_'):
+        if not member.user.avatar:
+            avatar = default_color(str(member.user.default_avatar))   
+        elif member.user.avatar.startswith('a_'):
             avatar = u'https://cdn.discordapp.com/avatars/{}/{}.gif'.format(user.id, user.avatar)
         else:
             avatar = u'https://cdn.discordapp.com/avatars/{}/{}.png'.format(user.id, user.avatar)
