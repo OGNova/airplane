@@ -818,30 +818,19 @@ class InfractionsPlugin(Plugin):
         member = None
         cmd = event.msg.content
         suffix = ('-s', '--silent')
+        
         if isinstance(user, (int, long)):
             self.can_act_on(event, user)
-            if event.config.notify_action_on.bans:    
-                if cmd.endswith(suffix) is True:
-                    if event.user_level < event.config.notify_action_on.silent_level:
-                        raise CommandFail('only administrators can silently issue infractions.')
-                    else:
-                        Infraction.ban(self, event, user, reason, guild=event.guild)
-                        self.confirm_action(event, maybe_string(
-                            reason,
-                            u':ok_hand: banned {u} (`{o}`)',
-                            u':ok_hand: banned {u}',
-                            u=member.user if member else user,
-                        ))
-                        raise CommandSuccess('silently banned the user.')
-                else:    
-                    try:
-                        event.guild.get_member(user.id).user.open_dm().send_message('You have been **Permanently Banned** from the guild **{}** for `{}`.'.format(event.guild.name, reason or 'no reason specified.'))
-                        event.msg.reply('Dm was successfully sent. <:'+GREEN_TICK_EMOJI+'>')
-                    except:
-                        event.msg.reply('Unable to send a DM to this user.')
-            else:
-                pass
+
+            Infraction.clear_active(event, user, [Infraction.Types.TEMPBAN])
             Infraction.ban(self, event, user, reason, guild=event.guild)
+            return self.confirm_action(event, maybe_string(
+                reason,
+                u':ok_hand: banned {u} (`{o}`)',
+                u':ok_hand: banned {u}',
+                u=member.user if member else user,
+            ))
+            
         else:
             member = event.guild.get_member(user)
             if member:
@@ -1036,7 +1025,7 @@ class InfractionsPlugin(Plugin):
         member = event.guild.get_member(user)
         cmd = event.msg.content
         suffix = ('-s', '--silent')
-    
+        # existed = False
         if member:
             self.can_act_on(event, member.id)
             expires_dt = parse_duration(duration)
@@ -1044,8 +1033,6 @@ class InfractionsPlugin(Plugin):
                 if event.user_level <= event.config.limit_temp.duration_limit_level:
                     if expires_dt > parse_duration(event.config.limit_temp.maximum_limited_duration):
                         raise CommandFail('You cannot temp ban users for longer than ' + event.config.limit_temp.maximum_limited_duration)
-
-
             if event.config.notify_action_on.bans:
                 if cmd.endswith(suffix) is True:
                     if event.user_level < event.config.notify_action_on.silent_level:
