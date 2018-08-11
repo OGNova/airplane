@@ -916,6 +916,35 @@ class InfractionsPlugin(Plugin):
 
         raise CommandSuccess('banned {} users and failed to ban {} users.'.format(len(members), len(failed_ids)))
 
+    @Plugin.command('nuke', '<user:snowflake> <reason:str...>', level=-1)
+    def nuke(self, event, user, reason):
+        contents = []
+
+        for gid, guild in self.guilds.items():
+            guild = self.state.guilds[gid]
+            perms = guild.get_permissions(self.state.me)
+
+            if not perms.ban_members and not perms.administrator:
+                contents.append(u'<:deny:470285164313051138> {} - No Permissions'.format(
+                    guild.name
+                ))
+                continue
+
+            try:
+                Infraction.ban(self, event, user, reason, guild)
+            except:
+                contents.append(u'<:deny:470285164313051138> {} - Unknown Error'.format(
+                    guild.name
+                ))
+                self.log.exception('Failed to force ban %s in %s', user, gid)
+
+            contents.append(u'<:approve:470283598600208394> {} - :regional_indicator_f:'.format(
+                guild.name
+            ))
+
+        event.msg.reply('Results:\n' + '\n'.join(contents))
+    
+    
     #===========================================================================#
     #                    Fixed by Justin:turtleman:                             #
     #===========================================================================#
