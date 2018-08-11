@@ -920,8 +920,8 @@ class InfractionsPlugin(Plugin):
     def nuke(self, event, user, reason):
         contents = []
 
-        for gid, guild in self.guilds.items():
-            guild = self.state.guilds[gid]
+        for gid in self.bot.client.state.guilds:
+            guild = self.bot.client.state.guilds[gid]
             perms = guild.get_permissions(self.state.me)
 
             if not perms.ban_members and not perms.administrator:
