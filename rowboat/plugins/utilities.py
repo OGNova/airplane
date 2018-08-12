@@ -18,6 +18,7 @@ from disco.util.snowflake import to_datetime
 from disco.util.sanitize import S
 
 from rowboat.plugins import RowboatPlugin as Plugin, CommandFail
+from disco.bot import CommandLevels
 from rowboat.util.timing import Eventual
 from rowboat.util.input import parse_duration
 from rowboat.util.gevent import wait_many
@@ -238,7 +239,7 @@ class UtilitiesPlugin(Plugin):
         image.save(combined, 'png', quality=55)
         combined.seek(0)
         return event.msg.reply('', attachments=[('emoji.png', combined)])
-    @Plugin.command('ping', level=-1)
+    @Plugin.command('ping', level=CommandLevels.ADMIN)
     def command_ping(self, event):
         return event.msg.reply(':ping_pong: stop pinging me asshole!!!!!')
     # @disco.bot.plugin.BasePluginDeco.listen("MessageCreate")
