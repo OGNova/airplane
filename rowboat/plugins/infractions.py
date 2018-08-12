@@ -601,11 +601,12 @@ class InfractionsPlugin(Plugin):
                                 u=member.user,
                             ))
                             raise CommandSuccess('silently muted the user.')
-                            try:
-                                event.guild.get_member(user.id).user.open_dm().send_message('You have been **Permanently Muted** in the guild **{}** for `{}`'.format(event.guild.name, reason or 'no reason specified.'))
-                                event.msg.reply('Dm was successfully sent. <:'+GREEN_TICK_EMOJI+'>')
-                            except:
-                                event.msg.reply('Unable to send a DM to this user.')
+                    else:
+                        try:
+                            event.guild.get_member(user.id).user.open_dm().send_message('You have been **Permanently Muted** in the guild **{}** for `{}`'.format(event.guild.name, reason or 'no reason specified.'))
+                            event.msg.reply('Dm was successfully sent. <:'+GREEN_TICK_EMOJI+'>')
+                        except:
+                            event.msg.reply('Unable to send a DM to this user.')
                 else:
                     pass
 
