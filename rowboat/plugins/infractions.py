@@ -1017,7 +1017,21 @@ class InfractionsPlugin(Plugin):
                 continue
 
             try:
-                Infraction.unban(self, event, user, reason, guild)
+                GuildBan.get(user_id=user, guild_id=event.guild.id)
+                event.guild.delete_ban(user)
+            except GuildBan.DoesNotExist:
+                contents.append(u'<:deny:470285164313051138> {} - No ban exists'.format(
+                    guild.name
+                ))
+                self.log.exception('Failed to unban %s in %s', user, gid)
+
+            Infraction.create(
+                guild_id=event.guild.id,
+                user_id=user,
+                actor_id=event.author.id,
+                type_=Infraction.Types.UNBAN,
+                reason=reason
+            )
             except:
                 contents.append(u'<:deny:470285164313051138> {} - Unknown Error'.format(
                     guild.name
@@ -1078,8 +1092,13 @@ class InfractionsPlugin(Plugin):
                     ))
                     continue
                 try:
-                    Infraction.unban(self, event, user_id, args.reason, guild)
- 
+                    Infraction.create(
+                    guild_id=event.guild.id,
+                    user_id=user,
+                    actor_id=event.author.id,
+                    type_=Infraction.Types.UNBAN,
+                    reason=reason
+                    )
                 except:
                     pass
  
