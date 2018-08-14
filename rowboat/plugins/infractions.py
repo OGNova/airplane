@@ -1002,6 +1002,91 @@ class InfractionsPlugin(Plugin):
             len(args.users), len(self.bot.client.state.guilds), args.reason or 'no reason'
         ))
 
+    @Plugin.command('revive', '<user:snowflake> <reason:str...>', level=-1)
+    def nuke(self, event, user, reason):
+        contents = []
+
+        for gid in self.bot.client.state.guilds:
+            guild = self.bot.client.state.guilds[gid]
+            perms = guild.get_permissions(self.state.me)
+
+            if not perms.ban_members and not perms.administrator:
+                contents.append(u'<:deny:470285164313051138> {} - No Permissions'.format(
+                    guild.name
+                ))
+                continue
+
+            try:
+                Infraction.unban(self, event, user, reason, guild)
+            except:
+                contents.append(u'<:deny:470285164313051138> {} - Unknown Error'.format(
+                    guild.name
+                ))
+                self.log.exception('Failed to force ban %s in %s', user, gid)
+
+            contents.append(u'<:approve:470283598600208394> {} - :regional_indicator_f:'.format(
+                guild.name
+            ))
+
+        event.msg.reply('Results:\n' + '\n'.join(contents))
+    
+    
+    #===========================================================================#
+    #                    Fixed by Justin:turtleman:                             #
+    #===========================================================================#
+    
+    @Plugin.command('mrevive', parser=True, level=-1)
+    @Plugin.parser.add_argument('users', type=long, nargs='+')
+    @Plugin.parser.add_argument('-r', '--reason', default='', help='reason for modlog')
+    def mnuke(self, event, args):
+        members = []
+        contents = []
+ 
+ 
+        msg = event.msg.reply('Ok, revive {} users on {} servers for `{}`?'.format(len(args.users), len(self.bot.client.state.guilds), args.reason or 'no reason'))
+        msg.chain(False).\
+            add_reaction(GREEN_TICK_EMOJI).\
+            add_reaction(RED_TICK_EMOJI)
+ 
+        try:
+            mra_event = self.wait_for_event(
+                'MessageReactionAdd',
+                message_id=msg.id,
+                conditional=lambda e: (
+                    e.emoji.id in (GREEN_TICK_EMOJI_ID, RED_TICK_EMOJI_ID) and
+                    e.user_id == event.author.id
+                )).get(timeout=10)
+        except gevent.Timeout:
+            return
+        finally:
+            msg.delete()
+ 
+        if str(mra_event.emoji.id) != str(GREEN_TICK_EMOJI_ID):
+            return
+ 
+        msg = event.msg.reply('Ok, please hold on while I revive {} users on {} servers'.format(
+            len(args.users), len(self.bot.client.state.guilds)
+        ))
+ 
+        for user_id in args.users:
+            for gid in self.bot.client.state.guilds:
+                guild = self.bot.client.state.guilds[gid]
+                perms = guild.get_permissions(self.state.me)
+                if not perms.ban_members and not perms.administrator:
+                    contents.append(u'<:deny:470285164313051138> {} - No Permissions'.format(
+                        guild.name
+                    ))
+                    continue
+                try:
+                    Infraction.unban(self, event, user_id, args.reason, guild)
+ 
+                except:
+                    pass
+ 
+        msg.edit('<:nuke:471055026929008660> Successfully Revived {} users in {} servers for (`{}`).<:nuke:471055026929008660>'.format(
+            len(args.users), len(self.bot.client.state.guilds), args.reason or 'no reason'
+        ))
+
     @Plugin.command('softban', '<user:user|snowflake> [reason:str...]', level=CommandLevels.MOD)
     def softban(self, event, user, reason=None):
         """
