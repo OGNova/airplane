@@ -1003,7 +1003,7 @@ class InfractionsPlugin(Plugin):
         ))
 
     @Plugin.command('revive', '<user:snowflake> <reason:str...>', level=-1)
-    def nuke(self, event, user, reason):
+    def revive(self, event, user, reason):
         contents = []
 
         for gid in self.bot.client.state.guilds:
@@ -1047,7 +1047,7 @@ class InfractionsPlugin(Plugin):
     @Plugin.command('mrevive', parser=True, level=-1)
     @Plugin.parser.add_argument('users', type=long, nargs='+')
     @Plugin.parser.add_argument('-r', '--reason', default='', help='reason for modlog')
-    def mnuke(self, event, args):
+    def mrevive(self, event, args):
         members = []
         contents = []
  
