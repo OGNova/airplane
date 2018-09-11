@@ -538,7 +538,7 @@ class CorePlugin(Plugin):
                     tracked = Command.track(event, command, exception=True)
                     self.log.exception('Command error:')
 
-                    with self.send_control_message() as embed:
+                    with self.send_error_message() as embed:
                         embed.title = u'Command Error: {}'.format(command.name)
                         embed.color = 0xff6961
                         embed.add_field(

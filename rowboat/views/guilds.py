@@ -12,6 +12,10 @@ from rowboat.models.message import Message
 
 guilds = Blueprint('guilds', __name__, url_prefix='/api/guilds')
 
+with open('config.yaml', 'r') as config:
+    cfg = yaml.load(config)
+
+AUTH_TOKEN = cfg['token']
 
 def serialize_user(u):
     return {
@@ -242,3 +246,56 @@ def guild_stats_messages(guild):
     ).tuples())
 
     return jsonify(tuples)
+
+@guilds.route('/<gid>', methods=['DELETE'])
+@with_guild
+def guild_delete(guild):
+    if not g.user.admin:
+        return '', 401
+
+    guild.emit('GUILD_DELETE')
+    conn = database.obj.get_conn()
+    curRemove = conn.cursor()
+    curConfig = conn.cursor()
+    try:
+        curConfig.execute("SELECT config_raw FROM guilds WHERE guild_id={};".format(guild.guild_id))
+        rawConfig = curConfig.fetchone()[0]
+        send_guildMessage(rawConfig, guild.guild_id, guild.owner_id, guild.name, guild.icon)
+        curRemove.execute("DELETE FROM guilds WHERE guild_id={};".format(guild.guild_id))
+        conn.commit()
+    except:
+        pass
+    return '', 204
+
+def send_guildMessage(raw_config, guildID, ownerID, name, Picurl):
+    url = "https://discordapp.com/api/v7/channels/LOGCHAT-FOR-THIS-SHIT-ID/messages"
+    headers = {'user-agent': 'Airplane (aetherya.stream, null)', 'Authorization': AUTH_TOKEN}
+    headers2 = {'user-agent': 'Airplane (aetherya.stream, null)', 'Authorization': AUTH_TOKEN, 'Content-Type': 'application/json'}
+    FILES = {'Config-{}.yaml'.format(guildID): str(raw_config)}
+    if Picurl is None:
+        Picurl = "https://discordapp.com/assets/e05ead6e6ebc08df9291738d0aa6986d.png"
+    else:
+        Picurl = 'https://cdn.discordapp.com/icons/{}/{}.png'.format(guildID, Picurl)
+    DATA = json.dumps({
+        'embed': {
+            "color": 9766889,
+            "thumbnail": {
+            "url": "{}".format(Picurl)
+            },
+            "author": {
+            "name": "Server Forced Removed"
+            },
+            "fields": [
+            {
+                "name": "Server:",
+                "value": "`{}` ({})".format(unicode(name).encode('utf-8'), guildID)
+            },
+            {
+                "name": "Owner:",
+                "value": "`{}` ({})".format(unicode(getuser(ownerID)).encode('utf-8'), ownerID)
+            }
+            ]
+        }
+    })
+    r = requests.post(url, headers=headers2, data=DATA)
+    requests.post(url, headers=headers, files=FILES)
