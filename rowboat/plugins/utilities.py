@@ -188,7 +188,7 @@ class UtilitiesPlugin(Plugin):
     @Plugin.command('emoji', '<emoji:str>', global_=True)
     def emoji(self, event, emoji):
         if not EMOJI_RE.match(emoji):
-            return event.msg.reply(u'Unknown emoji: `{}`'.format(emoji))
+            return event.msg.reply(u'Unknown emoji: `{}`'.format(S(emoji)))
 
         fields = []
 
@@ -200,10 +200,14 @@ class UtilitiesPlugin(Plugin):
         if guild:
             fields.append('**Guild:** {} ({})'.format(S(guild.name), guild.id))
 
-        url = 'https://discordapp.com/api/emojis/{}.png'.format(eid)
+        anim = emoji.startswith('<a:')
+        fields.append('**Animated:** {}'.format('Yes' if anim else 'No'))
+
+        ext = 'gif' if anim else 'png'
+        url = 'https://discordapp.com/api/emojis/{}.{}'.format(eid, ext)
         r = requests.get(url)
         r.raise_for_status()
-        return event.msg.reply('\n'.join(fields), attachments=[('emoji.png', r.content)])
+        return event.msg.reply('\n'.join(fields), attachments=[('emoji.'+ext, r.content)])
 
     @Plugin.command('jumbo', '<emojis:str...>', global_=True)
     def jumbo(self, event, emojis):
@@ -398,7 +402,8 @@ class UtilitiesPlugin(Plugin):
             Infraction.guild_id,
             fn.COUNT('*')
         ).where(
-            (Infraction.user_id == user.id)
+            (Infraction.user_id == user.id) &
+            (~(Infraction.reason ** '[NOTE]%'))
         ).group_by(Infraction.guild_id).tuples().async()
 
         voice = GuildVoiceSession.select(
