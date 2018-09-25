@@ -704,6 +704,78 @@ class InfractionsPlugin(Plugin):
         else:
             raise CommandFail('invalid user')
 
+    @Plugin.command('unmuteall', level=CommandLevels.ADMIN)
+    def unmuteall(self, event):
+        completed_ids = []
+        failed_ids = []
+        gid = event.guild.id
+        query = "SELECT user_id FROM infractions WHERE type=5 AND active = True AND guild_id = %s;"
+        conn = database.obj.get_conn()
+        try:
+            c = conn.cursor()
+            c.execute("SELECT user_id FROM infractions WHERE type=5 AND active = True AND guild_id = %s;", (gid,))
+            ids = c.fetchall()
+            c.close
+        except:
+            raise CommandFail('failed to find muted users.')
+
+        if len(ids) == 0:
+            raise CommandFail('there are no temp-muted users.')
+        else:
+            msg = event.msg.reply('Ok, unmute `{}` users?'.format(len(ids)))
+            msg.chain(False).\
+                add_reaction(GREEN_TICK_EMOJI).\
+                add_reaction(RED_TICK_EMOJI)
+            try:
+                mra_event = self.wait_for_event(
+                    'MessageReactionAdd',
+                    message_id=msg.id,
+                    conditional=lambda e: (
+                        e.emoji.id in (GREEN_TICK_EMOJI_ID, RED_TICK_EMOJI_ID) and
+                        e.user_id == event.author.id
+                    )).get(timeout=10)
+            except gevent.Timeout:
+                return
+            finally:
+                msg.delete()
+
+        if mra_event.emoji.id != GREEN_TICK_EMOJI_ID:
+            return
+        for i in range(len(ids)):
+            member = event.guild.get_member(str(ids[i][0]))
+            if member:
+                self.can_act_on(event, member.id)
+                if not event.config.mute_role:
+                    raise CommandFail('mute is not setup on this server')
+
+                if event.config.mute_role not in member.roles:
+                    failed_ids.append(member.id)
+                    continue
+
+                Infraction.clear_active(event, member.id, [Infraction.Types.MUTE, Infraction.Types.TEMPMUTE])
+
+                self.call(
+                    'ModLogPlugin.create_debounce',
+                    event,
+                    ['GuildMemberUpdate'],
+                    role_id=event.config.mute_role,
+                )
+
+                member.remove_role(event.config.mute_role)
+
+
+                self.call(
+                    'ModLogPlugin.log_action_ext',
+                    Actions.MEMBER_UNMUTED,
+                    event.guild.id,
+                    member=member,
+                    actor=unicode(event.author) if event.author.id != member.id else 'Automatic',
+                )
+                completed_ids.append(member.id)
+            else:
+                failed_ids.append(str(ids[i][0]))
+        raise CommandSuccess('Successfully unmuted {} users and failed to unmute {} users.'.format(len(completed_ids), len(failed_ids)))
+
     @Plugin.command('kick', '<user:user|snowflake> [reason:str...]', level=CommandLevels.MOD)
     def kick(self, event, user, reason=None):
         member = event.guild.get_member(user)
