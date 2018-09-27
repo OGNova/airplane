@@ -56,7 +56,7 @@ class TagsPlugin(Plugin):
             (Tag.name == tag.name)
         ).execute()
 
-        event.msg.reply(u':information_source: {}'.format(
+        event.msg.reply(u'{}'.format(
             tag.content
         ))
 
