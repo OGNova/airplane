@@ -992,6 +992,7 @@ class InfractionsPlugin(Plugin):
     @Plugin.command('nuke', '<user:snowflake> <reason:str...>', level=-1)
     def nuke(self, event, user, reason):
         contents = []
+        failed = []
 
         for gid in self.bot.client.state.guilds:
             guild = self.bot.client.state.guilds[gid]
@@ -1016,6 +1017,9 @@ class InfractionsPlugin(Plugin):
             ))
 
         event.msg.reply('Results:\n' + '\n'.join(contents))
+        event.msg.reply('Failed to ban on {} servers.'.format(
+            len(failed)
+        ))
     
     
     #===========================================================================#
@@ -1028,7 +1032,7 @@ class InfractionsPlugin(Plugin):
     def mnuke(self, event, args):
         members = []
         contents = []
- 
+
  
         msg = event.msg.reply('Ok, nuke {} users on {} servers for `{}`?'.format(len(args.users), len(self.bot.client.state.guilds), args.reason or 'no reason'))
         msg.chain(False).\
