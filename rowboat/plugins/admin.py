@@ -801,10 +801,10 @@ class AdminPlugin(Plugin):
         else:
             raise CommandFail('invalid user')
 
-    @Plugin.command('slowmode', '<timer:int> [channe:channel|snowflake]', level=CommandLevels.ADMIN)
+    @Plugin.command('slowmode', '<cooldown:int> [channel:channel|snowflake]', level=CommandLevels.ADMIN)
     def slowmode(self, event, cooldown, channel=None):
         if cooldown < 0 or cooldown > 120:
-            raise CommandFail('cooldown must be between 0 and 120 seconds.')
+            raise CommandFail('cooldown must be between 0-120 seconds')
 
         if isinstance(channel, DiscoChannel):
             channel = channel.id
@@ -816,7 +816,7 @@ class AdminPlugin(Plugin):
 
         self.bot.client.api.channels_modify(
             channel_id,
-            rate_limit_per_user = cooldown,
+            rate_limit_per_user=cooldown,
             reason=u'Modified by {} ({})'.format(
                 event.author,
                 event.author.id
