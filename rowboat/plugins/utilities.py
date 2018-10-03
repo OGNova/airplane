@@ -212,9 +212,8 @@ class UtilitiesPlugin(Plugin):
     @Plugin.command('jumbo', '<emojis:str...>', global_=True)
     def jumbo(self, event, emojis):
         urls = []
-        anim = emojis.split(' ')[0].startswith('<a:')
         first_emote = emojis.split(' ')[0]
-        if anim:
+        if first_emote.startswith('<a:'):
             if EMOJI_RE.match(first_emote):
                 eid = EMOJI_RE.findall(first_emote)[0]
                 url = 'https://discordapp.com/api/emojis/{}.gif'.format(eid[1])
