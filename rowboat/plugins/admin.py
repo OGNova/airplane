@@ -801,30 +801,30 @@ class AdminPlugin(Plugin):
         else:
             raise CommandFail('invalid user')
 
-    # @Plugin.command('slowmode', '<cooldown:int> [channel:channel|snowflake]', level=CommandLevels.ADMIN)
-    # def slowmode(self, event, cooldown, channel=None):
-    #     if cooldown < 0 or cooldown > 120:
-    #         raise CommandFail('cooldown must be between 0-120 seconds')
+    @Plugin.command('slowmode', '<cooldown:int> [channel:channel|snowflake]', level=CommandLevels.ADMIN)
+    def slowmode(self, event, cooldown, channel=None):
+        if cooldown < 0 or cooldown > 120:
+            raise CommandFail('cooldown must be between 0-120 seconds')
 
-    #     if isinstance(channel, DiscoChannel):
-    #         channel = channel.id
+        if isinstance(channel, DiscoChannel):
+            channel = channel.id
 
-    #     channel_id = channel or event.channel.id
+        channel_id = channel or event.channel.id
 
-    #     if not channel_id in event.guild.channels:
-    #         raise CommandFail('channel not found')
+        if not channel_id in event.guild.channels:
+            raise CommandFail('channel not found')
 
-    #     self.bot.client.api.channels_modify(
-    #         channel_id,
-    #         rate_limit_per_user=cooldown,
-    #         reason=u'Modified by {} ({})'.format(
-    #             event.author,
-    #             event.author.id
-    #         )
-    #     )
+        self.bot.client.api.channels_modify(
+            channel_id,
+            rate_limit_per_user=cooldown,
+            reason=u'Modified by {} ({})'.format(
+                event.author,
+                event.author.id
+            )
+        )
 
-    #     mode = 'set to {} second{}'.format(cooldown, 's' if cooldown > 1 else '') if cooldown > 0 else 'disabled'
-    #     raise CommandSuccess('slowmode for <#{}> has been {}'.format(channel_id, mode))
+        mode = 'set to {} second{}'.format(cooldown, 's' if cooldown > 1 else '') if cooldown > 0 else 'disabled'
+        raise CommandSuccess('slowmode for <#{}> has been {}'.format(channel_id, mode))
 
     # @Plugin.command('chat', level=CommandLevels.ADMIN)
     # @Plugin.parser.add_argument('--lock', '--unlock', default='-lock', help='reason for modlog')
