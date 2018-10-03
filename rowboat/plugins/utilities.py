@@ -212,50 +212,53 @@ class UtilitiesPlugin(Plugin):
     @Plugin.command('jumbo', '<emojis:str...>', global_=True)
     def jumbo(self, event, emojis):
         urls = []
-
-        for emoji in emojis.split(' ')[:5]:
-            if EMOJI_RE.match(emoji):
-                _, eid = EMOJI_RE.findall(emoji)[0]
-                urls.append('https://discordapp.com/api/emojis/{}.png'.format(eid))
-            else:
-                urls.append(get_emoji_url(emoji))
-
-        width, height, images = 0, 0, []
-
-        for r in Pool(6).imap(requests.get, urls):
-            try:
+        anim = emojis.split(' ')[0].startswith('<a:')
+        first_emote = emojis.split(' ')[0]
+        if anim:
+            if EMOJI_RE.match(first_emote):
+                eid = EMOJI_RE.findall(first_emote)[0]
+                url = 'https://discordapp.com/api/emojis/{}.gif'.format(eid[1])
+                r = requests.get(url)
                 r.raise_for_status()
-            except requests.HTTPError:
-                return
+                return event.msg.reply('', attachments=[('emoji.gif', r.content)])
+            else:
+                raise CommandFail('Invalid Animated Emote.')
+        else:
+            for emoji in emojis.split(' ')[:5]:
+                if emoji.startswith('<a:'):
+                    continue
+                if EMOJI_RE.match(emoji):
+                    _, eid = EMOJI_RE.findall(emoji)[0]
+                    urls.append('https://discordapp.com/api/emojis/{}.png'.format(eid))
+                else:
+                    urls.append(get_emoji_url(emoji))
 
-            img = Image.open(BytesIO(r.content))
-            height = img.height if img.height > height else height
-            width += img.width + 10
-            images.append(img)
+            width, height, images = 0, 0, []
 
-        image = Image.new('RGBA', (width, height))
-        width_offset = 0
-        for img in images:
-            image.paste(img, (width_offset, 0))
-            width_offset += img.width + 10
+            for r in Pool(6).imap(requests.get, urls):
+                try:
+                    r.raise_for_status()
+                except requests.HTTPError:
+                    return
 
-        combined = BytesIO()
-        image.save(combined, 'png', quality=55)
-        combined.seek(0)
-        return event.msg.reply('', attachments=[('emoji.png', combined)])
+                img = Image.open(BytesIO(r.content))
+                height = img.height if img.height > height else height
+                width += img.width + 10
+                images.append(img)
+
+            image = Image.new('RGBA', (width, height))
+            width_offset = 0
+            for img in images:
+                image.paste(img, (width_offset, 0))
+                width_offset += img.width + 10
+
+            combined = BytesIO()
+            image.save(combined, 'png', quality=55)
+            combined.seek(0)
+            return event.msg.reply('', attachments=[('emoji.png', combined)])
     @Plugin.command('ping', level=CommandLevels.ADMIN)
     def command_ping(self, event):
         return event.msg.reply(':ping_pong: stop pinging me asshole!!!!!')
-    # @disco.bot.plugin.BasePluginDeco.listen("MessageCreate")
-    # def on_message_create(self, event):
-    #     if "alexa play despacito" in event.message.content and event.author.id == 191793155685744640:
-    #         def f():
-    #             event.message.reply('des')
-    #             gevent.sleep(.5)
-    #             event.message.reply('pa')
-    #             gevent.sleep(.5)
-    #             event.message.reply('cito')
-    #         gevent.spawn(f)
     @Plugin.command('seen', '<user:user>', global_=True)
     def seen(self, event, user):
         try:
