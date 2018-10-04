@@ -360,8 +360,36 @@ class InfractionsPlugin(Plugin):
 
     @Plugin.command('recent', aliases=['latest'], group='infractions', level=CommandLevels.MOD)
     def infractions_recent(self, event):
-        # TODO: fucking write this bruh
-        pass
+        q = (Infraction.guild_id == event.guild.id)
+        user = User.alias()
+        actor = User.alias()
+         infraction = Infraction.select(Infraction, user, actor).join(
+            user,
+            on=((Infraction.user_id == user.user_id).alias('user'))
+        ).switch(Infraction).join(
+            actor,
+            on=((Infraction.actor_id == actor.user_id).alias('actor'))
+        ).where(q).order_by(Infraction.created_at.desc()).limit(1)
+        
+        type_ = {i.index: i for i in Infraction.Types.attrs}[infraction.type_]
+        embed = MessageEmbed()
+         if type_ in (Infraction.Types.MUTE, Infraction.Types.TEMPMUTE, Infraction.Types.TEMPROLE):
+            embed.color = 0xfdfd96
+        elif type_ in (Infraction.Types.KICK, Infraction.Types.SOFTBAN):
+            embed.color = 0xffb347
+        else:
+            embed.color = 0xff6961
+         embed.title = str(type_).title()
+        embed.set_thumbnail(url=infraction.user.get_avatar_url())
+        embed.add_field(name='User', value=unicode(infraction.user), inline=True)
+        embed.add_field(name='Moderator', value=unicode(infraction.actor), inline=True)
+        embed.add_field(name='ID', value=unicode(infraction.id), inline=True)
+        embed.add_field(name='Active', value='yes' if infraction.active else 'no', inline=True)
+        if infraction.active and infraction.expires_at:
+            embed.add_field(name='Expires', value=humanize.naturaldelta(infraction.expires_at - datetime.utcnow()))
+        embed.add_field(name='Reason', value=infraction.reason or '_No Reason Given', inline=False)
+        embed.timestamp = infraction.created_at.isoformat()
+        event.msg.reply('', embed=embed)
 
     @Plugin.command('duration', '<infraction:int> <duration:str>', group='infractions', level=CommandLevels.MOD)
     def infraction_duration(self, event, infraction, duration):
@@ -470,7 +498,12 @@ class InfractionsPlugin(Plugin):
 
     @Plugin.command('delete', '<infraction:int> [reason:str...]', group='infractions', level=-1)
     def infraction_delete(self, event, infraction):
-        query = "DELETE FROM infractions WHERE id=%s RETURNING *;"
+        try:
+            inf = Infraction.select(Infraction).where(
+                (Infraction.id == infraction)
+            ).get()
+        except Infraction.DoesNotExist:
+            raise CommandFail('cannot find an infraction with ID `{}`'.format(infraction)))
 
         msg = event.msg.reply('Ok, delete infraction #`{}`?'.format(infraction))
         msg.chain(False).\
@@ -480,9 +513,9 @@ class InfractionsPlugin(Plugin):
         try:
             mra_event = self.wait_for_event(
                 'MessageReactionAdd',
-                message_id=msg.id,
-                conditional=lambda e: (
-                    e.emoji.id in (GREEN_TICK_EMOJI_ID, RED_TICK_EMOJI_ID) and
+                message_id = msg.id,
+                conditional = lambda e: (
+                    e.emoji.id in (GREEN_TICK_EMOJI, RED_TICK_EMOJI) and
                     e.user_id == event.author.id
                 )).get(timeout=10)
         except gevent.Timeout:
@@ -492,24 +525,11 @@ class InfractionsPlugin(Plugin):
 
         if mra_event.emoji.id != GREEN_TICK_EMOJI_ID:
             return
-        conn = database.obj.get_conn()
-        try:
-            c = conn.cursor()
-            c.execute(query, (infraction,))
-            conn.commit()
-            c.close    
-        except Infraction.DoesNotExist:
-            raise CommandFail('invalid infraction (try `!infractions recent`)')
-        except:
-            raise CommandFail('Failed to delete infraction #`{}`'.format(infraction))
-        self.queue_infractions()
-        c.close()
-        conn.close()
-        raise CommandSuccess('Successfully deleted inf #`{}`.'.format(infraction))
+        
+        inf.delete_instance()
+        self.queue_infractions
 
-
-        # if inf.actor_id != event.author.id and event.user_level < CommandLevels.ADMIN:
-        #     raise CommandFail('only administrators can modify the duration of infractions created by other moderators')
+        raise CommandSuccess('deleted infraction #`{}`.'.format(infraction))
     
     @Plugin.command('mute', '<user:user|snowflake> [reason:str...]', level=CommandLevels.MOD)
     @Plugin.command('tempmute', '<user:user|snowflake> <duration:str> [reason:str...]', level=CommandLevels.MOD)
