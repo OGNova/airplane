@@ -237,10 +237,22 @@ class AdminPlugin(Plugin):
         q = Message.select(Message.id).join(User).order_by(Message.id.desc()).limit(size)
 
         if mode in ('all', 'channel'):
-            q = q.where((Message.channel_id == (channel or event.channel).id))
+            cid = event.channel.id
+            if channel:
+                cid = channel if isinstance(channel, (int, long)) else channel.id
+            channel = event.guild.channels.get(cid)
+            if not channel:
+                raise CommandFail('channel not found')
+            perms = channel.get_permissions(event.author)
+            if not (perms.administrator or perms.read_messages):
+                raise CommandFail('invalid permissions')
+            q = q.where(Message.channel_id == cid)
         else:
+            user_id = user if isinstance(user, (int, long)) else user.id
+            if event.author.id != user_id:
+                self.can_act_on(event, user_id)
             q = q.where(
-                (Message.author_id == (user if isinstance(user, (int, long)) else user.id)) &
+                (Message.author_id == user_id) &
                 (Message.guild_id == event.guild.id)
             )
 
@@ -789,10 +801,10 @@ class AdminPlugin(Plugin):
         else:
             raise CommandFail('invalid user')
 
-    @Plugin.command('slowmode', '<timer:int> [channe:channel|snowflake]', level=CommandLevels.ADMIN)
+    @Plugin.command('slowmode', '<cooldown:int> [channel:channel|snowflake]', level=CommandLevels.ADMIN)
     def slowmode(self, event, cooldown, channel=None):
         if cooldown < 0 or cooldown > 120:
-            raise CommandFail('cooldown must be between 0 and 120 seconds.')
+            raise CommandFail('cooldown must be between 0-120 seconds')
 
         if isinstance(channel, DiscoChannel):
             channel = channel.id
@@ -804,7 +816,7 @@ class AdminPlugin(Plugin):
 
         self.bot.client.api.channels_modify(
             channel_id,
-            rate_limit_per_user = cooldown,
+            rate_limit_per_user=cooldown,
             reason=u'Modified by {} ({})'.format(
                 event.author,
                 event.author.id
