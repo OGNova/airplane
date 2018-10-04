@@ -4,3 +4,5 @@ config.yaml
 .venv/
 *.log
 .data
+frontend/node_modules
+.idea
