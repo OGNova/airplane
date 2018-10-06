@@ -23,7 +23,7 @@ from rowboat.models.user import User, Infraction
 from rowboat.models.guild import GuildMemberBackup, GuildBan
 from rowboat.sql import database
 from rowboat.constants import (
-    GREEN_TICK_EMOJI_ID, RED_TICK_EMOJI_ID, GREEN_TICK_EMOJI, RED_TICK_EMOJI
+    GREEN_TICK_EMOJI_ID, RED_TICK_EMOJI_ID, GREEN_TICK_EMOJI, RED_TICK_EMOJI, ROWBOAT_LOG_CHANNEL
 )
 
 def clamp(string, size):
@@ -496,6 +496,23 @@ class InfractionsPlugin(Plugin):
             # Run this in a greenlet so we dont block event execution
             self.spawn(f)
 
+    def log_deletion(self, event, infraction):
+        embed = MessageEmbed()
+        embed.set_footer(text='Airplane {}'.format(
+            'Production' if ENV == 'prod' else 'Testing'
+        ))
+        embed.timestamp = datetime.utcnow().isoformat()
+        embed.color = 0x99AAB5
+        try:
+            yield embed
+            self.bot.client.api.channel_messages_create(
+                ROWBOAT_LOG_CHANNEL,
+                embed=embed
+            )
+        except:
+            self.log.exception('Failed to send control message.')
+            return
+
     @Plugin.command('delete', '<infraction:int> [reason:str...]', group='infractions', level=-1)
     def infraction_delete(self, event, infraction):
         try:
@@ -530,6 +547,13 @@ class InfractionsPlugin(Plugin):
         self.queue_infractions
 
         raise CommandSuccess('deleted infraction #`{}`.'.format(infraction))
+
+        with self.log_deletion() as embed:
+            embed.title = 'Infraction Deleted'
+            embed.color = 0x99AAB5
+            embed.add_field(name='Server', value=event.guild.msg.name, inline=True)
+            embed.add_field(name='Actor', value=event.msg.author, inline=True)
+            embed.add_field(name='Infraction ID', value=infraction, inline=False)
     
     @Plugin.command('mute', '<user:user|snowflake> [reason:str...]', level=CommandLevels.MOD)
     @Plugin.command('tempmute', '<user:user|snowflake> <duration:str> [reason:str...]', level=CommandLevels.MOD)
