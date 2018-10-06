@@ -373,13 +373,13 @@ class InfractionsPlugin(Plugin):
         
         type_ = {i.index: i for i in Infraction.Types.attrs}[infraction.type_]
         embed = MessageEmbed()
-         if type_ in (Infraction.Types.MUTE, Infraction.Types.TEMPMUTE, Infraction.Types.TEMPROLE):
+        if type_ in (Infraction.Types.MUTE, Infraction.Types.TEMPMUTE, Infraction.Types.TEMPROLE):
             embed.color = 0xfdfd96
         elif type_ in (Infraction.Types.KICK, Infraction.Types.SOFTBAN):
             embed.color = 0xffb347
         else:
             embed.color = 0xff6961
-         embed.title = str(type_).title()
+        embed.title = str(type_).title()
         embed.set_thumbnail(url=infraction.user.get_avatar_url())
         embed.add_field(name='User', value=unicode(infraction.user), inline=True)
         embed.add_field(name='Moderator', value=unicode(infraction.actor), inline=True)
