@@ -363,7 +363,7 @@ class InfractionsPlugin(Plugin):
         q = (Infraction.guild_id == event.guild.id)
         user = User.alias()
         actor = User.alias()
-         infraction = Infraction.select(Infraction, user, actor).join(
+        infraction = Infraction.select(Infraction, user, actor).join(
             user,
             on=((Infraction.user_id == user.user_id).alias('user'))
         ).switch(Infraction).join(
