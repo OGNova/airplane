@@ -520,7 +520,7 @@ class InfractionsPlugin(Plugin):
                 (Infraction.id == infraction)
             ).get()
         except Infraction.DoesNotExist:
-            raise CommandFail('cannot find an infraction with ID `{}`'.format(infraction)))
+            raise CommandFail('cannot find an infraction with ID `{}`'.format(infraction))
 
         msg = event.msg.reply('Ok, delete infraction #`{}`?'.format(infraction))
         msg.chain(False).\
