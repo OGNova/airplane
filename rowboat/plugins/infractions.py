@@ -532,7 +532,7 @@ class InfractionsPlugin(Plugin):
                 'MessageReactionAdd',
                 message_id = msg.id,
                 conditional = lambda e: (
-                    e.emoji.id in (GREEN_TICK_EMOJI, RED_TICK_EMOJI) and
+                    e.emoji.id in (GREEN_TICK_EMOJI_ID, RED_TICK_EMOJI_ID) and
                     e.user_id == event.author.id
                 )).get(timeout=10)
         except gevent.Timeout:
