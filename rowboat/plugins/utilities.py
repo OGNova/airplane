@@ -395,11 +395,6 @@ class UtilitiesPlugin(Plugin):
             (Message.guild_id == event.guild.id)
         ).limit(1).order_by(Message.timestamp.desc()).async()
 
-        oldest_msg = Message.select(Message.timestamp).where(
-            (Message.author_id == user.id) &
-            (Message.guild_id == event.guild.id)
-        ).limit(1).order_by(Message.timestamp.asc()).async()
-
         infractions = Infraction.select(
             Infraction.guild_id,
             fn.COUNT('*')
