@@ -414,23 +414,17 @@ class UtilitiesPlugin(Plugin):
 
         # Wait for them all to complete (we're still going to be as slow as the
         #  slowest query, so no need to be smart about this.)
-        wait_many(newest_msg, oldest_msg, infractions, voice, timeout=15)
+        wait_many(newest_msg, infractions, voice, timeout=15)
         tags = to_tags(guild_id=event.msg.guild.id)
 
-        if newest_msg.value and oldest_msg.value:
+        if newest_msg.value
             statsd.timing('sql.duration.newest_msg', newest_msg.value._query_time, tags=tags)
-            statsd.timing('sql.duration.oldest_msg', oldest_msg.value._query_time, tags=tags)
             newest_msg = newest_msg.value.get()
-            oldest_msg = oldest_msg.value.get()
 
             content.append(u'\n **\u276F Activity**')
             content.append('Last Message: {} ago ({})'.format(
                 humanize.naturaldelta(datetime.utcnow() - newest_msg.timestamp),
                 newest_msg.timestamp.isoformat(),
-            ))
-            content.append('First Message: {} ago ({})'.format(
-                humanize.naturaldelta(datetime.utcnow() - oldest_msg.timestamp),
-                oldest_msg.timestamp.isoformat(),
             ))
 
         if infractions.value:
