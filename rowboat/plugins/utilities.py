@@ -417,7 +417,7 @@ class UtilitiesPlugin(Plugin):
         wait_many(newest_msg, infractions, voice, timeout=15)
         tags = to_tags(guild_id=event.msg.guild.id)
 
-        if newest_msg.value
+        if newest_msg.value:
             statsd.timing('sql.duration.newest_msg', newest_msg.value._query_time, tags=tags)
             newest_msg = newest_msg.value.get()
 
