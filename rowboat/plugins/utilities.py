@@ -429,7 +429,7 @@ class UtilitiesPlugin(Plugin):
 
         for i in self.server_owners:
             if i == str(user.id):
-                content.append('Ownership: {}'.format(self.server_owners[i]))
+                content.append('Server Ownership: {}'.format(self.server_owners[i]))
         
         for i in self.server_managers:
             if i == str(user.id):
