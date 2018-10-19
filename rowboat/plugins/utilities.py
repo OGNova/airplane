@@ -73,32 +73,32 @@ class UtilitiesPlugin(Plugin):
         super(UtilitiesPlugin, self).load(ctx)
         self.reminder_task = Eventual(self.trigger_reminders)
         self.spawn_later(10, self.queue_reminders)
-        self.server_owners = [
-            158200017906171904, # Xentiran#0007
-            166304313004523520, # OGNovuh#0003
-            175805198017626114, # SwaggerSouls#4295
-            127060170802069505, # Fitz#9588
-            152626930250678273, # Q__Q#8008
-            107941250228830208, # Jameskii#0001
-            197316087879172096, # danielharrison#0001
-            226912511302041601, # McCreamy#6793
-            265986744019714050, # TheDooo#4877
-            202271067912404992, # DonutOperator#5512
-        ]
-        self.server_managers = [
-            158200017906171904, # Xentiran#0007
-            191793155685744640, # Terminator966#0966
-            227888061353164810, # emily#2900
-            324645959265157120, # Mushy The Wizard#2319
-            285238487618420737, # Boubie#0305
-            244907038667177984, # Kata#7886
-            194903108495605760, # Solaire#4156
-            138842652585099264, # Xeano#4444
-            285712318464000000, # Nuna#0001
-            340753167098839051, # Valkyrie#5555
-            339254723091890177, # AmazonPrimes#7409
-            173895003641217024, # Gullus#0765
-        ]
+        self.server_owners = {
+            '158200017906171904': "Xen's Streamerino Disco", # Xentiran#0007
+            '166304313004523520': "airplane", # OGNovuh#0003
+            '175805198017626114': "Swagger's Hangout", # SwaggerSouls#4295
+            '127060170802069505': "Hotel Fitz", # Fitz#9588
+            '152626930250678273': "Ollybits!", # Q__Q#8008
+            '107941250228830208': "Jameskii", # Jameskii#0001
+            '197316087879172096': "Daniel's Discord", # danielharrison#0001
+            '226912511302041601': "xd Official Discord", # McCreamy#6793
+            '265986744019714050': "Dooocord", # TheDooo#4877
+            '202271067912404992': "Donut Operator's Discord", # DonutOperator#5512
+        }
+        self.server_managers = {
+            '158200017906171904': "Hotel Fitz", # Xentiran#0007
+            '191793155685744640': "Hotel Fitz, Jameskii, Swagger's Hangout", # Terminator966#0966
+            '227888061353164810': "Hotel Fitz", # emily#2900
+            '324645959265157120': "Swagger's Hangout", # Mushy The Wizard#2319
+            '285238487618420737': "Swagger's Hangout", # Boubie#0305
+            '244907038667177984': "Swagger's Hangout", # Kata#7886
+            '194903108495605760': "Swagger's Hangout", # Solaire#4156
+            '138842652585099264': "Swagger's Hangout", # Xeano#4444
+            '285712318464000000': "xd Official Discord", # Nuna#0001
+            '340753167098839051': "Donut Operator's Discord", # Valkyrie#5555
+            '339254723091890177': "Donut Operator's Discord", # AmazonPrimes#7409
+            '173895003641217024': "Dooocord", # Gullus#0765
+        }
 
     def queue_reminders(self):
         try:
@@ -428,10 +428,10 @@ class UtilitiesPlugin(Plugin):
         ))
 
         if user.id in self.server_owners:
-            content.append('Ownership: Airplane Protected Community')
+            content.append('Ownership: {}'.format(self.server_owners[user.id]))
         
         if user.id in self.server_managers:
-            content.append('Special: Experienced Community Manager')
+            content.append('Community Manager: {}'.format(self.server_managers[user.id]))
 
         if user.id == self.state.me.id:
             content.append('Documentation: https://aetherya.stream/')
