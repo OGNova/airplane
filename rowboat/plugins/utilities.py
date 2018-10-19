@@ -388,6 +388,12 @@ class UtilitiesPlugin(Plugin):
                 content.append(u'Roles: {}'.format(
                     ', '.join((member.guild.roles.get(r).name for r in member.roles))
                 ))
+            if not member.user.avatar:
+                avatar = default_color(str(member.user.default_avatar))   
+            elif member.user.avatar.startswith('a_'):
+                avatar = u'https://cdn.discordapp.com/avatars/{}/{}.gif'.format(user.id, user.avatar)
+            else:
+                avatar = u'https://cdn.discordapp.com/avatars/{}/{}.png'.format(user.id, user.avatar)
 
         # Execute a bunch of queries async
         newest_msg = Message.select(Message.timestamp).where(
@@ -445,13 +451,6 @@ class UtilitiesPlugin(Plugin):
             )))
 
         embed = MessageEmbed()
-
-        if not member.user.avatar:
-            avatar = default_color(str(member.user.default_avatar))   
-        elif member.user.avatar.startswith('a_'):
-            avatar = u'https://cdn.discordapp.com/avatars/{}/{}.gif'.format(user.id, user.avatar)
-        else:
-            avatar = u'https://cdn.discordapp.com/avatars/{}/{}.png'.format(user.id, user.avatar)
         
 
         embed.set_author(name=u'{}#{}'.format(
