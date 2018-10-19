@@ -427,11 +427,13 @@ class UtilitiesPlugin(Plugin):
             created_dt.isoformat()
         ))
 
-        if user.id in self.server_owners:
-            content.append('Ownership: {}'.format(self.server_owners[str(user.id)]))
+        for i in self.server_owners:
+            if i == str(user.id):
+                content.append('Ownership: {}'.format(self.server_owners[i]))
         
-        if user.id in self.server_managers:
-            content.append('Community Manager: {}'.format(self.server_managers[str(user.id)]))
+        for i in self.server_managers:
+            if i == str(user.id):
+                content.append('Community Manager: {}'.format(self.server_managers[i]))
 
         if user.id == self.state.me.id:
             content.append('Documentation: https://aetherya.stream/')
