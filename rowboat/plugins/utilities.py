@@ -24,6 +24,7 @@ from rowboat.util.input import parse_duration
 from rowboat.util.gevent import wait_many
 from rowboat.util.stats import statsd, to_tags
 from rowboat.types.plugin import PluginConfig
+from rowboat.redis import rdb
 from rowboat.models.guild import GuildVoiceSession
 from rowboat.models.user import User, Infraction
 from rowboat.models.message import Message, Reminder
@@ -72,6 +73,32 @@ class UtilitiesPlugin(Plugin):
         super(UtilitiesPlugin, self).load(ctx)
         self.reminder_task = Eventual(self.trigger_reminders)
         self.spawn_later(10, self.queue_reminders)
+        self.server_owners = [
+            158200017906171904, # Xentiran#0007
+            166304313004523520, # OGNovuh#0003
+            175805198017626114, # SwaggerSouls#4295
+            127060170802069505, # Fitz#9588
+            152626930250678273, # Q__Q#8008
+            107941250228830208, # Jameskii#0001
+            197316087879172096, # danielharrison#0001
+            226912511302041601, # McCreamy#6793
+            265986744019714050, # TheDooo#4877
+            202271067912404992, # DonutOperator#5512
+        ]
+        self.server_managers = [
+            158200017906171904, # Xentiran#0007
+            191793155685744640, # Terminator966#0966
+            227888061353164810, # emily#2900
+            324645959265157120, # Mushy The Wizard#2319
+            285238487618420737, # Boubie#0305
+            244907038667177984, # Kata#7886
+            194903108495605760, # Solaire#4156
+            138842652585099264, # Xeano#4444
+            285712318464000000, # Nuna#0001
+            340753167098839051, # Valkyrie♕#5555
+            339254723091890177, # AmazonPrimes#7409
+            173895003641217024, # Gullus#0765
+        ]
 
     def queue_reminders(self):
         try:
@@ -350,8 +377,27 @@ class UtilitiesPlugin(Plugin):
         embed.description = '\n'.join(content)
         event.msg.reply('', embed=embed)
 
-    @Plugin.command('info', '<user:user>')
-    def info(self, event, user):
+    # --------------Coded by Xenthys#0001 for Rawgoat--------------
+    @Plugin.command('info', '[user:user|snowflake]')
+    def info(self, event, user=None):
+        if user is None:
+            user = event.author
+
+        user_id = 0
+        if isinstance(user, (int, long)):
+            user_id = user
+            user = self.state.users.get(user)
+
+        if user and not user_id:
+            user = self.state.users.get(user.id)
+
+        if not user:
+            if user_id:
+                user = self.fetch_user(user_id)
+                User.from_disco_user(user)
+            else:
+                raise CommandFail('unknown user')
+
         content = []
         content.append(u'**\u276F User Information**')
         content.append(u'ID: {}'.format(user.id))
@@ -360,17 +406,37 @@ class UtilitiesPlugin(Plugin):
         if user.presence:
             emoji, status = get_status_emoji(user.presence)
             content.append('Status: {} <{}>'.format(status, emoji))
-            if user.presence.game and user.presence.game.name:
-                if user.presence.game.type == GameType.DEFAULT:
-                    content.append(u'Game: {}'.format(user.presence.game.name))
-                else:
-                    content.append(u'Stream: [{}]({})'.format(user.presence.game.name, user.presence.game.url))
+
+            game = user.presence.game
+            if game and game.name:
+                activity = ['Playing', 'Stream'][int(game.type or 0)]
+                if not game.type:
+                    if game.name == 'Spotify':
+                        activity = 'Listening to'
+                    else:
+                        activity = None
+                if activity:
+                    content.append(u'{}: {}'.format(activity,
+                        u'[{}]({})'.format(game.name, game.url) if game.url else game.name
+                    ))
+
 
         created_dt = to_datetime(user.id)
         content.append('Created: {} ago ({})'.format(
             humanize.naturaldelta(datetime.utcnow() - created_dt),
             created_dt.isoformat()
         ))
+
+        if user.id in self.server_owners:
+            content.append('Ownership: Airplane Protected Community')
+        
+        if user.id in self.server_managers:
+            content.append('Special: Experienced Community Manager')
+
+        if user.id == self.state.me.id:
+            content.append('Documentation: https://aetherya.stream/')
+        elif rdb.sismember('global_admins', user.id):
+            content.append('Airplane Staff: Global Administrator')
 
         member = event.guild.get_member(user.id) if event.guild else None
         if member:
@@ -385,21 +451,34 @@ class UtilitiesPlugin(Plugin):
             ))
 
             if member.roles:
-                content.append(u'Roles: {}'.format(
-                    ', '.join((member.guild.roles.get(r).name for r in member.roles))
+                roles = []
+                for r in member.roles:
+                    roles.append(member.guild.roles.get(r))
+                roles = sorted(roles, key=lambda r: r.position, reverse=True)
+                total = len(member.roles)
+                roles = roles[:20]
+                content.append(u'Roles ({}): {}{}'.format(
+                    total, ' '.join(r.mention for r in roles),
+                    ' (+{})'.format(total-20) if total > 20 else ''
                 ))
 
         # Execute a bunch of queries async
         newest_msg = Message.select(Message.timestamp).where(
             (Message.author_id == user.id) &
             (Message.guild_id == event.guild.id)
-        ).limit(1).order_by(Message.timestamp.desc()).async()
+        ).order_by(Message.timestamp.desc()).limit(1).async()
+
+        # oldest_msg = Message.select(Message.timestamp).where(
+        #     (Message.author_id == user.id) &
+        #     (Message.guild_id == event.guild.id)
+        # ).order_by(Message.timestamp.asc()).limit(1).async()
 
         infractions = Infraction.select(
             Infraction.guild_id,
             fn.COUNT('*')
         ).where(
             (Infraction.user_id == user.id) &
+            (Infraction.type_ != 6) & # Unban
             (~(Infraction.reason ** '[NOTE]%'))
         ).group_by(Infraction.guild_id).tuples().async()
 
@@ -414,25 +493,28 @@ class UtilitiesPlugin(Plugin):
 
         # Wait for them all to complete (we're still going to be as slow as the
         #  slowest query, so no need to be smart about this.)
-        wait_many(newest_msg, infractions, voice, timeout=15)
+        try:
+            wait_many(newest_msg, infractions, voice, timeout=3)
+        except gevent.Timeout:
+            pass
         tags = to_tags(guild_id=event.msg.guild.id)
-
-        if not user.avatar:
-            avatar = default_color(str(user.default_avatar))   
-        elif user.avatar.startswith('a_'):
-            avatar = u'https://cdn.discordapp.com/avatars/{}/{}.gif'.format(user.id, user.avatar)
-        else:
-            avatar = u'https://cdn.discordapp.com/avatars/{}/{}.png'.format(user.id, user.avatar)
-
+            
         if newest_msg.value:
+            content.append(u'\n **\u276F Activity**')
             statsd.timing('sql.duration.newest_msg', newest_msg.value._query_time, tags=tags)
             newest_msg = newest_msg.value.get()
-
-            content.append(u'\n **\u276F Activity**')
             content.append('Last Message: {} ago ({})'.format(
                 humanize.naturaldelta(datetime.utcnow() - newest_msg.timestamp),
                 newest_msg.timestamp.isoformat(),
             ))
+
+        # if oldest_msg.value:
+        #     statsd.timing('sql.duration.oldest_msg', oldest_msg.value._query_time, tags=tags)
+        #     oldest_msg = oldest_msg.value.get()
+        #     content.append('First Message: {} ago ({})'.format(
+        #         humanize.naturaldelta(datetime.utcnow() - oldest_msg.timestamp),
+        #         oldest_msg.timestamp.isoformat(),
+        #     ))
 
         if infractions.value:
             statsd.timing('sql.duration.infractions', infractions.value._query_time, tags=tags)
@@ -452,7 +534,16 @@ class UtilitiesPlugin(Plugin):
             )))
 
         embed = MessageEmbed()
-        
+
+        avatar = user.avatar
+        if avatar:
+            avatar = u'https://cdn.discordapp.com/avatars/{}/{}.{}'.format(
+                user.id, avatar, u'gif' if avatar.startswith('a_') else u'png'
+            )
+        else:
+            avatar = u'https://cdn.discordapp.com/embed/avatars/{}.png'.format(
+                int(user.discriminator) % 5
+            )
 
         embed.set_author(name=u'{}#{}'.format(
             user.username,
@@ -462,8 +553,13 @@ class UtilitiesPlugin(Plugin):
         embed.set_thumbnail(url=avatar)
 
         embed.description = '\n'.join(content)
-        embed.color = get_dominant_colors_user(user, avatar)
+        try:
+            embed.color = get_dominant_colors_user(user, avatar)
+        except:
+            pass
         event.msg.reply('', embed=embed)
+
+# --------------Coded by Xenthys#0001 for Rawgoat--------------
 
     def trigger_reminders(self):
         reminders = Reminder.with_message_join().where(
