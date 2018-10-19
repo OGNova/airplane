@@ -428,10 +428,10 @@ class UtilitiesPlugin(Plugin):
         ))
 
         if user.id in self.server_owners:
-            content.append('Ownership: {}'.format(self.server_owners[user.id]))
+            content.append('Ownership: {}'.format(self.server_owners[str(user.id)]))
         
         if user.id in self.server_managers:
-            content.append('Community Manager: {}'.format(self.server_managers[user.id]))
+            content.append('Community Manager: {}'.format(self.server_managers[str(user.id)]))
 
         if user.id == self.state.me.id:
             content.append('Documentation: https://aetherya.stream/')
