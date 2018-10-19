@@ -388,12 +388,6 @@ class UtilitiesPlugin(Plugin):
                 content.append(u'Roles: {}'.format(
                     ', '.join((member.guild.roles.get(r).name for r in member.roles))
                 ))
-            if not member.user.avatar:
-                avatar = default_color(str(member.user.default_avatar))   
-            elif member.user.avatar.startswith('a_'):
-                avatar = u'https://cdn.discordapp.com/avatars/{}/{}.gif'.format(user.id, user.avatar)
-            else:
-                avatar = u'https://cdn.discordapp.com/avatars/{}/{}.png'.format(user.id, user.avatar)
 
         # Execute a bunch of queries async
         newest_msg = Message.select(Message.timestamp).where(
@@ -422,6 +416,13 @@ class UtilitiesPlugin(Plugin):
         #  slowest query, so no need to be smart about this.)
         wait_many(newest_msg, infractions, voice, timeout=15)
         tags = to_tags(guild_id=event.msg.guild.id)
+
+        if not user.avatar:
+            avatar = default_color(str(user.default_avatar))   
+        elif user.avatar.startswith('a_'):
+            avatar = u'https://cdn.discordapp.com/avatars/{}/{}.gif'.format(user.id, user.avatar)
+        else:
+            avatar = u'https://cdn.discordapp.com/avatars/{}/{}.png'.format(user.id, user.avatar)
 
         if newest_msg.value:
             statsd.timing('sql.duration.newest_msg', newest_msg.value._query_time, tags=tags)
