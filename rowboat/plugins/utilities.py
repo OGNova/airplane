@@ -75,7 +75,7 @@ class UtilitiesPlugin(Plugin):
         self.spawn_later(10, self.queue_reminders)
         self.server_owners = {
             '158200017906171904': "Xen's Streamerino Disco", # Xentiran#0007
-            '166304313004523520': "airplane, PokéBlobs", # OGNovuh#0003
+            '166304313004523520': "airplane, PokeBlobs", # OGNovuh#0003
             '175805198017626114': "Swagger's Hangout", # SwaggerSouls#4295
             '127060170802069505': "Hotel Fitz", # Fitz#9588
             '152626930250678273': "Ollybits!", # Q__Q#8008
