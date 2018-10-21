@@ -774,29 +774,23 @@ class AdminPlugin(Plugin):
         member = event.guild.get_member(user)
         if member:
             self.can_act_on(event, member.id)
-            user_id = member.user.id
             kwargs = {}
             if newname == None:
                 kwargs['nick'] = ''
                 member.modify(**kwargs)
                 try:
                     raise CommandSuccess('reset {}\'s nickname.'.format(member.username))
-                    return
                 except:
                     raise CommandSuccess('reset <@!{}>\'s nickname.'.format(member.user.id))
-                    return
             elif (len(newname)>32):
                 raise CommandFail('invalid nickname. Nicknames must be <= 32 chars')
-                return
             else:
-                kwargs['nick'] = newname
+                kwargs['nick'] = str(newname)
                 member.modify(**kwargs)
                 try:
-                    raise CommandSuccess('updated {}\'s nickname to (`{}`)'.format(member.username, newname))
-                    return
+                    raise CommandSuccess('updated {}\'s nickname to (`{}`)'.format(member.username, str(newname)))
                 except:
-                    raise CommandSuccess('updated <@!{}>\'s nickname to (`{}`)'.format(member.user.id, newname))
-                    return
+                    raise CommandSuccess('updated <@!{}>\'s nickname to (`{}`)'.format(member.user.id, str(newname)))
 
         else:
             raise CommandFail('invalid user')
