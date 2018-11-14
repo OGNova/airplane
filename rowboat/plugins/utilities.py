@@ -17,6 +17,8 @@ from disco.types.message import MessageEmbed
 from disco.util.snowflake import to_datetime
 from disco.util.sanitize import S
 
+from disco.api.http import APIException
+
 from rowboat.plugins import RowboatPlugin as Plugin, CommandFail
 from disco.bot import CommandLevels
 from rowboat.util.timing import Eventual
