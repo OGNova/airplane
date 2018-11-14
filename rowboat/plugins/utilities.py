@@ -172,6 +172,36 @@ class UtilitiesPlugin(Plugin):
         r.raise_for_status()
         event.msg.reply('', attachments=[('duck.jpg', r.content)])
     
+    @Plugin.command('bunny', aliases=['bunbun', 'wabbit', 'fluff'] global_=True)
+    def bunny(self, event):
+        try:
+            r = requests.get('https://api.bunnies.io/v2/loop/random/?media=png,gif')
+            r.raise_for_status()
+        except:
+            return event.msg.reply('404 bunny not found :(')
+
+        media = r.json()['media']
+        ext = 'png'
+        if (media['gif']):
+            url = media['gif']
+            ext='gif'
+        elif(media['png']):
+            url = media['png']
+        else:
+            return event.msg.reply('404 bunny not found :(')
+
+        r = requests.get(url)
+        try:
+            r.raise_for_status()
+        except requests.HTTPError as e:
+            self.log.error('Bunny fetch failed: {}'.format(str(e)))
+            return event.msg.reply('404 bunny not found :(')
+
+        try:
+            event.msg.reply('', attachments=[('bunny.{}'.format(ext), r.content)])
+        except APIException:
+            self.bunny(event)
+    
     @Plugin.command('dog', global_=True)
     def dog(self, event):
         # Sometimes random.dog gives us gifs or mp4s (smh)
