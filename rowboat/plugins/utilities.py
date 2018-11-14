@@ -172,7 +172,7 @@ class UtilitiesPlugin(Plugin):
         r.raise_for_status()
         event.msg.reply('', attachments=[('duck.jpg', r.content)])
     
-    @Plugin.command('bunny', aliases=['bunbun', 'wabbit', 'fluff'] global_=True)
+    @Plugin.command('bunny', aliases=['bunbun', 'wabbit', 'fluff'], global_=True)
     def bunny(self, event):
         try:
             r = requests.get('https://api.bunnies.io/v2/loop/random/?media=png,gif')
