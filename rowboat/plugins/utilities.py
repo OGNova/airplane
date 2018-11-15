@@ -19,7 +19,7 @@ from disco.util.snowflake import to_datetime
 from disco.util.sanitize import S
 
 
-from disco.api.http import APIException
+from disco.api.http import Routes, APIException
 
 from rowboat.plugins import RowboatPlugin as Plugin, CommandFail
 from disco.bot import CommandLevels
