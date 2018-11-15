@@ -13,9 +13,11 @@ from datetime import datetime, timedelta
 from collections import defaultdict
 
 from disco.types.user import GameType, Status
+from disco.types.user import GameType, Status, User as DiscoUser
 from disco.types.message import MessageEmbed
 from disco.util.snowflake import to_datetime
 from disco.util.sanitize import S
+
 
 from disco.api.http import APIException
 
@@ -410,6 +412,16 @@ class UtilitiesPlugin(Plugin):
         event.msg.reply('', embed=embed)
 
     # --------------Coded by Xenthys#0001 for Rawgoat--------------
+
+    def fetch_user(self, id, raise_on_error=True):
+        try:
+            r = self.bot.client.api.http(Routes.USERS_GET, dict(user=id))
+            return DiscoUser.create(self.bot.client.api.client,r.json())
+        except APIException:
+            if raise_on_error:
+                raise CommandFail('unknown user')
+            return
+
     @Plugin.command('info', '[user:user|snowflake]')
     def info(self, event, user=None):
         if user is None:
