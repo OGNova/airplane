@@ -1043,7 +1043,7 @@ class InfractionsPlugin(Plugin):
             perms = guild.get_permissions(self.state.me)
 
             if not perms.ban_members and not perms.administrator:
-                contents.append(u'<:deny:470285164313051138> {} - No Permissions'.format(
+                failed.append(u'<:deny:470285164313051138> {} - No Permissions'.format(
                     guild.name
                 ))
                 continue
@@ -1051,7 +1051,7 @@ class InfractionsPlugin(Plugin):
             try:
                 Infraction.ban(self, event, user, reason, guild)
             except:
-                contents.append(u'<:deny:470285164313051138> {} - Unknown Error'.format(
+                failed.append(u'<:deny:470285164313051138> {} - Unknown Error'.format(
                     guild.name
                 ))
                 self.log.exception('Failed to force ban %s in %s', user, gid)
