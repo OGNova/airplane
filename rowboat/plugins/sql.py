@@ -254,19 +254,8 @@ class SQLPlugin(Plugin):
             for users in message.get_reactors(reaction.emoji, bulk=True):
                 Reaction.from_disco_reactors(message.id, reaction, (i.id for i in users))
 
-    @Plugin.command(
-        'global',
-        '<duration:str> [pool:int]',
-        level=-1,
-        global_=True,
-        context={'mode': 'global'},
-        group='recover')
-    @Plugin.command('here',
-            '<duration:str> [pool:int]',
-            level=-1,
-            global_=True,
-            context={'mode': 'here'},
-            group='recover')
+    @Plugin.command('global', '<duration:str> [pool:int]', level=-1, global_=True, context={'mode': 'global'}, group='recover')
+    @Plugin.command('here', '<duration:str> [pool:int]', level=-1, global_=True, context={'mode': 'here'}, group='recover')
     def command_recover(self, event, duration, pool=4, mode=None):
         if mode == 'global':
             channels = list(self.state.channels.values())
