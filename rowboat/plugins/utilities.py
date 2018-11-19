@@ -13,9 +13,13 @@ from datetime import datetime, timedelta
 from collections import defaultdict
 
 from disco.types.user import GameType, Status
+from disco.types.user import GameType, Status, User as DiscoUser
 from disco.types.message import MessageEmbed
 from disco.util.snowflake import to_datetime
 from disco.util.sanitize import S
+
+
+from disco.api.http import Routes, APIException
 
 from rowboat.plugins import RowboatPlugin as Plugin, CommandFail
 from disco.bot import CommandLevels
@@ -171,6 +175,36 @@ class UtilitiesPlugin(Plugin):
         r = requests.get(url)
         r.raise_for_status()
         event.msg.reply('', attachments=[('duck.jpg', r.content)])
+    
+    @Plugin.command('bunny', aliases=['bunbun', 'wabbit', 'fluff'], global_=True)
+    def bunny(self, event):
+        try:
+            r = requests.get('https://api.bunnies.io/v2/loop/random/?media=png,gif')
+            r.raise_for_status()
+        except:
+            return event.msg.reply('404 bunny not found :(')
+
+        media = r.json()['media']
+        ext = 'png'
+        if (media['gif']):
+            url = media['gif']
+            ext='gif'
+        elif(media['png']):
+            url = media['png']
+        else:
+            return event.msg.reply('404 bunny not found :(')
+
+        r = requests.get(url)
+        try:
+            r.raise_for_status()
+        except requests.HTTPError as e:
+            self.log.error('Bunny fetch failed: {}'.format(str(e)))
+            return event.msg.reply('404 bunny not found :(')
+
+        try:
+            event.msg.reply('', attachments=[('bunny.{}'.format(ext), r.content)])
+        except APIException:
+            self.bunny(event)
     
     @Plugin.command('dog', global_=True)
     def dog(self, event):
@@ -378,6 +412,16 @@ class UtilitiesPlugin(Plugin):
         event.msg.reply('', embed=embed)
 
     # --------------Coded by Xenthys#0001 for Rawgoat--------------
+
+    def fetch_user(self, id, raise_on_error=True):
+        try:
+            r = self.bot.client.api.http(Routes.USERS_GET, dict(user=id))
+            return DiscoUser.create(self.bot.client.api.client,r.json())
+        except APIException:
+            if raise_on_error:
+                raise CommandFail('unknown user')
+            return
+
     @Plugin.command('info', '[user:user|snowflake]')
     def info(self, event, user=None):
         if user is None:
