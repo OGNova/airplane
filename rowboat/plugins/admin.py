@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import re
 import time
 import gevent
@@ -778,19 +779,21 @@ class AdminPlugin(Plugin):
             if newname == None:
                 kwargs['nick'] = ''
                 member.modify(**kwargs)
-                try:
-                    raise CommandSuccess('reset {}\'s nickname.'.format(member.username))
-                except:
-                    raise CommandSuccess('reset <@!{}>\'s nickname.'.format(member.user.id))
+                raise CommandSuccess(u'reset `{}`\'s nickname.'.format(unicode(member.user)))
+                # try:
+                #     raise CommandSuccess(u'reset `{}`\'s nickname.'.format(member.username))
+                # except:
+                #     raise CommandSuccess(u'reset <@!{}>\'s nickname.'.format(member.user.id))
             elif (len(newname)>32):
                 raise CommandFail('invalid nickname. Nicknames must be <= 32 chars')
             else:
-                kwargs['nick'] = str(newname)
+                kwargs['nick'] = unicode(newname)
                 member.modify(**kwargs)
-                try:
-                    raise CommandSuccess('updated {}\'s nickname to (`{}`)'.format(member.username, str(newname)))
-                except:
-                    raise CommandSuccess('updated <@!{}>\'s nickname to (`{}`)'.format(member.user.id, str(newname)))
+                raise CommandSuccess(u'updated `{}`\'s nickname to (`{}`)'.format(unicode(member.user), unicode(newname)))
+                # try:
+                #     raise CommandSuccess(u'updated `{}`\'s nickname to (`{}`)'.format(member.username, unicode(newname).encode('utf-8')))
+                # except:
+                #     raise CommandSuccess(u'updated <@!{}>\'s nickname to (`{}`)'.format(member.user.id, unicode(newname).encode('utf-8')))
 
         else:
             raise CommandFail('invalid user')
