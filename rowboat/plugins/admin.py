@@ -820,10 +820,8 @@ class AdminPlugin(Plugin):
             )
         )
 
-        mode = 'set to {} second{}'.format(cooldown, 's' if cooldown > 1 else '') if cooldown > 0 else 'disabled'
-        raise CommandSuccess('slowmode for <#{}> has been {}'.format(channel_id, mode))
-
-    # @Plugin.command('chat', level=CommandLevels.ADMIN)
-    # @Plugin.parser.add_argument('--lock', '--unlock', default='-lock', help='reason for modlog')
-    # def chat_command(self, event):
-    #     print(args)
+        raise CommandSuccess('slowmode for <#{}> has been {}'.format(
+            'disabled' if cooldown < 1 else 'set to {} second{}'.format(
+                cooldown, 's' if cooldown > 1 else ''
+            )
+        ))
