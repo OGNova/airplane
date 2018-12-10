@@ -11,6 +11,7 @@ from datetime import datetime
 from disco.bot import CommandLevels
 from disco.types.user import User as DiscoUser
 from disco.types.message import MessageTable, MessageEmbed
+from disco.api.http import APIException
 
 from rowboat.plugins import RowboatPlugin as Plugin, CommandFail, CommandSuccess
 from rowboat.util.timing import Eventual
@@ -1137,23 +1138,30 @@ class InfractionsPlugin(Plugin):
                 continue
 
             try:
-                GuildBan.get(user_id=user, guild_id=event.guild.id)
-                event.guild.delete_ban(user)
-            except:
-                contents.append(u'<:deny:470285164313051138> {} - No ban exists'.format(
-                    guild.name
-                ))
+                # GuildBan.get(user_id=user, guild_id=event.guild.id)
+                # event.guild.delete_ban(user)
+                self.bot.client.api.guilds_bans_delete(gid, user, reason)
+            except APIException as e:
+                if e.code == 10026: # Unknown Ban
+                    contents.append(u'<:deny:470285164313051138> {} - Ban Not Found'.format(
+                        guild.name
+                    ))
+                # Was the just incase you want it here.
+                # if e.code == 50013: # Missing Permissions
+                #     contents.append(u'<:deny:470285164313051138> {} - Permission Denied'.format(
+                #         guild.name
+                #     ))
                 self.log.exception('Failed to unban %s in %s', user, gid)
 
             Infraction.create(
-                guild_id=event.guild.id,
+                guild_id=gid,
                 user_id=user,
                 actor_id=event.author.id,
                 type_=Infraction.Types.UNBAN,
                 reason=reason
             )
 
-            contents.append(u'<:approve:470283598600208394> {} - :regional_indicator_f:'.format(
+            contents.append(u'<:approve:470283598600208394> {} - Ban Removed'.format(
                 guild.name
             ))
 
