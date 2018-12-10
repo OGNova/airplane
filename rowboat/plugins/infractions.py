@@ -1139,7 +1139,7 @@ class InfractionsPlugin(Plugin):
             try:
                 GuildBan.get(user_id=user, guild_id=event.guild.id)
                 event.guild.delete_ban(user)
-            except GuildBan.DoesNotExist:
+            except:
                 contents.append(u'<:deny:470285164313051138> {} - No ban exists'.format(
                     guild.name
                 ))
