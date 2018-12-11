@@ -821,7 +821,7 @@ class AdminPlugin(Plugin):
         )
 
         raise CommandSuccess('slowmode for <#{}> has been {}'.format(
-            'disabled' if cooldown < 1 else 'set to {} second{}'.format(
+            channel_id, 'disabled' if cooldown < 1 else 'set to {} second{}'.format(
                 cooldown, 's' if cooldown > 1 else ''
             )
         ))
