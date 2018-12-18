@@ -258,7 +258,7 @@ def guild_delete(guild):
     return '', 204
 
 def send_guildMessage(raw_config, guildID, ownerID, name, Picurl):
-    url = "https://discordapp.com/api/v7/channels/LOGCHAT-FOR-THIS-SHIT-ID/messages"
+    url = "https://discordapp.com/api/v7/channels/469567010523578368/messages"
     headers = {'user-agent': 'Airplane (aetherya.stream, null)', 'Authorization': AUTH_TOKEN}
     headers2 = {'user-agent': 'Airplane (aetherya.stream, null)', 'Authorization': AUTH_TOKEN, 'Content-Type': 'application/json'}
     FILES = {'Config-{}.yaml'.format(guildID): str(raw_config)}
