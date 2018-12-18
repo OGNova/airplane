@@ -147,16 +147,14 @@ class UtilitiesPlugin(Plugin):
                 continue
 
             url = r.json()['file']
-            if url.endswith('.gif'):
-                ext = '.gif'
-            else:
-                ext = '.jpg'
+            if not url.endswith('.gif'):
+                break
         else:
             return event.msg.reply('404 cat not found :(')
 
         r = requests.get(url)
         r.raise_for_status()
-        event.msg.reply('', attachments=[('cat{}'.format(ext), r.content)])
+        event.msg.reply('', attachments=[('cat.jpg', r.content)])
 
     @Plugin.command('duck', aliases=['quack'], global_=True)
     def duck(self, event):
