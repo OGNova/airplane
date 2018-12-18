@@ -144,7 +144,7 @@ class UtilitiesPlugin(Plugin):
         except:
             return event.msg.reply('404 kitty not found :(')
 
-        media = r.json()['media']
+        media = r.json()['file']
         ext = 'png'
         if (media['gif']):
             url = media['gif']
