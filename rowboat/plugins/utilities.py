@@ -136,25 +136,35 @@ class UtilitiesPlugin(Plugin):
 
         event.msg.reply(str(random.randint(start, end)))
 
-    @Plugin.command('cat', global_=True)
+    @Plugin.command('cat', aliases=['kitty'], global_=True)
     def cat(self, event):
-        # Sometimes random.cat gives us gifs (smh)
-        for _ in range(3):
-            try:
-                r = requests.get('http://aws.random.cat/meow')
-                r.raise_for_status()
-            except:
-                continue
+        try:
+            r = requests.get('http://aws.random.cat/meow')
+            r.raise_for_status()
+        except:
+            return event.msg.reply('404 kitty not found :(')
 
-            url = r.json()['file']
-            if not url.endswith('.gif'):
-                break
+        media = r.json()['media']
+        ext = 'png'
+        if (media['gif']):
+            url = media['gif']
+            ext='gif'
+        elif(media['png']):
+            url = media['png']
         else:
-            return event.msg.reply('404 cat not found :(')
+            return event.msg.reply('404 kitty not found :(')
 
         r = requests.get(url)
-        r.raise_for_status()
-        event.msg.reply('', attachments=[('cat.jpg', r.content)])
+        try:
+            r.raise_for_status()
+        except requests.HTTPError as e:
+            self.log.error('Kitty fetch failed: {}'.format(str(e)))
+            return event.msg.reply('404 cat not found :(')
+
+        try:
+            event.msg.reply('', attachments=[('cat.{}'.format(ext), r.content)])
+        except APIException:
+            self.bunny(event)
 
     @Plugin.command('duck', aliases=['quack'], global_=True)
     def duck(self, event):
