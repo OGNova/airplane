@@ -1,8 +1,10 @@
 rowboat-*.json
-config.yaml
+# config.yaml
 *.pyc
 .venv/
 *.log
 .data
+.redis
 frontend/node_modules
 .idea
+.vscode

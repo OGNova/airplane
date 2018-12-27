@@ -38,6 +38,7 @@ class Guild(BaseModel):
 
     enabled = BooleanField(default=True)
     whitelist = BinaryJSONField(default=[])
+    premium = BooleanField(default=False)
 
     added_at = DateTimeField(default=datetime.utcnow)
 
@@ -56,7 +57,26 @@ class Guild(BaseModel):
         return cls.get(guild_id=guild_id)
 
     @classmethod
-    def setup(cls, guild):
+    def setup(cls, guild, owner):
+        oid = unicode(owner.id)
+
+        raw = [
+            u'# Please read https://rawgo.at/docs to get started with configuration.',
+            u'# The server owner will always have dashboard admin access, whatever happens.\n',
+            u'web:\n  {}: admin # {}\n'.format(oid, owner),
+            u'commands:\n  prefix: \'!\'\n  overrides:\n  - {plugin.name: \'utilities\', out: {level: 1}}\n',
+            u'levels:\n  {}: 100 # {}\n'.format(oid, owner),
+            u'plugins:\n  admin:\n    persist:\n      roles: false\n      role_ids: []',
+            u'      nickname: false\n      voice: false\n    group_confirm_reactions: false\n',
+            u'  infractions:\n    reason_edit_level: 100',
+            u'    #mute_role: 000000000000000000\n\n  utilities: {}\n  tags: {}\n'
+        ]
+
+        raw = u'\n'.join(raw).encode('latin1', 'ignore')
+
+        parsed = yaml.load(raw) or {}
+        GuildConfig(parsed).validate()
+
         return cls.create(
             guild_id=guild.id,
             owner_id=guild.owner_id,
@@ -64,8 +84,8 @@ class Guild(BaseModel):
             icon=guild.icon,
             splash=guild.splash,
             region=guild.region,
-            config={'web': {guild.owner_id: 'admin'}},
-            config_raw='')
+            config=parsed,
+            config_raw=raw)
 
     def is_whitelisted(self, flag):
         return int(flag) in self.whitelist
@@ -84,6 +104,12 @@ class Guild(BaseModel):
 
         self.update(config=parsed, config_raw=raw).where(Guild.guild_id == self.guild_id).execute()
         self.emit('GUILD_UPDATE')
+
+    def update_premium(self, update_type):
+        self.update(premium=update_type).where(Guild.guild_id == self.guild_id).execute()
+    
+    def is_premium(self):
+        return self.premium
 
     def emit(self, action, **kwargs):
         emit(action, id=self.guild_id, **kwargs)
@@ -144,7 +170,8 @@ class Guild(BaseModel):
             'splash': self.splash,
             'region': self.region,
             'enabled': self.enabled,
-            'whitelist': self.whitelist
+            'whitelist': self.whitelist,
+            'premium': self.premium
         }
 
         if hasattr(self, 'role'):

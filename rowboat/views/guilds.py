@@ -237,6 +237,22 @@ def guild_stats_messages(guild):
 
     return jsonify(tuples)
 
+@guilds.route('/<gid>/premium/enable', methods=['POST'])
+@with_guild()
+def guild_premium_enable(guild):
+    if not g.user.admin:
+        return '', 401
+    guild.update_premium(True)
+    return 'Premium has been enabled.', 200
+
+@guilds.route('/<gid>/premium/disable', methods=['DELETE'])
+@with_guild()
+def guild_premium_disable(guild):
+    if not g.user.admin:
+        return '', 401
+    guild.update_premium(False)
+    return 'Premium has been disabled', 200
+
 @guilds.route('/<gid>', methods=['DELETE'])
 @with_guild
 def guild_delete(guild):

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import {globalState} from '../state';
+import { globalState } from '../state';
 import BaseModel from './base';
 
 export default class Guild extends BaseModel {
