@@ -1,5 +1,5 @@
 rowboat-*.json
-# config.yaml
+config.yaml
 *.pyc
 .venv/
 *.log
