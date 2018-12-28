@@ -34,6 +34,67 @@ class DashboardGuildsList extends Component {
   }
 }
 
+class ControlPanel extends Component {
+  constructor() {
+    super();
+
+    this.messageTimer = null;
+
+    this.state = {
+      guilds: null,
+      message: null,
+    };
+  }
+
+  componentWillMount() {
+    globalState.getCurrentUser().then((user) => {
+      user.getGuilds().then((guilds) => {
+        this.setState({guilds});
+      });
+    });
+  }
+
+  onDeploy() {
+    globalState.deploy().then(() => {
+      this.renderMessage('success', 'Deploy Started');
+    }).catch((err) => {
+      this.renderMessage('danger', `Deploy Failed: ${err}`);
+    });
+  }
+
+  renderMessage(type, contents) {
+    this.setState({
+      message: {
+        type: type,
+        contents: contents,
+      }
+    })
+
+    if (this.messageTimer) clearTimeout(this.messageTimer);
+
+    this.messageTimer = setTimeout(() => {
+      this.setState({
+        message: null,
+      });
+      this.messageTimer = null;
+    }, 5000);
+  }
+
+  render() {
+    return (
+      <div className="panel panel-default">
+        {this.state.message && <div className={"alert alert-" + this.state.message.type}>{this.state.message.contents}</div>}
+        <div className="panel-heading">
+          <i className="fa fa-cog fa-fw"></i> Control Panel
+        </div>
+        <div className="panel-body">
+        <a href="#" onClick={() => this.onDeploy()} className="btn btn-success btn-block">Deploy</a>
+        </div>
+      </div>
+    );
+  }
+}
+
 class StatsPanel extends Component {
   render () {
     const panelClass = `panel panel-${this.props.color}`;
