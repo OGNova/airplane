@@ -1,11 +1,14 @@
 import json
 import subprocess
 
-from flask import Blueprint, g, make_response
+from flask import Blueprint, request, g, make_response, jsonify, render_template
 from datetime import datetime
 
 from rowboat.redis import rdb
-from rowboat.models.message import MessageArchive
+from rowboat.models.message import Message, MessageArchive
+from rowboat.models.guild import Guild
+from rowboat.models.user import User
+from rowboat.models.channel import Channel
 from rowboat.util.decos import authed
 
 dashboard = Blueprint('dash', __name__)
@@ -37,6 +40,25 @@ class ServerSentEvent(object):
         return "%s\n\n" % "\n".join(lines)
 
 
+@dashboard.route('/api/stats')
+def stats():
+    stats = json.loads(rdb.get('web:dashboard:stats') or '{}')
+
+    if not stats or 'refresh' in request.args:
+        # stats['messages'] = pretty_number(Message.select().count())
+        # stats['guilds'] = pretty_number(Guild.select().count())
+        # stats['users'] = pretty_number(User.select().count())
+        # stats['channels'] = pretty_number(Channel.select().count())
+        stats['messages'] = Message.select().count()
+        stats['guilds'] = Guild.select().count()
+        stats['users'] = User.select().count()
+        stats['channels'] = Channel.select().count()
+
+        rdb.setex('web:dashboard:stats', json.dumps(stats), 300)
+    
+    return jsonify(stats)
+
+
 @dashboard.route('/api/archive/<aid>.<fmt>')
 def archive(aid, fmt):
     try:
@@ -54,6 +76,9 @@ def archive(aid, fmt):
         mime_type = 'text/plain'
     elif fmt == 'csv':
         mime_type = 'text/csv'
+
+    if fmt == 'html':
+        return render_template('archive.html')
 
     res = make_response(archive.encode(fmt))
     res.headers['Content-Type'] = mime_type
