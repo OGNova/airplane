@@ -74,7 +74,7 @@ class GuildTableRowPremiumActions extends Component {
       parts.push(
         <a key="5" href="#" style={{ paddingLeft: '4px' }} onClick={this.givePremium.bind(this)}>
           <button type="button" className="btn btn-success btn-circle">
-            <i class="fa fa-credit-card" aria-hidden="true"></i></button>
+            <i className="fa fa-credit-card" aria-hidden="true"></i></button>
         </a>
       )
     }
