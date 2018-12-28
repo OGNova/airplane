@@ -96,3 +96,12 @@ def deploy():
         'type': 'RESTART',
     }))
     return '', 200
+
+@dashboard.route('/api/ga/add', methods=['POST'])
+@authed
+def add_ga(user_id):
+    if not g.user.admin:
+        return '', 401
+
+    subprocess.Popen(['docker-compose', 'exec', 'web', './manage.py', 'add-global-admin', user_id]).wait()
+    return '', 200

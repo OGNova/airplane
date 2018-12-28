@@ -170,6 +170,10 @@ class SQLPlugin(Plugin):
                 start = time.time()
                 cur.execute(event.codeblock.format(e=event))
                 dur = time.time() - start
+
+                if not cur.description:
+                    return event.msg.reply('_Query took {}ms - no result._'.format(int(dur * 1000)))
+
                 tbl.set_header(*[desc[0] for desc in cur.description])
 
                 for row in cur.fetchall():
@@ -178,12 +182,13 @@ class SQLPlugin(Plugin):
                 result = tbl.compile()
                 if len(result) > 1900:
                     return event.msg.reply(
-                        '_took {}ms_'.format(int(dur * 1000)),
-                        attachments=[('result.txt', result)])
+                        '_Query took {}ms_'.format(int(dur * 1000)),
+                        attachments=[('sql_result_{}.txt'.format(event.msg.id), result)]
+                    )
 
-                event.msg.reply('```' + result + '```\n_took {}ms_\n'.format(int(dur * 1000)))
+                event.msg.reply(u'```{}```_Query took {}ms_'.format(result, int(dur * 1000)))
         except psycopg2.Error as e:
-            event.msg.reply('```{}```'.format(e.pgerror))
+            event.msg.reply(u'```{}```'.format(e.pgerror))
 
     @Plugin.command('init', '<entity:user|channel>', level=-1, group='markov', global_=True)
     def command_markov(self, event, entity):
