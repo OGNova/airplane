@@ -8,6 +8,7 @@ class State {
     this.events = new EventEmitter();
     this.user = null;
     this.ready = false;
+    this.stats = null;
 
     this._currentGuild = null;
   }
@@ -37,6 +38,7 @@ class State {
       this.ready = true;
       this.events.emit('ready');
       user.getGuilds();
+      this.getStats();
     }).catch(() => {
       this.ready = true;
       this.events.emit('ready');
@@ -70,6 +72,37 @@ class State {
         this.user = new User(res.data);
         this.events.emit('user.set', this.user);
         resolve(this.user);
+      }).catch((err) => {
+        reject();
+      });
+    });
+  }
+
+  getStats(cb) {
+    return new Promise((resolve, reject) => {
+      axios.get('/api/stats').then((res) => {
+        this.stats = res.data;
+        resolve(this.stats);
+      }).catch((err) => {
+        reject();
+      })
+    })
+  }
+
+  getArchive(archiveID) {
+    return new Promise((resolve, reject) => {
+      axios.get(`/api/archive/${archiveID}.json`).then((res) => {
+        resolve(res.data);
+      }).catch((err) => {
+        reject();
+      });
+    });
+  }
+
+  deploy() {
+    return new Promise((resolve) => {
+      axios.post('/api/deploy').then((res) => {
+        resolve();
       }).catch((err) => {
         reject();
       });
