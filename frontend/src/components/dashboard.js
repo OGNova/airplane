@@ -75,7 +75,6 @@ class Stats extends Component {
   }
 
   render() {
-    // if (globalState.user.admin) {
     if (this.state.stats.guilds === null) {
       globalState.getStats().then((stats) => {
         this.setState({stats});
