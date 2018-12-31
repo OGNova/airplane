@@ -444,3 +444,12 @@ table.dataTable thead .sorting:after {
 .row:first-of-type {
   padding-top: 10px;
 }
+
+.guild-circle {
+  border-radius: 50%;
+  margin-right: 5px;
+}
+
+.guild-circle:hover {
+  border-radius: 30%;
+}

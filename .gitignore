@@ -4,5 +4,7 @@ config.yaml
 .venv/
 *.log
 .data
+.redis
 frontend/node_modules
 .idea
+.vscode

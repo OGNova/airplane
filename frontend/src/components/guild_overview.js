@@ -50,6 +50,10 @@ class GuildOverviewInfoTable extends Component {
             <td>{this.props.guild.region}</td>
           </tr>
           <tr>
+            <td>Premium Enabled?</td>
+            <td>{this.props.guild.premium ? 'True' : 'False'}</td>
+          </tr>
+          <tr>
             <td>Icon</td>
             <td><GuildIcon guildID={this.props.guild.id} guildIcon={this.props.guild.icon} /></td>
           </tr>

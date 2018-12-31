@@ -219,6 +219,8 @@ class MessageArchive(BaseModel):
             User
         ).where(
             (Message.id << self.message_ids)
+        ).order_by(
+            Message.id
         )
 
         if fmt == 'txt':
