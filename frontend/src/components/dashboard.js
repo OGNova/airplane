@@ -5,8 +5,6 @@ import PageHeader from './page_header';
 import GuildsTable from './guilds_table';
 import {globalState} from '../state';
 
-import TextField from '@material-ui/core/TextField'
-
 class DashboardGuildsList extends Component {
   constructor() {
     super();
