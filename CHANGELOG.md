@@ -1,5 +1,15 @@
 # Changelog
 
+## V1.3.2
+
+### Features
+
+- Added new dashboard route and corresponding Global Admin shutdown button.
+
+### Bugfixes
+
+- Fix styling of stats panels.
+
 ## V1.3.1
 
 ### Bugfixes
