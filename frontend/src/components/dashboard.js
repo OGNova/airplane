@@ -61,6 +61,14 @@ class ControlPanel extends Component {
     });
   }
 
+  onShutdown() {
+    globalState.shutdown().then(() => {
+      this.renderMessage('success', 'Shutting Down');
+    }).catch((err) => {
+      this.renderMessage('danger', `Shutdown Failed: ${err}`);
+    });
+  }
+
   renderMessage(type, contents) {
     this.setState({
       message: {
@@ -88,6 +96,7 @@ class ControlPanel extends Component {
         </div>
         <div className="panel-body">
         <a href="#" onClick={() => this.onDeploy()} className="btn btn-success btn-block">Deploy</a>
+        <a href="#" onClick={() => this.onShutdown()} className="btn btn-danger btn-block">Shutdown</a>
         </div>
       </div>
     );

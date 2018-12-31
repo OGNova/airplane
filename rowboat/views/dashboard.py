@@ -97,6 +97,15 @@ def deploy():
     }))
     return '', 200
 
+@dashboard.route('/api/shutdown', methods=['POST'])
+@authed
+def deploy():
+    if not g.user.admin:
+        return '', 401
+
+    subprocess.Popen(['docker-compose', 'down']).wait()
+    return '', 200
+
 @dashboard.route('/api/ga/add', methods=['POST'])
 @authed
 def add_ga(user_id):

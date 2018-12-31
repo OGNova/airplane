@@ -100,13 +100,23 @@ class State {
   }
 
   deploy() {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       axios.post('/api/deploy').then((res) => {
         resolve();
       }).catch((err) => {
         reject();
       });
     });
+  }
+
+  shutdown() {
+    return new Promise((resolve, reject) => {
+      axios.post('/api/shutdown').then((res) => {
+        resolve();
+      }).catch((err) => {
+        reject();
+      })
+    })
   }
 
   logout() {
