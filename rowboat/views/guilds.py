@@ -10,6 +10,8 @@ from rowboat.models.guild import Guild, GuildConfigChange
 from rowboat.models.user import User, Infraction
 from rowboat.models.message import Message
 
+from rowboat.sql import database
+
 guilds = Blueprint('guilds', __name__, url_prefix='/api/guilds')
 
 with open('config.yaml', 'r') as config:
@@ -264,10 +266,10 @@ def guild_delete(guild):
     curRemove = conn.cursor()
     curConfig = conn.cursor()
     try:
-        curConfig.execute("SELECT config_raw FROM guilds WHERE guild_id={};".format(guild.guild_id))
+        curConfig.execute("SELECT config_raw FROM guilds WHERE guild_id={}".format(guild.guild_id))
         rawConfig = curConfig.fetchone()[0]
         send_guildMessage(rawConfig, guild.guild_id, guild.owner_id, guild.name, guild.icon)
-        curRemove.execute("DELETE FROM guilds WHERE guild_id={};".format(guild.guild_id))
+        curRemove.execute("DELETE FROM guilds WHERE guild_id={}".format(guild.guild_id))
         conn.commit()
     except:
         pass
