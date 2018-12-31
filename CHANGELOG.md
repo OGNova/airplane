@@ -1,5 +1,13 @@
 # Changelog
 
+## V1.3.1
+
+### Bugfixes
+
+- Fix guild force delete routing.
+
+# ALL CHANGES MADE PAST THIS POINT ARE MADE BY THE AIRPLANE TEAM
+
 ## V1.3.0
 
 ### Features
