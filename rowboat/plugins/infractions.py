@@ -591,6 +591,10 @@ class InfractionsPlugin(Plugin):
                             if event.user_level < event.config.notify_action_on.silent_level:
                                 raise CommandFail('only administrators can silently issue infractions.')
                             else:
+                                if reason.endswith('-s'):
+                                    reason = reason[0:len(reason)-3]
+                                elif reason.endswith('--silent'):
+                                    reason = reason[0:len(reason)-9]
                                 Infraction.tempmute(self, event, member, reason, duration)
                                 self.queue_infractions()
 
@@ -832,6 +836,10 @@ class InfractionsPlugin(Plugin):
                     if event.user_level < event.config.notify_action_on.silent_level:
                         raise CommandFail('only administrators can silently issue infractions.')
                     else:
+                        if reason.endswith('-s'):
+                            reason = reason[0:len(reason)-3]
+                        elif reason.endswith('--silent'):
+                            reason = reason[0:len(reason)-9]
                         self.can_act_on(event, member.id)
                         Infraction.kick(self, event, member, reason)
                         self.confirm_action(event, maybe_string(
@@ -958,6 +966,10 @@ class InfractionsPlugin(Plugin):
                         if event.user_level < event.config.notify_action_on.silent_level:
                             raise CommandFail('only administrators can silently issue infractions.')
                         else:
+                            if reason.endswith('-s'):
+                                reason = reason[0:len(reason)-3]
+                            elif reason.endswith('--silent'):
+                                reason = reason[0:len(reason)-9]
                             Infraction.ban(self, event, member, reason, guild=event.guild)
                             self.confirm_action(event, maybe_string(
                             reason,
@@ -1295,6 +1307,10 @@ class InfractionsPlugin(Plugin):
                     if event.user_level < event.config.notify_action_on.silent_level:
                         raise CommandFail('only administrators can silently issue infractions.')
                     else:
+                        if reason.endswith('-s'):
+                            reason = reason[0:len(reason)-3]
+                        elif reason.endswith('--silent'):
+                            reason = reason[0:len(reason)-9]
                         Infraction.tempban(self, event, member, reason, expires_dt)
                         self.queue_infractions()
                         self.confirm_action(event, maybe_string(
@@ -1350,6 +1366,10 @@ class InfractionsPlugin(Plugin):
                     if event.user_level < event.config.notify_action_on.silent_level:
                         raise CommandFail('only administrators can silently issue infractions.')
                     else:
+                        if reason.endswith('-s'):
+                            reason = reason[0:len(reason)-3]
+                        elif reason.endswith('--silent'):
+                            reason = reason[0:len(reason)-9]
                         Infraction.warn(self, event, member, reason, guild=event.guild)
                         self.confirm_action(event, maybe_string(
                         reason,
