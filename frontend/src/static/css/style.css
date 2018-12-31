@@ -453,3 +453,7 @@ table.dataTable thead .sorting:after {
 .guild-circle:hover {
   border-radius: 30%;
 }
+
+.large {
+  font-size: 28px;
+}
