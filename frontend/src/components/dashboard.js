@@ -96,6 +96,13 @@ class ControlPanel extends Component {
         </div>
         <div className="panel-body">
         <a href="#" onClick={() => this.onDeploy()} className="btn btn-success btn-block">Deploy</a>
+        <form>
+          <label>
+            Container:
+            <input type="text" name="container"/>
+          </label>
+          <input type="submit" className="btn btn-warning btn-block" value="Restart"></input>
+        </form>
         <a href="#" onClick={() => this.onShutdown()} className="btn btn-danger btn-block">Shutdown</a>
         </div>
       </div>
