@@ -99,7 +99,7 @@ def deploy():
 
 @dashboard.route('/api/shutdown', methods=['POST'])
 @authed
-def deploy():
+def shutdown():
     if not g.user.admin:
         return '', 401
 
