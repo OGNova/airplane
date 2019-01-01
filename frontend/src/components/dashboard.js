@@ -61,6 +61,14 @@ class ControlPanel extends Component {
     });
   }
 
+  onRestart() {
+    globalState.restart().then(() => {
+      this.renderMessage('success', 'Restarting');
+    }).catch((err) => {
+      this.renderMessage('danger', `Restart Failed: ${err}`);
+    });
+  }
+    
   onShutdown() {
     globalState.shutdown().then(() => {
       this.renderMessage('success', 'Shutting Down');
@@ -96,15 +104,7 @@ class ControlPanel extends Component {
         </div>
         <div className="panel-body">
         <a href="#" onClick={() => this.onDeploy()} className="btn btn-success btn-block">Deploy</a>
-        <a href="#" onClick={() => this.onRestart()} className="btn btn-warning btn-block">
-          <form>
-            <label>
-              Container:
-              <input type="text" name="container" />
-            </label>
-            <input type="submit" value="Restart"></input>
-          </form>
-        </a>
+        <a href="#" onClick={() => this.onRestart()} className="btn btn-warning btn-block">Restart</a>
         <a href="#" onClick={() => this.onShutdown()} className="btn btn-danger btn-block">Shutdown</a>
         </div>
       </div>

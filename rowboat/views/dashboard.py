@@ -106,6 +106,15 @@ def shutdown():
     subprocess.Popen(['docker-compose', 'down']).wait()
     return '', 200
 
+@dashboard.route('/api/restart', methods=['POST'])
+@authed
+def restart():
+    if not g.user.admin:
+        return '', 401
+
+    subprocess.Popen(['docker-compose', 'restart']).wait()
+    return '', 200
+
 @dashboard.route('/api/ga/add', methods=['POST'])
 @authed
 def add_ga(user_id):
