@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import disco
 import gevent
 from rowboat.plugins import RowboatPlugin as Plugin, CommandFail, CommandSuccess
@@ -80,3 +81,8 @@ class MemesPlugin(Plugin):
     @Plugin.command('pong', level=-1)
     def pong(self, event):
         return event.msg.reply('I pong, you ping. Idiot...')
+
+    @Plugin.command('banana', '<user:user|snowflake> [reason:str...]', level=-1)
+    def banana(self, event, user, reason=None):
+        #Love my banana command, kthx ~Justin
+        return event.channel.send_message(u':banana: Banana\'d {User} (`{Reason}`)'.format(User=unicode(user), Reason=unicode(reason).encode('utf-8')))
