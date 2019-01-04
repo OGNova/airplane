@@ -369,36 +369,46 @@ class InfractionsPlugin(Plugin):
 
         event.msg.reply(tbl.compile())
 
-    @Plugin.command('recent', aliases=['latest'], group='infractions', level=CommandLevels.MOD)
+    @Plugin.command('latest', aliases=['recent'], group='infractions', level=CommandLevels.MOD)
     def infractions_recent(self, event):
-        q = (Infraction.guild_id == event.guild.id)
-        user = User.alias()
-        actor = User.alias()
-        infraction = Infraction.get(Infraction, user, actor).join(
-            user,
-            on=((Infraction.user_id == user.user_id).alias('user'))
-        ).switch(Infraction).join(
-            actor,
-            on=((Infraction.actor_id == actor.user_id).alias('actor'))
-        ).where(q).order_by(Infraction.created_at.desc()).limit(1)
-        
+        try:
+            user = User.alias()
+            actor = User.alias()
+
+            infraction = Infraction.select(Infraction, user, actor).join(
+                user,
+                on=((Infraction.user_id == user.user_id).alias('user'))
+            ).switch(Infraction).join(
+                actor,
+                on=((Infraction.actor_id == actor.user_id).alias('actor'))
+            ).where(
+                (Infraction.guild_id == event.guild.id)
+            ).order_by(
+                Infraction.created_at.desc()
+            ).limit(1).get()
+        except Infraction.DoesNotExist:
+            raise CommandFail('cannot find any infraction')
+
         type_ = {i.index: i for i in Infraction.Types.attrs}[infraction.type_]
         embed = MessageEmbed()
+
         if type_ in (Infraction.Types.MUTE, Infraction.Types.TEMPMUTE, Infraction.Types.TEMPROLE):
             embed.color = 0xfdfd96
         elif type_ in (Infraction.Types.KICK, Infraction.Types.SOFTBAN):
             embed.color = 0xffb347
         else:
             embed.color = 0xff6961
+
         embed.title = str(type_).title()
         embed.set_thumbnail(url=infraction.user.get_avatar_url())
-        embed.add_field(name='User', value=unicode(infraction.user), inline=True)
-        embed.add_field(name='Moderator', value=unicode(infraction.actor), inline=True)
-        embed.add_field(name='ID', value=unicode(infraction.id), inline=True)
+        embed.add_field(name='ID', value=str(infraction.id), inline=True)
         embed.add_field(name='Active', value='yes' if infraction.active else 'no', inline=True)
+        embed.add_field(name='User', value=u'{} ({})'.format(infraction.user, infraction.user.user_id), inline=True)
+        embed.add_field(name='Moderator', value=u'{} ({})'.format(infraction.actor, infraction.actor.user_id), inline=True)
+
         if infraction.active and infraction.expires_at:
             embed.add_field(name='Expires', value=humanize.naturaldelta(infraction.expires_at - datetime.utcnow()))
-        embed.add_field(name='Reason', value=infraction.reason or '_No Reason Given', inline=False)
+        embed.add_field(name='Reason', value=infraction.reason or '(no reason)', inline=False)
         embed.timestamp = infraction.created_at.isoformat()
         event.msg.reply('', embed=embed)
 
