@@ -592,7 +592,7 @@ class CorePlugin(Plugin):
         if not m.permissions.administrator and not global_admin:
             return event.msg.reply(':warning: bot must have the Administrator permission')
 
-        guild = Guild.setup(self, event.guild, event.guild.owner)
+        guild = Guild.setup(event.guild)
         rdb.srem(GUILDS_WAITING_SETUP_KEY, str(event.guild.id))
         self.guilds[event.guild.id] = guild
         event.msg.reply(':ok_hand: successfully loaded configuration')

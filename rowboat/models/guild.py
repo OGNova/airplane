@@ -29,6 +29,7 @@ class Guild(BaseModel):
     icon = TextField(null=True)
     splash = TextField(null=True)
     region = TextField(null=True)
+    features = ArrayField(TextField, default=[], null=True)
 
     last_ban_sync = DateTimeField(null=True)
 
@@ -57,26 +58,7 @@ class Guild(BaseModel):
         return cls.get(guild_id=guild_id)
 
     @classmethod
-    def setup(cls, guild, owner):
-        oid = unicode(owner.id)
-
-        raw = [
-            u'# Please read https://rawgo.at/docs to get started with configuration.',
-            u'# The server owner will always have dashboard admin access, whatever happens.\n',
-            u'web:\n  {}: admin # {}\n'.format(oid, owner),
-            u'commands:\n  prefix: \'!\'\n  overrides:\n  - {plugin.name: \'utilities\', out: {level: 1}}\n',
-            u'levels:\n  {}: 100 # {}\n'.format(oid, owner),
-            u'plugins:\n  admin:\n    persist:\n      roles: false\n      role_ids: []',
-            u'      nickname: false\n      voice: false\n    group_confirm_reactions: false\n',
-            u'  infractions:\n    reason_edit_level: 100',
-            u'    #mute_role: 000000000000000000\n\n  utilities: {}\n  tags: {}\n'
-        ]
-
-        raw = u'\n'.join(raw).encode('latin1', 'ignore')
-
-        parsed = yaml.load(raw) or {}
-        GuildConfig(parsed).validate()
-
+    def setup(cls, guild):
         return cls.create(
             guild_id=guild.id,
             owner_id=guild.owner_id,
@@ -84,8 +66,9 @@ class Guild(BaseModel):
             icon=guild.icon,
             splash=guild.splash,
             region=guild.region,
-            config=parsed,
-            config_raw=raw)
+            features=guild.features
+            config={'web': {guild.owner_id: 'admin'}},
+            config_raw='')
 
     def is_whitelisted(self, flag):
         return int(flag) in self.whitelist
@@ -169,6 +152,7 @@ class Guild(BaseModel):
             'icon': self.icon,
             'splash': self.splash,
             'region': self.region,
+            'features': self.features,
             'enabled': self.enabled,
             'whitelist': self.whitelist,
             'premium': self.premium
