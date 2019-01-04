@@ -369,6 +369,7 @@ class InfractionsPlugin(Plugin):
 
         event.msg.reply(tbl.compile())
 
+    # Coded by Xenthys for rawgoat.
     @Plugin.command('latest', aliases=['recent'], group='infractions', level=CommandLevels.MOD)
     def infractions_recent(self, event):
         try:
