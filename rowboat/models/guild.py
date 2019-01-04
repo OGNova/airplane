@@ -66,7 +66,7 @@ class Guild(BaseModel):
             icon=guild.icon,
             splash=guild.splash,
             region=guild.region,
-            features=guild.features
+            features=guild.features,
             config={'web': {guild.owner_id: 'admin'}},
             config_raw='')
 
