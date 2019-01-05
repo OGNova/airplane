@@ -457,3 +457,43 @@ table.dataTable thead .sorting:after {
 .large {
   font-size: 28px;
 }
+
+.ReactTable .rt-thead.-filters input,
+.ReactTable .rt-thead.-filters select {
+  background: rgba(0, 0, 0, 0.1) !important;
+}
+
+.ReactTable .-pagination input,
+.ReactTable .-pagination select {
+  background: rgba(0, 0, 0, 0.1) !important;
+}
+
+.ReactTable .-pagination .-btn {
+  color: #ccc !important;
+}
+
+/* Diff */
+.codeMarker {
+  background: #004d7a;
+  position: absolute;
+  z-index: 20;
+  /* width: 100% !important; */
+}
+
+div:not(.ace_editor)+.ace_editor.ace-monokai::before {
+  content: "before";
+  color: #008bdc;
+  font-size: 25px;
+  position: absolute;
+  z-index: 200;
+  right: 25px;
+}
+
+.ace_editor+.ace_editor.ace-monokai::before {
+  content: "after";
+  color: #008bdc;
+  font-size: 25px;
+  position: absolute;
+  z-index: 200;
+  right: 25px;
+}
