@@ -34,21 +34,22 @@ export default class Guild extends BaseModel {
     });
   }
 
-  getConfig(refresh = false) {
-    if (this.config && !refresh) {
-      return new Promise((resolve) => {
-        resolve(this.config);
-      });
-    }
-
+  getConfigHistory(id) {
     return new Promise((resolve, reject) => {
-      axios.get(`/api/guilds/${this.id}/config`).then((res) => {
-        resolve(res.data);
+      axios.get(`/api/guilds/${id}/config/history`).then((res) => {
+        let data = res.data
+        data = data.map(obj => {
+          obj.created_timestamp = Math.floor(new Date(obj.created_at).getTime() / 1000);
+          obj.user.discriminator = String(obj.user.discriminator).padStart(4, "0");
+          return obj;
+        });
+        resolve(data);
       }).catch((err) => {
         reject();
       });
     });
   }
+
 
   putConfig(config) {
     return new Promise((resolve, reject) => {
