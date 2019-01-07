@@ -71,8 +71,7 @@ class CorePlugin(Plugin):
         # Overwrite the main bot instances plugin loader so we can magicfy events
         self.bot.add_plugin = self.our_add_plugin
 
-        if ENV != 'prod':
-            self.spawn(self.wait_for_plugin_changes)
+        self.spawn(self.wait_for_plugin_changes)
 
         self.global_config = None
 
