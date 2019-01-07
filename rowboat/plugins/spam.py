@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import re
 import time
 import operator
@@ -155,6 +156,7 @@ class SpamPlugin(Plugin):
                     violation.member,
                     'Spam Detected',
                     datetime.utcnow() + timedelta(seconds=punishment_duration))
+                self.call('InfractionsPlugin.queue_infractions')
             elif punishment == PunishmentType.KICK:
                 Infraction.kick(
                     self,
@@ -168,6 +170,7 @@ class SpamPlugin(Plugin):
                     violation.member,
                     'Spam Detected',
                     datetime.utcnow() + timedelta(seconds=punishment_duration))
+                self.call('InfractionsPlugin.queue_infractions')
             elif punishment == PunishmentType.BAN:
                 Infraction.ban(
                     self,

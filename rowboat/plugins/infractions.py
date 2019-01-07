@@ -1268,6 +1268,8 @@ class InfractionsPlugin(Plugin):
         Ban then unban a user from the server (with an optional reason for the modlog)
         """
         member = event.guild.get_member(user)
+        cmd = event.msg.content
+        suffix = ('-s', '--silent')
         if member:
             if event.config.notify_action_on.kicks:
                 if cmd.endswith(suffix) is True:
