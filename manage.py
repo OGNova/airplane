@@ -72,7 +72,7 @@ def serve(reloader):
 
 
 @cli.command()
-@click.option('--env', '-e', default='local')
+@click.option('--env', '-e', default='prod')
 def bot(env):
     with open('config.yaml', 'r') as f:
         config = load(f)

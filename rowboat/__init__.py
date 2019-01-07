@@ -6,7 +6,7 @@ from disco.util.logging import LOG_FORMAT
 from raven import Client
 from raven.transport.gevent import GeventedHTTPTransport
 
-ENV = os.getenv('ENV', 'local')
+ENV = os.getenv('ENV', 'prod')
 DSN = os.getenv('DSN')
 REV = subprocess.check_output(['git', 'rev-parse', 'HEAD']).strip()
 
