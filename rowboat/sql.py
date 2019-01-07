@@ -1,5 +1,6 @@
 import os
 import psycogreen.gevent; psycogreen.gevent.patch_psycopg()
+import yaml
 
 from peewee import Proxy, OP, Model
 from peewee import Expression
@@ -10,6 +11,10 @@ REGISTERED_MODELS = []
 # Create a database proxy we can setup post-init
 database = Proxy()
 
+with open('config.yaml', 'r') as config:
+    cfg = yaml.load(config)
+db_password = cfg['db_password']
+db_host = cfg['db_host']
 
 OP['IRGX'] = 'irgx'
 
@@ -35,15 +40,18 @@ def init_db(env):
     if env == 'docker':
         database.initialize(PostgresqlExtDatabase(
             'rowboat',
-            host='db',
+            host=db_host,
+            password=db_password,
             user='postgres',
-            port=int(os.getenv('PG_PORT', 5432)),
+            port=int(5432),
             autorollback=True))
     else:
         database.initialize(PostgresqlExtDatabase(
             'rowboat',
-            user='rowboat',
-            port=int(os.getenv('PG_PORT', 5432)),
+            host=db_host,
+            password=db_password,
+            user='postgres',
+            port=int(5432),
             autorollback=True))
 
     for model in REGISTERED_MODELS:
