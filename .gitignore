@@ -8,3 +8,5 @@ config.yaml
 frontend/node_modules
 .idea
 .vscode
+*.aof
+src/
