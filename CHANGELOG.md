@@ -1,5 +1,16 @@
 # Changelog
 
+## V2.0.0
+
+### Bugfixes
+
+- Fix `inf recent` and `inf search`, thanks @Xenthys
+- Fix issue with `info` where no info would display if a user was on Spotify
+
+### Backend
+
+- Push the bot to production, thanks Aperture!
+
 ## V1.3.2
 
 ### Features
