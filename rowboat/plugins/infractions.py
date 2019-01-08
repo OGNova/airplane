@@ -702,7 +702,8 @@ class InfractionsPlugin(Plugin):
             raise CommandFail('invalid user')
 
         self.can_act_on(event, member.id)
-        role_id = role if isinstance(role, (int, long)) else event.config.role_aliases.get(role.lower())
+        admin_config = getattr(event.base_config.plugins, 'admin', None)
+        role_id = role if isinstance(role, (int, long)) else admin_config.role_aliases.get(role.lower())
         if not role_id or role_id not in event.guild.roles:
             raise CommandFail('invalid or unknown role')
 
