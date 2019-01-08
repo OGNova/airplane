@@ -1,4 +1,5 @@
 # Coded by Xenthys for Rawgoat. https://rawgo.at/docs/
+# -*- coding: utf-8 -*-
 
 import re
 import requests
