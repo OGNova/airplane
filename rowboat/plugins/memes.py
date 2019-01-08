@@ -14,6 +14,7 @@ from rowboat.util.gevent import wait_many
 class MemesConfig(PluginConfig):
     #auto-reply to meesux
     hate_meesux = Field(bool, default=False)
+
 @Plugin.with_config(MemesConfig)
 class MemesPlugin(Plugin):
     def load(self, ctx):
