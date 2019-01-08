@@ -101,7 +101,6 @@ class UtilitiesPlugin(Plugin):
             '285712318464000000': "xd Official Discord", # Nuna#0001
             '340753167098839051': "Donut Operator's Discord", # Valkyrie#5555
             '339254723091890177': "Donut Operator's Discord", # AmazonPrimes#7409
-            '173895003641217024': "Dooocord", # Gullus#0765
         }
 
     def queue_reminders(self):
