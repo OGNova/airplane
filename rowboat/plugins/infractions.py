@@ -541,7 +541,7 @@ class InfractionsPlugin(Plugin):
             self.log.exception('Failed to send control message.')
             return
 
-    @Plugin.command('delete', '<infraction:int> [reason:str...]', group='infractions', level=-1)
+    @Plugin.command('delete', '<infraction:int> [reason:str...]', group='infractions')
     def infraction_delete(self, event, infraction):
         try:
             inf = Infraction.select(Infraction).where(
