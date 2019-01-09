@@ -14,6 +14,7 @@ from disco.types.user import User as DiscoUser
 from disco.types.message import MessageTable, MessageEmbed
 from disco.api.http import APIException
 
+from rowboat import ENV
 from rowboat.plugins import RowboatPlugin as Plugin, CommandFail, CommandSuccess
 from rowboat.util.timing import Eventual
 from rowboat.util.input import parse_duration
