@@ -2,6 +2,7 @@ import csv
 import gevent
 import humanize
 import gevent
+import contextlib
 
 from StringIO import StringIO
 from holster.emitter import Priority
@@ -524,6 +525,7 @@ class InfractionsPlugin(Plugin):
             # Run this in a greenlet so we dont block event execution
             self.spawn(f)
 
+    @contextlib.contextmanager
     def log_deletion(self, channel_id):
         embed = MessageEmbed()
         embed.set_footer(text='Airplane {}'.format(
