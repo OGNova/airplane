@@ -544,7 +544,9 @@ class InfractionsPlugin(Plugin):
     @Plugin.command('delete', '<infraction:int> [reason:str...]', group='infractions', level=-1)
     def infraction_delete(self, event, infraction):
         try:
-            inf = Infraction.get(id=infraction)
+            inf = Infraction.select(Infraction).where(
+                (Infraction.id == infraction)
+            ).get()
         except Infraction.DoesNotExist:
             raise CommandFail('cannot find an infraction with ID `{}`'.format(infraction))
 
