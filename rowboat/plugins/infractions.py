@@ -524,7 +524,7 @@ class InfractionsPlugin(Plugin):
             # Run this in a greenlet so we dont block event execution
             self.spawn(f)
 
-    def log_deletion(self, event, channel_id, infraction):
+    def log_deletion(self, channel_id):
         embed = MessageEmbed()
         embed.set_footer(text='Airplane {}'.format(
             'Production' if ENV == 'prod' else 'Testing'
@@ -579,13 +579,12 @@ class InfractionsPlugin(Plugin):
 
         raise CommandSuccess('deleted infraction #`{}`.'.format(infraction))
 
-        with self.log_deletion() as embed:
+        with self.log_deletion(channel_id=event.config.infraction_deletion_channel) as embed:
             embed.title = 'Infraction Deleted'
             embed.color = 0x99AAB5
             embed.add_field(name='Server', value=event.guild.msg.name, inline=True)
             embed.add_field(name='Actor', value=event.msg.author, inline=True)
             embed.add_field(name='Infraction ID', value=infraction, inline=False)
-            channel_id=event.config.infraction_deletion_channel
 
     @Plugin.command('mute', '<user:user|snowflake> [reason:str...]', level=CommandLevels.MOD)
     @Plugin.command('tempmute', '<user:user|snowflake> <duration:str> [reason:str...]', level=CommandLevels.MOD)
