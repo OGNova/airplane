@@ -36,6 +36,7 @@ def maybe_string(obj, exists, notexists, **kwargs):
     if obj:
         return exists.format(o=obj, **kwargs)
     return notexists.format(**kwargs)
+
 class NotifyConfig(SlottedModel):
     mutes = Field(bool, default=False)
     warns = Field(bool, default=False)
@@ -60,9 +61,14 @@ class InfractionsConfig(PluginConfig):
     # The mute role
     mute_role = Field(snowflake, default=None)
 
+    # The channel to log message deletions to
+    infraction_deletion_channel = Field(snowflake, default=None)
+
     # manage tempban
     limit_temp = Field(LimitTempConfig, default=None)
     
+    # Level required to delete infractions
+    infraction_deletion_level = Field(int, default=int(CommandLevels.ADMIN))
 
     # Level required to edit reasons
     reason_edit_level = Field(int, default=int(CommandLevels.ADMIN))
@@ -518,7 +524,7 @@ class InfractionsPlugin(Plugin):
             # Run this in a greenlet so we dont block event execution
             self.spawn(f)
 
-    def log_deletion(self, event, infraction):
+    def log_deletion(self, event, channel_id, infraction):
         embed = MessageEmbed()
         embed.set_footer(text='Airplane {}'.format(
             'Production' if ENV == 'prod' else 'Testing'
@@ -528,7 +534,7 @@ class InfractionsPlugin(Plugin):
         try:
             yield embed
             self.bot.client.api.channel_messages_create(
-                ROWBOAT_LOG_CHANNEL,
+                channel_id,
                 embed=embed
             )
         except:
@@ -538,11 +544,12 @@ class InfractionsPlugin(Plugin):
     @Plugin.command('delete', '<infraction:int> [reason:str...]', group='infractions', level=-1)
     def infraction_delete(self, event, infraction):
         try:
-            inf = Infraction.select(Infraction).where(
-                (Infraction.id == infraction)
-            ).get()
+            inf = Infraction.get(id=infraction)
         except Infraction.DoesNotExist:
             raise CommandFail('cannot find an infraction with ID `{}`'.format(infraction))
+
+        if event.user_level < event.config.infraction_deletion_level:
+            raise CommandFail('you do not have the permissions required to delete infractions.')
 
         msg = event.msg.reply('Ok, delete infraction #`{}`?'.format(infraction))
         msg.chain(False).\
@@ -576,7 +583,8 @@ class InfractionsPlugin(Plugin):
             embed.add_field(name='Server', value=event.guild.msg.name, inline=True)
             embed.add_field(name='Actor', value=event.msg.author, inline=True)
             embed.add_field(name='Infraction ID', value=infraction, inline=False)
-    
+            channel_id=event.config.infraction_deletion_channel
+
     @Plugin.command('mute', '<user:user|snowflake> [reason:str...]', level=CommandLevels.MOD)
     @Plugin.command('tempmute', '<user:user|snowflake> <duration:str> [reason:str...]', level=CommandLevels.MOD)
     def tempmute(self, event, user, duration=None, reason=None):
@@ -725,7 +733,7 @@ class InfractionsPlugin(Plugin):
 
     @Plugin.command('unmute', '<user:user|snowflake>', level=CommandLevels.MOD)
     def unmute(self, event, user, reason=None):
-        # TOOD: eventually we should pull the role from the GuildMemberBackup if they arent in server
+        # TODO: eventually we should pull the role from the GuildMemberBackup if they arent in server
         member = event.guild.get_member(user)
         cmd = event.msg.content
         suffix = ('-s', '--silent')
