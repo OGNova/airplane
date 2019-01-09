@@ -577,14 +577,14 @@ class InfractionsPlugin(Plugin):
         inf.delete_instance()
         self.queue_infractions
 
-        raise CommandSuccess('deleted infraction #`{}`.'.format(infraction))
-
         with self.log_deletion(channel_id=event.config.infraction_deletion_channel) as embed:
             embed.title = 'Infraction Deleted'
             embed.color = 0x99AAB5
             embed.add_field(name='Server', value=event.guild.msg.name, inline=True)
             embed.add_field(name='Actor', value=event.msg.author, inline=True)
             embed.add_field(name='Infraction ID', value=infraction, inline=False)
+
+        raise CommandSuccess('deleted infraction #`{}`.'.format(infraction))
 
     @Plugin.command('mute', '<user:user|snowflake> [reason:str...]', level=CommandLevels.MOD)
     @Plugin.command('tempmute', '<user:user|snowflake> <duration:str> [reason:str...]', level=CommandLevels.MOD)
