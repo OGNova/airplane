@@ -577,7 +577,7 @@ class InfractionsPlugin(Plugin):
         inf.delete_instance()
         self.queue_infractions
 
-        with self.log_deletion(channel_id=event.config.infraction_deletion_channel) as embed:
+        with self.log_deletion(event.config.infraction_deletion_channel) as embed:
             embed.title = 'Infraction Deleted'
             embed.color = 0x99AAB5
             embed.add_field(name='Server', value=event.guild.msg.name, inline=True)
