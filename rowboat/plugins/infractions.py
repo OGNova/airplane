@@ -583,7 +583,7 @@ class InfractionsPlugin(Plugin):
         with self.log_deletion(event.config.infraction_deletion_channel) as embed:
             embed.title = 'Infraction Deleted'
             embed.color = 0x99AAB5
-            embed.add_field(name='Server', value=event.guild.msg.name, inline=True)
+            embed.add_field(name='Server', value=event.guild.name, inline=True)
             embed.add_field(name='Actor', value=event.msg.author, inline=True)
             embed.add_field(name='Infraction ID', value=infraction, inline=False)
 
