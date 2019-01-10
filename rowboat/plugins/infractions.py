@@ -557,7 +557,7 @@ class InfractionsPlugin(Plugin):
         if event.user_level < event.config.infraction_deletion_level:
             raise CommandFail('you do not have the permissions required to delete infractions.')
 
-        if inf.guild_id != event.guild.id and if not rdb.sismember('global_admins', event.msg.author.id):
+        if inf.guild_id != event.guild.id and not rdb.sismember('global_admins', event.msg.author.id):
             raise CommandFail('you do not have the permissions to delete infractions from other servers.')
 
         msg = event.msg.reply('Ok, delete infraction #`{}`?'.format(infraction))
