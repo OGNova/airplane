@@ -537,7 +537,7 @@ class InfractionsPlugin(Plugin):
         try:
             yield embed
             self.bot.client.api.channels_messages_create(
-                channel_id=channel_id,
+                channel_id,
                 embed=embed
             )
         except:
