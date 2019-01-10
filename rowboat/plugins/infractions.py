@@ -1097,12 +1097,18 @@ class InfractionsPlugin(Plugin):
                 contents.append(u'<:deny:470285164313051138> {} - No Permissions'.format(
                     guild.name
                 ))
+                failed.append(u'<:deny:470285164313051138> {} - No Permissions'.format(
+                    guild.name
+                ))
                 continue
 
             try:
                 Infraction.ban(self, event, user, reason, guild)
             except:
                 contents.append(u'<:deny:470285164313051138> {} - Unknown Error'.format(
+                    guild.name
+                ))
+                failed.append(u'<:deny:470285164313051138> {} - No Permissions'.format(
                     guild.name
                 ))
                 self.log.exception('Failed to force ban %s in %s', user, gid)
