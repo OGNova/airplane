@@ -536,7 +536,7 @@ class InfractionsPlugin(Plugin):
         embed.color = 0x99AAB5
         try:
             yield embed
-            self.bot.client.api.channel_messages_create(
+            self.bot.client.api.channels_messages_create(
                 channel_id=channel_id,
                 embed=embed
             )
