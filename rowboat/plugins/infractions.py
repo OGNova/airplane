@@ -595,7 +595,8 @@ class InfractionsPlugin(Plugin):
             inf_type = 'Ban'
         elif type_ in (Infraction.Types.SOFTBAN):
             inf_type = 'Softban',
-        elif type_ in (Infractions.Types.UNBAN)
+        elif type_ in (Infractions.Types.UNBAN):
+            inf_type = 'Unban'
 
         with self.log_deletion(event.config.infraction_deletion_channel) as embed:
             embed.title = 'Infraction Deleted'
