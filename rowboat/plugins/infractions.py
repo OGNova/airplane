@@ -25,6 +25,7 @@ from rowboat.plugins.modlog import Actions
 from rowboat.models.user import User, Infraction
 from rowboat.models.guild import GuildMemberBackup, GuildBan
 from rowboat.sql import database
+from rowboat.redis import rdb
 from rowboat.constants import (
     GREEN_TICK_EMOJI_ID, RED_TICK_EMOJI_ID, GREEN_TICK_EMOJI, RED_TICK_EMOJI, ROWBOAT_LOG_CHANNEL
 )
@@ -555,6 +556,9 @@ class InfractionsPlugin(Plugin):
 
         if event.user_level < event.config.infraction_deletion_level:
             raise CommandFail('you do not have the permissions required to delete infractions.')
+
+        if inf.guild_id != event.guild.id and if not rdb.sismember('global_admins', event.msg.author.id):
+            raise CommandFail('you do not have the permissions to delete infractions from other servers.')
 
         msg = event.msg.reply('Ok, delete infraction #`{}`?'.format(infraction))
         msg.chain(False).\
