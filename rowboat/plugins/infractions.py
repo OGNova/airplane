@@ -580,13 +580,30 @@ class InfractionsPlugin(Plugin):
         inf.delete_instance()
         self.queue_infractions
 
+        type_ = {i.index: i for i in Infraction.Types.attrs}[inf.type_]
+        if type_ in (Infraction.Types.MUTE):
+            inf_type = 'Mute'
+        elif type_ in (Infraction.Types.TEMPMUTE):
+            inf_type = 'Tempmute'
+        elif type_ in (Infraction.Types.TEMPROLE):
+            inf_type = 'Temprole'
+        elif type_ in (Infraction.Types.WARNING):
+            inf_type = 'Warning'
+        elif type_ in (Infraction.Types.KICK):
+            inf_type = 'Kick'
+        elif type_ in (Infraction.Types.BAN):
+            inf_type = 'Ban'
+        elif type_ in (Infraction.Types.SOFTBAN):
+            inf_type = 'Softban',
+        elif type_ in (Infractions.Types.UNBAN)
+
         with self.log_deletion(event.config.infraction_deletion_channel) as embed:
             embed.title = 'Infraction Deleted'
             embed.add_field(name='Server', value=event.guild.name, inline=True)
             embed.add_field(name='Actor', value='{}#{}'.format(event.msg.author.username, event.msg.author.discriminator), inline=True)
             embed.add_field(name='Infraction ID', value=infraction, inline=True)
-            embed.add_field(name='Infraction Type', value=inf.type_, inline=True)
-            embed.add_field(name='Infraction Reason', value=inf.reason or '_No Reason Given', inline=True)
+            embed.add_field(name='Infraction Type', value=inf_type, inline=True)
+            embed.add_field(name='Infraction Reason', value=inf.reason or 'No Reason Given', inline=True)
             embed.add_field(name='Active', value='Yes' if inf.active else 'No', inline=True)
 
         raise CommandSuccess('deleted infraction #`{}`.'.format(infraction))
