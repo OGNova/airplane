@@ -585,9 +585,9 @@ class InfractionsPlugin(Plugin):
             embed.add_field(name='Server', value=event.guild.name, inline=True)
             embed.add_field(name='Actor', value='{}#{}'.format(event.msg.author.username, event.msg.author.discriminator), inline=True)
             embed.add_field(name='Infraction ID', value=infraction, inline=True)
-            embed.add_field(name='Infraction Type', value=infraction.type, inline=True)
-            embed.add_field(name='Infraction Reason', value=str(infraction.reason), inline=True)
-            embed.add_field(name='Active?', value=infraction.active, inline=True)
+            embed.add_field(name='Infraction Type', value=inf.type, inline=True)
+            embed.add_field(name='Infraction Reason', value=str(inf.reason), inline=True)
+            embed.add_field(name='Active?', value=inf.active, inline=True)
 
         raise CommandSuccess('deleted infraction #`{}`.'.format(infraction))
 
