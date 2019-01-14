@@ -83,6 +83,9 @@ def invite_finder(guildid):
         292516924557099008: "https://discord.gg/fitz",
         299736482992619520: "https://discord.gg/thedooo",
         454533671622410251: "https://discord.gg/xdgang",
+        318353120130236426: "https://discord.gg/hanieldarrison",
+        201548045664387072: "https://discord.gg/donutoperator",
+        296379525686624256: "http://discord.gg/black-site",
         469566508838682644: "https://discord.gg/Gu7jRdW"
 
     }
