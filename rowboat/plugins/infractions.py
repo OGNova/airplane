@@ -921,7 +921,6 @@ class InfractionsPlugin(Plugin):
                             event.msg.reply('Unable to send a DM to this user.')                    
             else:
                 pass
-            self.can_act_on(event, member.id)
             Infraction.kick(self, event, member, reason)
             self.confirm_action(event, maybe_string(
                 reason,
