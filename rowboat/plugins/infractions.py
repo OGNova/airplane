@@ -886,6 +886,7 @@ class InfractionsPlugin(Plugin):
         cmd = event.msg.content
         suffix = ('-s', '--silent')
         if member:
+            self.can_act_on(event, member.id)
             if event.config.notify_action_on.kicks:
                 if cmd.endswith(suffix) is True:
                     if event.user_level < event.config.notify_action_on.silent_level:
