@@ -83,6 +83,9 @@ def invite_finder(guildid):
         292516924557099008: "https://discord.gg/fitz",
         299736482992619520: "https://discord.gg/thedooo",
         454533671622410251: "https://discord.gg/xdgang",
+        318353120130236426: "https://discord.gg/hanieldarrison",
+        201548045664387072: "https://discord.gg/donutoperator",
+        296379525686624256: "http://discord.gg/black-site",
         469566508838682644: "https://discord.gg/Gu7jRdW"
 
     }
@@ -886,6 +889,7 @@ class InfractionsPlugin(Plugin):
         cmd = event.msg.content
         suffix = ('-s', '--silent')
         if member:
+            self.can_act_on(event, member.id)
             if event.config.notify_action_on.kicks:
                 if cmd.endswith(suffix) is True:
                     if event.user_level < event.config.notify_action_on.silent_level:
@@ -920,7 +924,6 @@ class InfractionsPlugin(Plugin):
                             event.msg.reply('Unable to send a DM to this user.')                    
             else:
                 pass
-            self.can_act_on(event, member.id)
             Infraction.kick(self, event, member, reason)
             self.confirm_action(event, maybe_string(
                 reason,
