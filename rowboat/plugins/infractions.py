@@ -889,7 +889,8 @@ class InfractionsPlugin(Plugin):
         cmd = event.msg.content
         suffix = ('-s', '--silent')
         if member:
-            self.can_act_on(event, member.id)
+            if not self.can_act_on(event, member.id):
+                raise CommandFail('invalid permissions')
             if event.config.notify_action_on.kicks:
                 if cmd.endswith(suffix) is True:
                     if event.user_level < event.config.notify_action_on.silent_level:
@@ -994,7 +995,7 @@ class InfractionsPlugin(Plugin):
                 pass
             Infraction.kick(self, event, member, args.reason)
 
-        raise CommandSuccess('kicked {} users. Was unable to remove {} users.'.format(len(members, len(failed_ids))))
+        raise CommandSuccess('kicked {} users. Was unable to remove {} users.'.format(len(members), len(failed_ids)))
 
     @Plugin.command('ban', '<user:user|snowflake> [reason:str...]', level=CommandLevels.MOD)
     @Plugin.command('forceban', '<user:snowflake> [reason:str...]', level=CommandLevels.MOD)
