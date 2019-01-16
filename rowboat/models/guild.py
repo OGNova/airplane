@@ -248,18 +248,6 @@ class GuildConfigChange(BaseModel):
 
 
 @BaseModel.register
-class GuildMember(BaseModel):
-    user_id = BigIntegerField()
-    guild_id = BigIntegerField()
-
-    level = int()
-    rank = int()
-
-    class Meta:
-        db_table = 'guild_member_levels'
-        primary_key = CompositeKey(user_id, guild_id)
-
-@BaseModel.register
 class GuildMemberBackup(BaseModel):
     user_id = BigIntegerField()
     guild_id = BigIntegerField()

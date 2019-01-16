@@ -444,7 +444,7 @@ class InfractionsPlugin(Plugin):
         embed.timestamp = infraction.created_at.isoformat()
         event.msg.reply('', embed=embed)
 
-    @Plugin.command('duration', '<infraction:int:str> <duration:str>', group='infractions', level=CommandLevels.MOD)
+    @Plugin.command('duration', '<infraction:int|str> <duration:str>', group='infractions', level=CommandLevels.MOD)
     def infraction_duration(self, event, infraction, duration):
         inf = self.find_infraction(event, infraction)
 
@@ -488,7 +488,7 @@ class InfractionsPlugin(Plugin):
                 inf.expires_at.isoformat()
             ))
 
-    @Plugin.command('reason', '<infraction:int:str> <reason:str...>', group='infractions', level=CommandLevels.MOD)
+    @Plugin.command('reason', '<infraction:int|str> <reason:str...>', group='infractions', level=CommandLevels.MOD)
     def reason(self, event, infraction, reason):
         inf = self.find_infraction(event, infraction)
 
