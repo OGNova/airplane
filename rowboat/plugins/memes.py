@@ -89,6 +89,6 @@ class MemesPlugin(Plugin):
         return event.channel.send_message(u':banana: Banana\'d {User} (`{Reason}`)'.format(User=unicode(user), Reason=unicode(reason).encode('utf-8')))
 
     @Plugin.command('kik', '<user:user|snowflake> [reason:str...]', level=-1)
-    def banana(self, event, user, reason=None):
+    def kik(self, event, user, reason=None):
         #Kik'd
         return event.channel.send_message(u'<:kik:535264925237510194> Kik\'d {User} (`{Reason}`)'.format(User=unicode(user), Reason=unicode(reason).encode('utf-8')))
