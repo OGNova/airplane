@@ -26,6 +26,8 @@ def generate_random_nonce(length=10):
 
 
 class LatencyPlugin(Plugin):
+    global_plugin = True
+    
     def load(self, ctx):
         super(LatencyPlugin, self).load(ctx)
         self.rtts = weakref.WeakValueDictionary()
