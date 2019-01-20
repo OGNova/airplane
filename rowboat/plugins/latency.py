@@ -27,7 +27,7 @@ def generate_random_nonce(length=10):
 
 class LatencyPlugin(Plugin):
     global_plugin = True
-    
+
     def load(self, ctx):
         super(LatencyPlugin, self).load(ctx)
         self.rtts = weakref.WeakValueDictionary()
@@ -70,7 +70,7 @@ class LatencyPlugin(Plugin):
 
         with timed() as outer:
             with timed() as inner:
-                msg = event.msg.reply('Latency Test', nonce=nonce)
+                msg = event.msg.reply('Ping!', nonce=nonce)
 
             if not waiter.wait(timeout=15):
                 event.msg.reply('I never recieved my latency test message!')
