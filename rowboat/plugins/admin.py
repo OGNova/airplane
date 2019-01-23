@@ -363,7 +363,7 @@ class AdminPlugin(Plugin):
 
             event.msg.reply(':wastebasket: Ok please hold on while I delete those messages...').after(5).delete()
 
-        event.msg.reply('<a:clean:535924986733395969>')
+        event.msg.reply('<a:clean:535924986733395969>').after(10).delete()
         def run_clean():
             for chunk in chunks(messages, 100):
                 self.client.api.channels_messages_delete_bulk(event.channel.id, chunk)
