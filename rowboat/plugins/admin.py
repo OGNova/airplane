@@ -508,7 +508,7 @@ class AdminPlugin(Plugin):
             (Message.deleted == 1)
         ).tuples().async()
 
-        wait_many(message_stats, reactions_given, emojis, deleted, timeout=10)
+        wait_many(message_stats, reactions_given, emojis, deleted, timeout=15)
 
         # If we hit an exception executing the core query, throw an exception
         if message_stats.exception:
