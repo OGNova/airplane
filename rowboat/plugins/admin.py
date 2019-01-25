@@ -799,7 +799,7 @@ class AdminPlugin(Plugin):
         if member:
             victim_level = self.bot.plugins.get('CorePlugin').get_level(event.guild, user.id)
 
-            if event.user_level <= victim_level:
+            if (event.user_level <= victim_level) & (user.id != event.author.id):
                 raise CommandFail('invalid permissions')
 
             kwargs = {}
