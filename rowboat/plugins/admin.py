@@ -797,7 +797,13 @@ class AdminPlugin(Plugin):
     def nickname(self, event, user, newname=None):
         member = event.guild.get_member(user)
         if member:
-            self.can_act_on(event, member.id)
+            victim_level = self.bot.plugins.get('CorePlugin').get_level(event.guild, user.id)
+
+            if event.user_level <= victim_level:
+                if not throw:
+                    return False
+                raise CommandFail('invalid permissions')
+
             kwargs = {}
             if newname == None:
                 kwargs['nick'] = ''
