@@ -695,9 +695,12 @@ class UtilitiesPlugin(Plugin):
 
     @Plugin.command('messageinfo', '<mid:snowflake>', level=CommandLevels.MOD)
     def messageinfo(self, event, mid):
-        msg = Message.select(Message).where(
-                (Message.id == mid)
-            ).get()
+        try:
+            msg = Message.select(Message).where(
+                    (Message.id == mid)
+                ).get()
+        except MessageDoesNotExist:
+            raise CommandFail('the id specified does not exist in our message database.')
         message_content = msg.content
         author_id = msg.author.id
         guild_id = msg.guild_id
