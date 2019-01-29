@@ -17,6 +17,7 @@ from disco.types.user import GameType, Status, User as DiscoUser
 from disco.types.message import MessageEmbed
 from disco.util.snowflake import to_datetime
 from disco.util.sanitize import S
+from rowboat.sql import database
 
 
 from disco.api.http import Routes, APIException
@@ -693,6 +694,7 @@ class UtilitiesPlugin(Plugin):
 
     @Plugin.command('messageinfo', '<mid:snowflake>', level=CommandLevels.MOD)
     def messageinfo(self, event, mid):
+        conn = database.obj.get_conn()
         c = conn.cursor()
         c.execute("SELECT content FROM messages WHERE id=%s;", (mid,))
         content = c.fetchone()
