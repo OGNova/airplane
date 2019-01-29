@@ -690,3 +690,109 @@ class UtilitiesPlugin(Plugin):
             r.remind_at.isoformat(),
             humanize.naturaldelta(r.remind_at - datetime.utcnow()),
         ))
+
+    @Plugin.command('messageinfo', '<mid:snowflake>', level=CommandLevels.MOD)
+    def messageinfo(self, event, mid):
+        c = conn.cursor()
+        c.execute("SELECT content FROM messages WHERE id=%s;", (mid,))
+        content = c.fetchone()
+        message_content = str(content[0])
+        c = conn.cursor()
+        c.execute("SELECT author_id FROM messages WHERE id=%s;", (mid,))
+        author_id = c.fetchone()
+        author_id = str(author_id[0])
+        c = conn.cursor()
+        c.execute("SELECT guild_id FROM messages WHERE id=%s;", (mid,))
+        guild_id = c.fetchone()
+        guild_id = str(guild_id[0])
+        c = conn.cursor()
+        c.execute("SELECT channel_id FROM messages WHERE id=%s;", (mid,))
+        channel_id = c.fetchone()
+        channel_id = str(channel_id[0])
+        c = conn.cursor()
+        c.execute("SELECT deleted FROM messages WHERE id=%s;", (mid,))
+        deleted = c.fetchone()
+        deleted = deleted[0]
+        c = conn.cursor()
+        c.execute("SELECT num_edits FROM messages WHERE id=%s;", (mid,))
+        num_edits = c.fetchone()
+        num_edits = num_edits[0]
+        if num_edits > 0:
+            num_edits_bool = True
+        else:
+            num_edits_bool = False
+        c = conn.cursor()
+        c.execute("SELECT username,discriminator FROM users WHERE user_id=%s;", (author_id,))
+        cached_name = c.fetchone()
+        temp_str = str(cached_name[1])
+        if len(str(cached_name[1])) != 4:
+            while len(str(temp_str)) < 4:
+                temp_str = '0' + str(temp_str)
+        cached_name = str(cached_name[0]) + '#' + str(temp_str)
+        c = conn.cursor()
+        c.execute("SELECT avatar FROM users WHERE user_id=%s;", (author_id,))
+        avatar_name = c.fetchone()
+        avatar_name = avatar_name[0]
+        c.close 
+        # except:
+        #     c.close()
+        #     raise CommandFail('Failed to report message #`{}`'.format(mid))
+        content = []
+        embed = MessageEmbed()
+        member = event.guild.get_member(author_id)
+        
+        if not avatar_name:
+            if member:
+                avatar = default_color(str(member.user.default_avatar))
+            else:
+                avatar = None   
+        elif avatar_name.startswith('a_'):
+            avatar = u'https://cdn.discordapp.com/avatars/{}/{}.gif'.format(author_id, avatar_name)
+        else:
+            avatar = u'https://cdn.discordapp.com/avatars/{}/{}.png'.format(author_id, avatar_name)
+        if member:
+            embed.set_author(name='{} ({})'.format(member.user, member.id), icon_url=avatar)
+            embed.set_thumbnail(url=avatar)
+        else:
+            if avatar:
+                embed.set_author(name='{} ({})'.format(cached_name, author_id), icon_url=avatar)
+                embed.set_thumbnail(url=avatar)
+            else:
+                embed.set_author(name='{} ({})'.format(cached_name, author_id))
+
+        # embed.title = "Message Content:"
+        content.append(u'**\u276F Message Information:**')
+        content.append(u'In channel: <#{}>'.format(channel_id))
+        content.append(u'Edited: **{}**'.format(num_edits_bool))
+        if deleted:
+            content.append(u'Deleted: **{}**'.format(deleted))
+        content.append(u'Content: ```{}```'.format(message_content))
+        if member:
+            content.append(u'\n**\u276F Member Information**')
+
+            if member.nick:
+                content.append(u'Nickname: {}'.format(member.nick))
+
+            content.append('Joined: {} ago ({})'.format(
+                humanize.naturaldelta(datetime.utcnow() - member.joined_at),
+                member.joined_at.isoformat(),
+            ))
+
+            if member.roles:
+                content.append(u'Roles: {}'.format(
+                    ', '.join((member.guild.roles.get(r).name for r in member.roles))
+                ))
+
+        # embed.url = 'https://discordapp.com/channels/{}/{}/{}'.format(guild_id, channel_id, mid)
+        embed.timestamp = datetime.utcnow().isoformat()
+        if not event.author.avatar:
+            auth_avatar = default_color(str(member.user.default_avatar))
+        elif event.author.avatar.startswith('a_'):
+            auth_avatar = u'https://cdn.discordapp.com/avatars/{}/{}.gif'.format(event.author.id, event.author.avatar)
+        else:
+            auth_avatar = u'https://cdn.discordapp.com/avatars/{}/{}.png'.format(event.author.id, event.author.avatar)
+        embed.set_footer(text='Requested by {}#{} ({})'.format(event.author.username, event.author.discriminator, event.author.id), icon_url=auth_avatar)
+        try:
+            embed.color = get_dominant_colors_user(member.user, avatar)
+        except:
+            embed.color = '00000000'
