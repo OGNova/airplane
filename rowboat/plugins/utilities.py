@@ -759,7 +759,7 @@ class UtilitiesPlugin(Plugin):
                 content.append(u'Roles: {}'.format(
                     ', '.join((member.guild.roles.get(r).name for r in member.roles))
                 ))
-
+        embed.description = '\n'.join(content)
         # embed.url = 'https://discordapp.com/channels/{}/{}/{}'.format(guild_id, channel_id, mid)
         embed.timestamp = datetime.utcnow().isoformat()
         if not event.author.avatar:
