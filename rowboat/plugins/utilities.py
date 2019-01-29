@@ -15,6 +15,7 @@ from collections import defaultdict
 from disco.types.user import GameType, Status
 from disco.types.user import GameType, Status, User as DiscoUser
 from disco.types.message import MessageEmbed
+from rowboat.models.message import Message
 from disco.util.snowflake import to_datetime
 from disco.util.sanitize import S
 from rowboat.sql import database
@@ -694,51 +695,25 @@ class UtilitiesPlugin(Plugin):
 
     @Plugin.command('messageinfo', '<mid:snowflake>', level=CommandLevels.MOD)
     def messageinfo(self, event, mid):
-        conn = database.obj.get_conn()
-        c = conn.cursor()
-        c.execute("SELECT content FROM messages WHERE id=%s;", (mid,))
-        content = c.fetchone()
-        message_content = str(content[0])
-        c = conn.cursor()
-        c.execute("SELECT author_id FROM messages WHERE id=%s;", (mid,))
-        author_id = c.fetchone()
-        author_id = str(author_id[0])
-        c = conn.cursor()
-        c.execute("SELECT guild_id FROM messages WHERE id=%s;", (mid,))
-        guild_id = c.fetchone()
-        guild_id = str(guild_id[0])
-        c = conn.cursor()
-        c.execute("SELECT channel_id FROM messages WHERE id=%s;", (mid,))
-        channel_id = c.fetchone()
-        channel_id = str(channel_id[0])
-        c = conn.cursor()
-        c.execute("SELECT deleted FROM messages WHERE id=%s;", (mid,))
-        deleted = c.fetchone()
-        deleted = deleted[0]
-        c = conn.cursor()
-        c.execute("SELECT num_edits FROM messages WHERE id=%s;", (mid,))
-        num_edits = c.fetchone()
-        num_edits = num_edits[0]
+        msg = Message.select(Message).where(
+                (Message.id == mid)
+            ).get()
+        content = msg.content
+        author_id = msg.author.id
+        guild_id = msg.guild_id
+        channel_id = msg.channel_id
+        deleted = msg.deleted
+        num_edits = msg.num_edits
         if num_edits > 0:
             num_edits_bool = True
         else:
             num_edits_bool = False
-        c = conn.cursor()
-        c.execute("SELECT username,discriminator FROM users WHERE user_id=%s;", (author_id,))
-        cached_name = c.fetchone()
-        temp_str = str(cached_name[1])
-        if len(str(cached_name[1])) != 4:
-            while len(str(temp_str)) < 4:
-                temp_str = '0' + str(temp_str)
-        cached_name = str(cached_name[0]) + '#' + str(temp_str)
-        c = conn.cursor()
-        c.execute("SELECT avatar FROM users WHERE user_id=%s;", (author_id,))
-        avatar_name = c.fetchone()
-        avatar_name = avatar_name[0]
-        c.close 
-        # except:
-        #     c.close()
-        #     raise CommandFail('Failed to report message #`{}`'.format(mid))
+        discrim = str(msg.author.discriminator)
+        # if len(str(cached_name[1])) != 4:
+        #     while len(str(temp_str)) < 4:
+        #         temp_str = '0' + str(temp_str)
+        cached_name = str(msg.author.username) + '#' + str(discrim)
+        avatar_name = msg.author.avatar 
         content = []
         embed = MessageEmbed()
         member = event.guild.get_member(author_id)
