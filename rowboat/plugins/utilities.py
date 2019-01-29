@@ -773,3 +773,4 @@ class UtilitiesPlugin(Plugin):
             embed.color = get_dominant_colors_user(member.user, avatar)
         except:
             embed.color = '00000000'
+        event.msg.reply('', embed=embed)
