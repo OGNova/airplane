@@ -756,9 +756,17 @@ class UtilitiesPlugin(Plugin):
             ))
 
             if member.roles:
-                content.append(u'Roles: {}'.format(
-                    ', '.join((member.guild.roles.get(r).name for r in member.roles))
+                roles = []
+                for r in member.roles:
+                    roles.append(member.guild.roles.get(r))
+                roles = sorted(roles, key=lambda r: r.position, reverse=True)
+                total = len(member.roles)
+                roles = roles[:20]
+                content.append(u'Roles ({}): {}{}'.format(
+                    total, ' '.join(r.mention for r in roles),
+                    ' (+{})'.format(total-20) if total > 20 else ''
                 ))
+                
         embed.description = '\n'.join(content)
         # embed.url = 'https://discordapp.com/channels/{}/{}/{}'.format(guild_id, channel_id, mid)
         embed.timestamp = datetime.utcnow().isoformat()
