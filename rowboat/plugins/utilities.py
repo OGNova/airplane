@@ -698,7 +698,7 @@ class UtilitiesPlugin(Plugin):
         msg = Message.select(Message).where(
                 (Message.id == mid)
             ).get()
-        content = msg.content
+        message_content = msg.content
         author_id = msg.author.id
         guild_id = msg.guild_id
         channel_id = msg.channel_id
