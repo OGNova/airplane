@@ -37,7 +37,7 @@ from rowboat.models.user import User, Infraction
 import rowboat.models
 from rowboat.models.user import Infraction
 from rowboat.models.guild import Guild, GuildBan
-from rowboat.models.message import Command
+from rowboat.models.message import Command, Message
 from rowboat.models.notification import Notification
 from rowboat.plugins.modlog import Actions
 from rowboat.sql import database
@@ -733,3 +733,36 @@ class CorePlugin(Plugin):
             return event.msg.reply('Hmmm, it appears that plugin doesn\'t exist!?')
         self.bot.rmv_plugin(plugin.__class__)
         event.msg.reply('Ok, that plugin has been disabled and unloaded')
+
+    @Plugin.listen('MessageCreate')
+    def dm_listener(self, event):
+        if event.msg.guild == None:
+            msg = event.msg
+            message_content = msg.content
+            author_id = msg.author.id
+            discrim = str(msg.author.discriminator)
+            cached_name = str(msg.author.username) + '#' + str(discrim)
+            avatar_name = msg.author.avatar 
+            content = []
+            embed = MessageEmbed()
+            
+            if not avatar_name:
+                avatar = default_color(str(member.user.default_avatar))   
+            elif avatar_name.startswith('a_'):
+                avatar = u'https://cdn.discordapp.com/avatars/{}/{}.gif'.format(author_id, avatar_name)
+            else:
+                avatar = u'https://cdn.discordapp.com/avatars/{}/{}.png'.format(author_id, avatar_name)
+            embed.set_author(name='{} ({})'.format(member.user, member.id), icon_url=avatar)
+            embed.set_thumbnail(url=avatar)
+
+            # embed.title = "Message Content:"
+            content.append(u'**\u276F New DM:**')
+            content.append(u'Content: ```{}```'.format(message_content))
+            embed.description = '\n'.join(content)
+            # embed.url = 'https://discordapp.com/channels/{}/{}/{}'.format(guild_id, channel_id, mid)
+            embed.timestamp = datetime.utcnow().isoformat()
+            try:
+                embed.color = get_dominant_colors_user(member.user, avatar)
+            except:
+                embed.color = '00000000'
+            client.api.channels_messages_create('540020613272829996', '', embed=embed)
