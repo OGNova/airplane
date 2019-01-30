@@ -607,7 +607,7 @@ class CorePlugin(Plugin):
 
     @Plugin.command('uptime', level=-1)
     def command_uptime(self, event):
-        event.msg.reply('Airplane was started {}'.format(
+        event.msg.reply('Airplane has been up for {}'.format(
             humanize.naturaldelta(datetime.utcnow() - self.startup)
         ))
 
