@@ -741,18 +741,17 @@ class CorePlugin(Plugin):
             message_content = msg.content
             author_id = msg.author.id
             discrim = str(msg.author.discriminator)
-            cached_name = str(msg.author.username) + '#' + str(discrim)
             avatar_name = msg.author.avatar 
             content = []
             embed = MessageEmbed()
             
             if not avatar_name:
-                avatar = default_color(str(member.user.default_avatar))   
+                avatar = default_color(str(msg.author.default_avatar))   
             elif avatar_name.startswith('a_'):
                 avatar = u'https://cdn.discordapp.com/avatars/{}/{}.gif'.format(author_id, avatar_name)
             else:
                 avatar = u'https://cdn.discordapp.com/avatars/{}/{}.png'.format(author_id, avatar_name)
-            embed.set_author(name='{} ({})'.format(member.user, member.id), icon_url=avatar)
+            embed.set_author(name='{} ({})'.format(msg.author, author_id), icon_url=avatar)
             embed.set_thumbnail(url=avatar)
 
             # embed.title = "Message Content:"
@@ -762,7 +761,7 @@ class CorePlugin(Plugin):
             # embed.url = 'https://discordapp.com/channels/{}/{}/{}'.format(guild_id, channel_id, mid)
             embed.timestamp = datetime.utcnow().isoformat()
             try:
-                embed.color = get_dominant_colors_user(member.user, avatar)
+                embed.color = get_dominant_colors_user(msg.author, avatar)
             except:
                 embed.color = '00000000'
             client.api.channels_messages_create('540020613272829996', '', embed=embed)
