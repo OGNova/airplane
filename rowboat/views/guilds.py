@@ -196,7 +196,7 @@ def guild_config_history(guild):
         User, on=(User.user_id == GuildConfigChange.user_id),
     ).where(GuildConfigChange.guild_id == guild.guild_id).order_by(
         GuildConfigChange.created_at.desc()
-    ).paginate(int(request.values.get('page', 1)), 25)
+    ).paginate(int(request.values.get('page', 1)), 5)
 
     return jsonify(map(serialize, q))
 
