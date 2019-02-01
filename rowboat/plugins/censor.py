@@ -40,6 +40,10 @@ class CensorSubConfig(SlottedModel):
     blocked_words = ListField(lower, default=[])
     blocked_tokens = ListField(lower, default=[])
 
+    blocked_nicknames = ListField(lower, default=[])
+    blocked_nickname_tokens = ListField(lower, default=[])
+    blocked_nickname_rename = Field(str, default='')
+    
     @cached_property
     def blocked_re(self):
         return re.compile(u'({})'.format(u'|'.join(
@@ -257,3 +261,21 @@ class CensorPlugin(Plugin):
             raise Censorship(CensorReason.WORD, event, ctx={
                 'words': blocked_words,
             })
+
+    @Plugin.listen('GuildMemberUpdate')
+    def on_member_update(self, event):
+        if event.member.nickname in event.config.blocked_nicknames:
+            if event.config.blocked_nickname_rename:
+                event.member.set_nickname('{}'.format(event.config.blocked_nickname_rename))
+                raise Censorship(CensorReason.NICKNAME, event, ctx={
+                    'hit': 'nickname',
+                    'nickname': event.member.nickname
+                })
+            else:
+                event.member.set_nickname('🐱 I AM A LAMEFACE 🐱')
+                raise Censorship(CensorReason.NICKNAME, event, ctx={
+                    'hit': 'nickname',
+                    'nickname': event.member.nickname
+                })
+        else:
+            return
