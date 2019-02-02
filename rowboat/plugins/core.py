@@ -737,8 +737,9 @@ class CorePlugin(Plugin):
     @Plugin.listen('MessageCreate')
     def dm_listener(self, event):
         if event.guild == None:
-            msg = event.msg
-            message_content = msg.content
+            MODIFIER_GRAVE_ACCENT = u'\u02CB'
+            msg = event
+            message_content = msg.content.replace('`', MODIFIER_GRAVE_ACCENT)
             author_id = msg.author.id
             discrim = str(msg.author.discriminator)
             avatar_name = msg.author.avatar 
