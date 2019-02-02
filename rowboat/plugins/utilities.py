@@ -699,7 +699,7 @@ class UtilitiesPlugin(Plugin):
             msg = Message.select(Message).where(
                     (Message.id == mid)
                 ).get()
-        except MessageDoesNotExist:
+        except Message.DoesNotExist:
             raise CommandFail('the id specified does not exist in our message database.')
         message_content = msg.content
         author_id = msg.author.id
