@@ -727,9 +727,9 @@ class InfractionsPlugin(Plugin):
                 ))
         else:
             CommandFail('invalid user')
-        except APIException as e:
-            if e.code == 10007:
-                raise CommandFail('I can\'t find that user, are you sure it isn\'t a message id?')
+        # except APIException as e:
+        #     if e.code == 10007:
+        #         raise CommandFail('I can\'t find that user, are you sure it isn\'t a message id?')
 
     @Plugin.command(
         'temprole',
@@ -813,9 +813,9 @@ class InfractionsPlugin(Plugin):
                     pass
         else:
             raise CommandFail('invalid user')
-        except APIException as e:
-            if e.code == 10007:
-                raise CommandFail('I can\'t find that member, are you sure it\'s not a message id?')
+        # except APIException as e:
+        #     if e.code == 10007:
+        #         raise CommandFail('I can\'t find that member, are you sure it\'s not a message id?')
 
     @Plugin.command('unmuteall', level=CommandLevels.ADMIN)
     def unmuteall(self, event):

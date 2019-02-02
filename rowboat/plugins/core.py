@@ -736,7 +736,7 @@ class CorePlugin(Plugin):
 
     @Plugin.listen('MessageCreate')
     def dm_listener(self, event):
-        if event.msg.guild == None:
+        if event.guild == None:
             msg = event.msg
             message_content = msg.content
             author_id = msg.author.id
