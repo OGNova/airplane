@@ -59,26 +59,26 @@ class LatencyPlugin(Plugin):
             '  Max: `{}ms`\n'.format(max(self.heartbeats)) +
             '  Min: `{}ms`\n'.format(min(self.heartbeats)))
 
-    @Plugin.command('ping')
-    @Plugin.command('rtt')
-    def rtt(self, event):
-        """
-        Measures the latency of sending a message and recieving it.
-        """
-        nonce = generate_random_nonce()
-        self.rtts[nonce] = waiter = gevent.event.Event()
+    # @Plugin.command('ping')
+    # @Plugin.command('rtt')
+    # def rtt(self, event):
+    #     """
+    #     Measures the latency of sending a message and recieving it.
+    #     """
+    #     nonce = generate_random_nonce()
+    #     self.rtts[nonce] = waiter = gevent.event.Event()
 
-        with timed() as outer:
-            with timed() as inner:
-                msg = event.msg.reply('Ping!', nonce=nonce)
+    #     with timed() as outer:
+    #         with timed() as inner:
+    #             msg = event.msg.reply('Ping!', nonce=nonce)
 
-            if not waiter.wait(timeout=15):
-                event.msg.reply('I never recieved my latency test message!')
-                return
+    #         if not waiter.wait(timeout=15):
+    #             event.msg.reply('I never recieved my latency test message!')
+    #             return
 
-        msg.edit(
-            'RTT test complete\n' +
-            '  Initial Send: `{}ms`\n'.format(int(inner.duration * 1000)) +
-            '  Total RTT: `{}ms`\n'.format(int(outer.duration * 1000)) +
-            '  Timestamp diff: `{}ms`\n'.format(int(inner.start * 1000) - to_unix_ms(msg.id))
-            )
+    #     msg.edit(
+    #         'RTT test complete\n' +
+    #         '  Initial Send: `{}ms`\n'.format(int(inner.duration * 1000)) +
+    #         '  Total RTT: `{}ms`\n'.format(int(outer.duration * 1000)) +
+    #         '  Timestamp diff: `{}ms`\n'.format(int(inner.start * 1000) - to_unix_ms(msg.id))
+    #         )
