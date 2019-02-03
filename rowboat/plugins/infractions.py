@@ -559,7 +559,7 @@ class InfractionsPlugin(Plugin):
         embed = MessageEmbed()
         embed.set_footer(text=u'Deleted by {user} ({id})'.format(user=event.author, id=event.author.id), icon_url=avatar)
         embed.timestamp = datetime.utcnow().isoformat()
-        embed.color = 0x14175308
+        embed.color = 14175308
         try:
             yield embed
             self.bot.client.api.channels_messages_create(
