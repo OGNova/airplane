@@ -622,8 +622,8 @@ class InfractionsPlugin(Plugin):
 
         with self.log_deletion(event.config.infraction_deletion_channel, event) as embed:
             embed.description = u'**Infraction Deleted: `#{infID}`** || **Type:** `{type}`'.format(infID=infraction, type=str(type_).title())
-            embed.add_field(name='User:', value=u'{user}'.format(user=self.state.users.get(inf.user_id)), inline=True)
-            embed.add_field(name='Moderator:', value=u'{moderator}'.format(moderator=self.state.users.get(inf.actor_id)), inline=True)
+            embed.add_field(name='User:', value=u'{user} (`{id}`)'.format(user=self.state.users.get(inf.user_id), id=inf.user_id), inline=True)
+            embed.add_field(name='Moderator:', value=u'{moderator} (`{mid}`)'.format(moderator=self.state.users.get(inf.actor_id), mid=inf.actor_id), inline=True)
             embed.add_field(name='Created At:', value=u'{}'.format(str(created_at_timestamp)), inline=True)
             if inf.expires_at:
                 embed.add_field(name='Expired At:', value=u'{}'.format(str(expired_at_timestamp)), inline=True)
