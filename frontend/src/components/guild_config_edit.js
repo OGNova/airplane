@@ -16,14 +16,14 @@ class ConfigHistory extends Component {
         buttonsList.push(
           <NavLink key={change.created_timestamp} to={`/guilds/${this.props.guild.id}/config/${change.created_timestamp}`} className="list-group-item" activeClassName="active">
             <i className="fa fa-history fa-fw"></i> {change.user.username}#{change.user.discriminator}
-            <span className="pull-right text-muted small" title={change.created_at}><em>{moment(new Date(change.created_timestamp*1000).toLocaleString()).fromNow()}</em></span>
+            <span className="pull-right text-muted small" title={change.created_at}><em>{change.created_diff}</em></span>
           </NavLink>
         )
       }
     }
 
     return (
-      <div className="col-lg-3">
+      <div className="col-md-3 col-sm-12">
         <div className="panel panel-default">
             <div className="panel-heading">
                 <i className="fa fa-history fa-fw"></i> History
@@ -101,6 +101,9 @@ export default class GuildConfigEdit extends Component {
         hasUnsavedChanges: false,
       });
       this.renderMessage('success', 'Saved Configuration!');
+      this.state.guild.getConfigHistory(this.state.guild.id).then((history) => {
+        this.setState({history: history});
+      });
     }).catch((err) => {
       this.renderMessage('danger', `Failed to save configuration: ${err}`);
     });
@@ -133,7 +136,7 @@ export default class GuildConfigEdit extends Component {
     return (<div>
       {this.state.message && <div className={"alert alert-" + this.state.message.type}>{this.state.message.contents}</div>}
       <div className="row">
-        <div className="col-md-9">
+        <div className="col-md-9 col-sm-12">
           <div className="panel panel-default">
             <div className="panel-heading">
               <i className="fa fa-gear fa-fw"></i> Configuration Editor
@@ -144,7 +147,7 @@ export default class GuildConfigEdit extends Component {
                   mode="yaml"
                   theme="monokai"
                   width="100%"
-                  height="1000px"
+                  height="75vh"
                   value={[history.before, history.after]}
                   readOnly={true}
                 />
@@ -153,7 +156,7 @@ export default class GuildConfigEdit extends Component {
                   mode="yaml"
                   theme="monokai"
                   width="100%"
-                  height="1000px"
+                  height="75vh"
                   value={this.state.contents == null ? '' : this.state.contents}
                   onChange={(newValue) => this.onEditorChange(newValue)}
                   readOnly={this.state.guild && this.state.guild.role != 'viewer' ? false : true}
