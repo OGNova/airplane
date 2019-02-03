@@ -544,7 +544,7 @@ class InfractionsPlugin(Plugin):
             self.spawn(f)
 
     @contextlib.contextmanager
-    def log_deletion(self, channel_id):
+    def log_deletion(self, channel_id, event):
 
         avatar = event.author.avatar
         if avatar:
@@ -616,16 +616,16 @@ class InfractionsPlugin(Plugin):
             ireason = inf.reason.replace('`', MODIFIER_GRAVE_ACCENT)
 
         created_at_timestamp = inf.created_at.strftime('%d/%d/%y @ %I:%M%p [%Z]')
-        if infraction.expires_at:
+        if inf.expires_at:
             expired_at_timestamp = inf.expires_at.strftime('%d/%d/%y @ %I:%M%p [%Z]')
 
 
-        with self.log_deletion(event.config.infraction_deletion_channel) as embed:
+        with self.log_deletion(event.config.infraction_deletion_channel, event) as embed:
             embed.description = u'**Infraction Deleted: `#{infID}`** || **Type:** `{type}`'.format(infID=infraction, type=type_.title())
             embed.add_field(name='User:', value=u'{user}'.format(user=self.state.users.get(inf.user_id)), inline=True)
             embed.add_field(name='Moderator:', value=u'{moderator}'.format(moderator=self.state.users.get(inf.actor_id)), inline=True)
             embed.add_field(name='Created At:', value=u'{}'.format(str(created_at_timestamp)), inline=True)
-            if infraction.expires_at:
+            if inf.expires_at:
                 embed.add_field(name='Expired At:', value=u'{}'.format(str(expired_at_timestamp)), inline=True)
             embed.add_field(name='Reason:', value=u'```{reason}```'.format(ireason or 'No Reason Given'), inline=False)
 
