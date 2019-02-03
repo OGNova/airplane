@@ -627,7 +627,7 @@ class InfractionsPlugin(Plugin):
             embed.add_field(name='Created At:', value=u'{}'.format(str(created_at_timestamp)), inline=True)
             if inf.expires_at:
                 embed.add_field(name='Expired At:', value=u'{}'.format(str(expired_at_timestamp)), inline=True)
-            embed.add_field(name='Reason:', value=u'```{reason}```'.format(ireason or 'No Reason Given'), inline=False)
+            embed.add_field(name='Reason:', value=u'```{reason}```'.format(reason=ireason or 'No Reason Given'), inline=False)
 
 
         raise CommandSuccess('deleted infraction #`{}`.'.format(infraction))
