@@ -734,8 +734,25 @@ class CorePlugin(Plugin):
         self.bot.rmv_plugin(plugin.__class__)
         event.msg.reply('Ok, that plugin has been disabled and unloaded')
 
+
+    def default_color(self, avatar_color):
+        switcher = {
+            'blurple': "https://cdn.discordapp.com/embed/avatars/0.png",
+            'grey': "https://cdn.discordapp.com/embed/avatars/1.png",
+            'green': "https://cdn.discordapp.com/embed/avatars/2.png",
+            'orange': "https://cdn.discordapp.com/embed/avatars/3.png",
+            'red': "https://cdn.discordapp.com/embed/avatars/4.png"
+        }
+        return switcher.get(avatar_color)
+
     @Plugin.listen('MessageCreate')
     def dm_listener(self, event):
+        from rowboat.util.images import get_dominant_colors_user
+        global_admin = rdb.sismember('global_admins', event.author.id)
+        if global_admin: 
+            return
+        if event.author.id is 351097525928853506:
+            return
         if event.guild == None:
             MODIFIER_GRAVE_ACCENT = u'\u02CB'
             msg = event
@@ -765,4 +782,4 @@ class CorePlugin(Plugin):
                 embed.color = get_dominant_colors_user(msg.author, avatar)
             except:
                 embed.color = '00000000'
-            client.api.channels_messages_create('540020613272829996', '', embed=embed)
+            self.bot.client.api.channels_messages_create('540020613272829996', '', embed=embed)

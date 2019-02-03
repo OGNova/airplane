@@ -544,13 +544,22 @@ class InfractionsPlugin(Plugin):
             self.spawn(f)
 
     @contextlib.contextmanager
-    def log_deletion(self, channel_id):
+    def log_deletion(self, channel_id, event):
+
+        avatar = event.author.avatar
+        if avatar:
+            avatar = u'https://cdn.discordapp.com/avatars/{}/{}.{}'.format(
+                event.author.id, avatar, u'gif' if avatar.startswith('a_') else u'png'
+            )
+        else:
+            avatar = u'https://cdn.discordapp.com/embed/avatars/{}.png'.format(
+                int(event.author.discriminator) % 5
+            )
+
         embed = MessageEmbed()
-        embed.set_footer(text='Airplane {}'.format(
-            'Production' if ENV == 'prod' else 'Testing'
-        ))
+        embed.set_footer(text=u'Deleted by {user} ({id})'.format(user=event.author, id=event.author.id), icon_url=avatar)
         embed.timestamp = datetime.utcnow().isoformat()
-        embed.color = 0x99AAB5
+        embed.color = 14175308
         try:
             yield embed
             self.bot.client.api.channels_messages_create(
@@ -563,6 +572,7 @@ class InfractionsPlugin(Plugin):
 
     @Plugin.command('delete', '<infraction:int> [reason:str...]', group='infractions')
     def infraction_delete(self, event, infraction):
+        MODIFIER_GRAVE_ACCENT = u'\u02CB'
         try:
             inf = Infraction.select(Infraction).where(
                 (Infraction.id == infraction)
@@ -601,15 +611,24 @@ class InfractionsPlugin(Plugin):
         self.queue_infractions
 
         type_ = {i.index: i for i in Infraction.Types.attrs}[inf.type_]
+        ireason = None
+        if inf.reason is not None:
+            ireason = inf.reason.replace('`', MODIFIER_GRAVE_ACCENT)
 
-        with self.log_deletion(event.config.infraction_deletion_channel) as embed:
-            embed.title = 'Infraction Deleted'
-            embed.add_field(name='Server', value=event.guild.name, inline=True)
-            embed.add_field(name='Actor', value='{}#{}'.format(event.msg.author.username, event.msg.author.discriminator), inline=True)
-            embed.add_field(name='Infraction ID', value=infraction, inline=True)
-            embed.add_field(name='Infraction Type', value=type_, inline=True)
-            embed.add_field(name='Infraction Reason', value=inf.reason or 'No Reason Given', inline=True)
-            embed.add_field(name='Active', value='Yes' if inf.active else 'No', inline=True)
+        created_at_timestamp = inf.created_at.strftime('%d/%d/%y @ %I:%M%p')
+        if inf.expires_at:
+            expired_at_timestamp = inf.expires_at.strftime('%d/%d/%y @ %I:%M%p')
+
+
+        with self.log_deletion(event.config.infraction_deletion_channel, event) as embed:
+            embed.description = u'**Infraction Deleted: `#{infID}`** || **Type:** `{type}`'.format(infID=infraction, type=str(type_).title())
+            embed.add_field(name='User:', value=u'{user} (`{id}`)'.format(user=self.state.users.get(inf.user_id), id=inf.user_id), inline=True)
+            embed.add_field(name='Moderator:', value=u'{moderator} (`{mid}`)'.format(moderator=self.state.users.get(inf.actor_id), mid=inf.actor_id), inline=True)
+            embed.add_field(name='Created At:', value=u'{}'.format(str(created_at_timestamp)), inline=True)
+            if inf.expires_at:
+                embed.add_field(name='Expired At:', value=u'{}'.format(str(expired_at_timestamp)), inline=True)
+            embed.add_field(name='Reason:', value=u'```{reason}```'.format(reason=ireason or 'No Reason Given'), inline=False)
+
 
         raise CommandSuccess('deleted infraction #`{}`.'.format(infraction))
 
