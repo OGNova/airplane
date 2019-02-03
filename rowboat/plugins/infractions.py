@@ -615,9 +615,9 @@ class InfractionsPlugin(Plugin):
         if inf.reason is not None:
             ireason = inf.reason.replace('`', MODIFIER_GRAVE_ACCENT)
 
-        created_at_timestamp = inf.created_at.strftime('%d/%d/%y @ %I:%M%p')
+        created_at_timestamp = inf.created_at.strftime('%m/%d/%y @ %I:%M%p')
         if inf.expires_at:
-            expired_at_timestamp = inf.expires_at.strftime('%d/%d/%y @ %I:%M%p')
+            expired_at_timestamp = inf.expires_at.strftime('%m/%d/%y @ %I:%M%p')
 
 
         with self.log_deletion(event.config.infraction_deletion_channel, event) as embed:
