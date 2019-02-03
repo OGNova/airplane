@@ -735,7 +735,7 @@ class CorePlugin(Plugin):
         event.msg.reply('Ok, that plugin has been disabled and unloaded')
 
 
-    def default_color(avatar_color):
+    def default_color(self, avatar_color):
         switcher = {
             'blurple': "https://cdn.discordapp.com/embed/avatars/0.png",
             'grey': "https://cdn.discordapp.com/embed/avatars/1.png",
@@ -750,6 +750,8 @@ class CorePlugin(Plugin):
         from rowboat.util.images import get_dominant_colors_user
         global_admin = rdb.sismember('global_admins', event.author.id)
         if global_admin: 
+            return
+        if event.author.id is 351097525928853506:
             return
         if event.guild == None:
             MODIFIER_GRAVE_ACCENT = u'\u02CB'
