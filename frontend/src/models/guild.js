@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { globalState } from '../state';
 import BaseModel from './base';
+import moment from 'moment';
 
 export default class Guild extends BaseModel {
   constructor(obj) {
@@ -56,7 +57,9 @@ export default class Guild extends BaseModel {
       axios.get(`/api/guilds/${id}/config/history`).then((res) => {
         let data = res.data
         data = data.map(obj => {
-          obj.created_timestamp = Math.floor(new Date(obj.created_at).getTime() / 1000);
+          obj.created_at = obj.created_at + '+00:00';
+          obj.created_timestamp = +moment(obj.created_at);
+          obj.created_diff = moment(obj.created_at).fromNow();
           obj.user.discriminator = String(obj.user.discriminator).padStart(4, "0");
           return obj;
         });
