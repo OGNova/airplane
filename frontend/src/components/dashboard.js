@@ -61,20 +61,36 @@ class ControlPanel extends Component {
     });
   }
 
-  onRestart() {
-    globalState.restart().then(() => {
-      this.renderMessage('success', 'Restarting');
+  onBotRestart() {
+    globalState.restartBot().then(() => {
+      this.renderMessage('success', 'Restarting Bot');
     }).catch((err) => {
       this.renderMessage('danger', `Restart Failed: ${err}`);
     });
   }
     
-  onShutdown() {
-    globalState.shutdown().then(() => {
-      this.renderMessage('success', 'Shutting Down');
+  onBotShutdown() {
+    globalState.shutdownBot().then(() => {
+      this.renderMessage('success', 'Shutting Bot Down');
     }).catch((err) => {
       this.renderMessage('danger', `Shutdown Failed: ${err}`);
     });
+  }
+
+  onFrontendRestart() {
+    globalState.restartFrontend().then(() => {
+      this.renderMessage('success', 'Restarting Frontend');
+    }).catch((err) => {
+      this.renderMessage('danger', `Restart Failed: ${err}`)
+    })
+  }
+
+  onFrontendShutdown() {
+    globalState.shutdownFrontend().then(() => {
+      this.renderMessage('success', 'Shutting Frontend Down');
+    }).catch((err) => {
+      this.renderMessage('danger', `Shutdown Failed: ${err}`)
+    })
   }
 
   renderMessage(type, contents) {
@@ -104,8 +120,10 @@ class ControlPanel extends Component {
         </div>
         <div className="panel-body">
         <a href="#" onClick={() => this.onDeploy()} className="btn btn-success btn-block">Deploy</a>
-        <a href="#" onClick={() => this.onRestart()} className="btn btn-warning btn-block">Restart</a>
-        <a href="#" onClick={() => this.onShutdown()} className="btn btn-danger btn-block">Shutdown</a>
+        <a href="#" onClick={() => this.onBotRestart()} className="btn btn-warning btn-block">Restart Bot</a>
+        <a href="#" onClick={() => this.onBotShutdown()} className="btn btn-danger btn-block">Shutdown Bot</a>
+        <a href="https://aetherya.stream" onClick={() => this.onFrontendRestart()} className="btn btn-warning btn-block">Restart Frontend</a>
+        <a href="https://aetherya.stream" onClick={() => this.onFrontendShutdown()} className="btn btn-danger btn-block">Shutdown Frontend</a>
         </div>
       </div>
     );

@@ -97,22 +97,40 @@ def deploy():
     }))
     return '', 200
 
-@dashboard.route('/api/shutdown', methods=['POST'])
+@dashboard.route('/api/bot/shutdown', methods=['POST'])
 @authed
-def shutdown():
+def shutdownBot():
     if not g.user.admin:
         return '', 401
 
-    subprocess.Popen(['docker-compose', 'down']).wait()
+    subprocess.Popen(['pm2', 'stop', 'bot']).wait()
     return '', 200
 
-@dashboard.route('/api/restart', methods=['POST'])
+@dashboard.route('/api/bot/restart', methods=['POST'])
 @authed
-def restart():
+def restartBot():
     if not g.user.admin:
         return '', 401
 
-    subprocess.Popen(['docker-compose', 'restart']).wait()
+    subprocess.Popen(['pm2', 'restart', 'bot']).wait()
+    return '', 200
+
+@dashboard.route('/api/frontend/shutdown', methods=['POST'])
+@authed
+def shutdownBot():
+    if not g.user.admin:
+        return '', 401
+
+    subprocess.Popen(['pm2', 'stop', 'frontend']).wait()
+    return '', 200
+
+@dashboard.route('/api/frontend/restart', methods=['POST'])
+@authed
+def restartBot():
+    if not g.user.admin:
+        return '', 401
+
+    subprocess.Popen(['pm2', 'restart', 'frontend']).wait()
     return '', 200
 
 @dashboard.route('/api/ga/add', methods=['POST'])

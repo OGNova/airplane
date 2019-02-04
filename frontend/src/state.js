@@ -109,9 +109,39 @@ class State {
     });
   }
 
-  shutdown() {
+  restartBot() {
     return new Promise((resolve, reject) => {
-      axios.post('/api/shutdown').then((res) => {
+      axios.post('/api/bot/restart').then((res) => {
+        resolve();
+      }).catch((err) => {
+        reject();
+      });
+    });
+  }
+
+  shutdownBot() {
+    return new Promise((resolve, reject) => {
+      axios.post('/api/bot/shutdown').then((res) => {
+        resolve();
+      }).catch((err) => {
+        reject();
+      })
+    })
+  }
+
+  restartFrontend() {
+    return new Promise((resolve, reject) => {
+      axios.post('/api/frontend/restart').then((res) => {
+        resolve();
+      }).catch((err) => {
+        reject();
+      });
+    });
+  }
+
+  shutdownFrontend() {
+    return new Promise((resolve, reject) => {
+      axios.post('/api/frontend/shutdown').then((res) => {
         resolve();
       }).catch((err) => {
         reject();
