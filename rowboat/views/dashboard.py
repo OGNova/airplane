@@ -117,7 +117,7 @@ def restartBot():
 
 @dashboard.route('/api/frontend/shutdown', methods=['POST'])
 @authed
-def shutdownBot():
+def shutdownFrontend():
     if not g.user.admin:
         return '', 401
 
@@ -126,7 +126,7 @@ def shutdownBot():
 
 @dashboard.route('/api/frontend/restart', methods=['POST'])
 @authed
-def restartBot():
+def restartFrontend():
     if not g.user.admin:
         return '', 401
 
