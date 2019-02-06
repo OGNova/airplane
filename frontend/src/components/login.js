@@ -27,7 +27,7 @@ export default class Login extends Component {
         <div className="row">
           <div className="col-md-4 col-md-offset-4">
             <div className="login-panel panel panel-default">
-              <div className="panel-heading" style={{ justifyContent: 'center' }}>
+              <div className="panel-heading" style={{ textAlign: "center" }}>
                 <h3 className="panel-title">Login with Discord</h3>
               </div>
               <div className="panel-body">
