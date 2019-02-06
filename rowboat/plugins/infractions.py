@@ -796,7 +796,7 @@ class InfractionsPlugin(Plugin):
                             raise CommandSuccess('silently added a temprole to the user.')
                     else:
                         try:
-                            event.guild.get_member(user.id).user.open_dm().send_message('You have temporarily been given the role **{}** in the guild **{}** for **{}** for `{}`'.format(role.lower(), event.guild, humanize.naturaldelta(duration - datetime.utcnow()), reason or 'no reason specified.'))
+                            event.guild.get_member(user.id).user.open_dm().send_message('You have temporarily been given the role **{}** in the guild **{}** for **{}** for `{}`'.format(role.name, event.guild, humanize.naturaldelta(duration - datetime.utcnow()), reason or 'no reason specified.'))
                             event.msg.reply('Dm was successfully sent. <:'+GREEN_TICK_EMOJI+'>')
                         except:
                             event.msg.reply('Unable to send a DM to this user.')
