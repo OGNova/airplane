@@ -45,6 +45,7 @@ class NotifyConfig(SlottedModel):
     warns = Field(bool, default=False)
     kicks = Field(bool, default=False)
     bans = Field(bool, default=False)
+    temprole = Field(bool, default=False)
     invite_back = Field(bool, default=False)
     silent_level = Field(int, default=int(CommandLevels.ADMIN))
 
