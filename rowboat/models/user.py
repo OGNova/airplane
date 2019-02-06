@@ -175,7 +175,7 @@ class Infraction(BaseModel):
             role_id=role.id,
         )
 
-        member.add_role(role_id, reason=reason)
+        member.add_role(role.id, reason=reason)
 
         cls.create(
             guild_id=event.guild.id,
