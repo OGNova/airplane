@@ -162,26 +162,31 @@ class InfractionsPlugin(Plugin):
                             user_id=item.user_id,
                             role_id=item.metadata['role'],
                         )
-
+                        
                         try:
                             member.remove_role(item.metadata['role'])
                         except:
                             pass
 
-                        self.call(
-                            'ModLogPlugin.log_action_ext',
-                            Actions.MEMBER_TEMPMUTE_EXPIRE,
-                            guild.id,
-                            member=member,
-                            inf=item
-                        )
-                        # if self.config.notify_action_on.mutes:
-                        #     try:
-                        #         item.guild_id.get_member(item.user_id).user.open_dm().send_message('Your **Temporary Mute** in the guild **{}** has expired.'.format(event.guild.name))
-                        #     except:
-                        #         pass
-                        # else:
-                        #     pass
+                        if type_ == Infraction.Types.TEMPMUTE:
+                            self.call(
+                                'ModLogPlugin.log_action_ext',
+                                Actions.MEMBER_TEMPMUTE_EXPIRE,
+                                guild.id,
+                                member=member,
+                                inf=item
+                            )
+                        elif type_ == Infraction.Types.TEMPROLE:
+                            role = guild.roles[item.metadata['role']]
+                            self.call(
+                                'ModLogPlugin.log_action_ext',
+                                Actions.MEMBER_TEMPROLE_EXPIRE,
+                                guild.id,
+                                member=member,
+                                inf=item,
+                                role=unicode(role.name),
+                                role_id=role.id
+                            )
                 else:
                     GuildMemberBackup.remove_role(
                         item.guild_id,
@@ -768,6 +773,8 @@ class InfractionsPlugin(Plugin):
 
             if role_id in member.roles:
                 raise CommandFail(u'{} is already in that role'.format(member.user))
+            
+            role = event.guild.roles[role_id]
 
             if not event.config.notify_action_on:
                 return
@@ -782,7 +789,7 @@ class InfractionsPlugin(Plugin):
                             elif reason.endswith('--silent'):
                                 reason = reason[0:len(reason)-9]
                             expire_dt = parse_duration(duration)
-                            Infraction.temprole(self, event, member, role_id, reason, expire_dt)
+                            Infraction.temprole(self, event, member, role, reason, expire_dt)
                             self.queue_infractions()
 
                             self.confirm_action(event, maybe_string(
@@ -795,8 +802,9 @@ class InfractionsPlugin(Plugin):
                             ))
                             raise CommandSuccess('silently added a temprole to the user.')
                     else:
+                        expire_dt = parse_duration(duration)
                         try:
-                            event.guild.get_member(user.id).user.open_dm().send_message('You have temporarily been given the role **{}** in the guild **{}** for **{}** for `{}`'.format(role.name, event.guild, humanize.naturaldelta(duration - datetime.utcnow()), reason or 'no reason specified.'))
+                            event.guild.get_member(user.id).user.open_dm().send_message('You have temporarily been given the role **{}** in the guild **{}** for **{}** for `{}`'.format(event.guild.roles[role_id].name, event.guild.name, humanize.naturaldelta(expire_dt - datetime.utcnow()), reason or 'no reason specified.'))
                             event.msg.reply('Dm was successfully sent. <:'+GREEN_TICK_EMOJI+'>')
                         except:
                             event.msg.reply('Unable to send a DM to this user.')
@@ -804,7 +812,7 @@ class InfractionsPlugin(Plugin):
                     pass
 
             expire_dt = parse_duration(duration)
-            Infraction.temprole(self, event, member, role_id, reason, expire_dt)
+            Infraction.temprole(self, event, member, role, reason, expire_dt)
             self.queue_infractions()
 
             self.confirm_action(event, maybe_string(
