@@ -749,7 +749,7 @@ class CorePlugin(Plugin):
     def dm_listener(self, event):
         from rowboat.util.images import get_dominant_colors_user
         global_admin = rdb.sismember('global_admins', event.author.id)
-        if global_admin or event.author.id = 351097525928853506: 
+        if global_admin or event.author.id == 351097525928853506: 
             return
         if event.guild == None:
             MODIFIER_GRAVE_ACCENT = u'\u02CB'
