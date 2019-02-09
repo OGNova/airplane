@@ -402,7 +402,7 @@ class UtilitiesPlugin(Plugin):
 
         for status, count in sorted(status_counts.items(), key=lambda i: str(i[0]), reverse=True):
             content.append(u'<{}> - {}'.format(
-                STATUS_EMOJI[status], count
+                STATUS_EMOJI[status], format(count, ":,d")
             ))
 
         embed = MessageEmbed()
