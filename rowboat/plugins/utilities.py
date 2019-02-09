@@ -381,7 +381,7 @@ class UtilitiesPlugin(Plugin):
             humanize.naturaldelta(datetime.utcnow() - created_at),
             created_at.isoformat(),
         ))
-        content.append(u'Members: {}'.format(len(guild.members)))
+        content.append(u'Members: {:,.2f}'.format(len(guild.members)))
         content.append(u'Features: {}'.format(', '.join(guild.features) or 'none'))
 
         content.append(u'\n**\u276F Counts**')
