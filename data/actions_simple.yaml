@@ -153,3 +153,11 @@ MEMBER_KICK:
 INFRACTION_REMOVE:
   emoji: pencil
   format: 'Infraction id **{infraction_id}**, `{infraction_reason}`, was removed by **{actor}**: `{reason}`'
+
+MEMBER_TEMP_ROLE:
+  emoji: closed_lock_with_key
+  format: '{member!s} (`{member.id}`) was added to role {role!s} (`{role_id}`) until {expires} by **{actor!s}**: `{reason!s}`'
+
+MEMBER_TEMPROLE_EXPIRE:
+  emoji: closed_lock_with_key
+  format: '{member!s} (`{member.id}`) was removed from role {role!s} (`{role_id}`), their temprole (#`{inf.id}`) expired.'

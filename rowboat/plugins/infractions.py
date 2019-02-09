@@ -45,6 +45,7 @@ class NotifyConfig(SlottedModel):
     warns = Field(bool, default=False)
     kicks = Field(bool, default=False)
     bans = Field(bool, default=False)
+    temprole = Field(bool, default=False)
     invite_back = Field(bool, default=False)
     silent_level = Field(int, default=int(CommandLevels.ADMIN))
 
@@ -161,26 +162,31 @@ class InfractionsPlugin(Plugin):
                             user_id=item.user_id,
                             role_id=item.metadata['role'],
                         )
-
+                        
                         try:
                             member.remove_role(item.metadata['role'])
                         except:
                             pass
 
-                        self.call(
-                            'ModLogPlugin.log_action_ext',
-                            Actions.MEMBER_TEMPMUTE_EXPIRE,
-                            guild.id,
-                            member=member,
-                            inf=item
-                        )
-                        # if self.config.notify_action_on.mutes:
-                        #     try:
-                        #         item.guild_id.get_member(item.user_id).user.open_dm().send_message('Your **Temporary Mute** in the guild **{}** has expired.'.format(event.guild.name))
-                        #     except:
-                        #         pass
-                        # else:
-                        #     pass
+                        if type_ == Infraction.Types.TEMPMUTE:
+                            self.call(
+                                'ModLogPlugin.log_action_ext',
+                                Actions.MEMBER_TEMPMUTE_EXPIRE,
+                                guild.id,
+                                member=member,
+                                inf=item
+                            )
+                        elif type_ == Infraction.Types.TEMPROLE:
+                            role = guild.roles[item.metadata['role']]
+                            self.call(
+                                'ModLogPlugin.log_action_ext',
+                                Actions.MEMBER_TEMPROLE_EXPIRE,
+                                guild.id,
+                                member=member,
+                                inf=item,
+                                role=unicode(role.name),
+                                role_id=role.id
+                            )
                 else:
                     GuildMemberBackup.remove_role(
                         item.guild_id,
@@ -756,30 +762,69 @@ class InfractionsPlugin(Plugin):
         level=CommandLevels.MOD)
     def temprole(self, event, user, role, duration, reason=None):
         member = event.guild.get_member(user)
-        if not member:
+        cmd = event.msg.content
+        suffix = ('-s', '--silent')
+        if member:        
+            self.can_act_on(event, member.id)
+            admin_config = getattr(event.base_config.plugins, 'admin', None)
+            role_id = role if isinstance(role, (int, long)) else admin_config.role_aliases.get(role.lower())
+            if not role_id or role_id not in event.guild.roles:
+                raise CommandFail('invalid or unknown role')
+
+            if role_id in member.roles:
+                raise CommandFail(u'{} is already in that role'.format(member.user))
+            
+            role = event.guild.roles[role_id]
+
+            if not event.config.notify_action_on:
+                return
+            else:
+                if event.config.notify_action_on.temprole:
+                    if cmd.endswith(suffix) is True:
+                        if event.user_level < event.config.notify_action_on.silent_level:
+                            raise CommandFail('only administrators can silently issue infractions.')
+                        else:
+                            if reason.endswith('s'):
+                                reason = reason[0:len(reason)-3]
+                            elif reason.endswith('--silent'):
+                                reason = reason[0:len(reason)-9]
+                            expire_dt = parse_duration(duration)
+                            Infraction.temprole(self, event, member, role, reason, expire_dt)
+                            self.queue_infractions()
+
+                            self.confirm_action(event, maybe_string(
+                                reason,
+                                u':ok_hand: {u} is now in the {r} role for {t} (`{o}`)',
+                                u':ok_hand: {u} is now in the {r} role for {t}',
+                                r=event.guild.roles[role_id].name,
+                                u=member.user,
+                                t=humanize.naturaldelta(expire_dt - datetime.utcnow()),
+                            ))
+                            raise CommandSuccess('silently added a temprole to the user.')
+                    else:
+                        expire_dt = parse_duration(duration)
+                        try:
+                            event.guild.get_member(user.id).user.open_dm().send_message('You have temporarily been given the role **{}** in the guild **{}** for **{}** for `{}`'.format(event.guild.roles[role_id].name, event.guild.name, humanize.naturaldelta(expire_dt - datetime.utcnow()), reason or 'no reason specified.'))
+                            event.msg.reply('Dm was successfully sent. <:'+GREEN_TICK_EMOJI+'>')
+                        except:
+                            event.msg.reply('Unable to send a DM to this user.')
+                else:
+                    pass
+
+            expire_dt = parse_duration(duration)
+            Infraction.temprole(self, event, member, role, reason, expire_dt)
+            self.queue_infractions()
+
+            self.confirm_action(event, maybe_string(
+                reason,
+                u':ok_hand: {u} is now in the {r} role for {t} (`{o}`)',
+                u':ok_hand: {u} is now in the {r} role for {t}',
+                r=event.guild.roles[role_id].name,
+                u=member.user,
+                t=humanize.naturaldelta(expire_dt - datetime.utcnow()),
+            ))
+        else:
             raise CommandFail('invalid user')
-
-        self.can_act_on(event, member.id)
-        admin_config = getattr(event.base_config.plugins, 'admin', None)
-        role_id = role if isinstance(role, (int, long)) else admin_config.role_aliases.get(role.lower())
-        if not role_id or role_id not in event.guild.roles:
-            raise CommandFail('invalid or unknown role')
-
-        if role_id in member.roles:
-            raise CommandFail(u'{} is already in that role'.format(member.user))
-
-        expire_dt = parse_duration(duration)
-        Infraction.temprole(self, event, member, role_id, reason, expire_dt)
-        self.queue_infractions()
-
-        self.confirm_action(event, maybe_string(
-            reason,
-            u':ok_hand: {u} is now in the {r} role for {t} (`{o}`)',
-            u':ok_hand: {u} is now in the {r} role for {t}',
-            r=event.guild.roles[role_id].name,
-            u=member.user,
-            t=humanize.naturaldelta(expire_dt - datetime.utcnow()),
-        ))
 
     @Plugin.command('unmute', '<user:user|snowflake>', level=CommandLevels.MOD)
     def unmute(self, event, user, reason=None):

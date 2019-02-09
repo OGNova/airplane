@@ -381,7 +381,7 @@ class UtilitiesPlugin(Plugin):
             humanize.naturaldelta(datetime.utcnow() - created_at),
             created_at.isoformat(),
         ))
-        content.append(u'Members: {}'.format(len(guild.members)))
+        content.append(u'Members: {:,d}'.format(len(guild.members)))
         content.append(u'Features: {}'.format(', '.join(guild.features) or 'none'))
 
         content.append(u'\n**\u276F Counts**')
@@ -402,7 +402,7 @@ class UtilitiesPlugin(Plugin):
 
         for status, count in sorted(status_counts.items(), key=lambda i: str(i[0]), reverse=True):
             content.append(u'<{}> - {}'.format(
-                STATUS_EMOJI[status], count
+                STATUS_EMOJI[status], format(count, ',d')
             ))
 
         embed = MessageEmbed()
