@@ -195,6 +195,18 @@
         {
             "id": "48",
             "content": "{1} attacks {0} with burnt toast. {0} is toasted!"
+        },
+        {
+            "id": "49",
+            "content": "It's over {0}. {1} has the high ground now!"
+        },
+        {
+            "id": "50",
+            "content": "It's over {0}. {1} has the high grou... oh wait... {1} fell off. Never mind."
+        },
+        {
+            "id": "51",
+            "content": "{1} leans in for a right hook but ends up lightly kissing {0} on the forehead. Awww!"
         }
     ]
 }
