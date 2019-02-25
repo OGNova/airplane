@@ -102,7 +102,7 @@ class MemesPlugin(Plugin):
 
     @Plugin.command('fight', '[user:user|snowflake]', level=10)
     def fight(self, event, user=None):
-        with open('./rowboat/plugins/fun.json') as f:
+        with open('./fun.json') as f:
             fun = json.load(f)
         fights = fun["fights"]
         author = event.author.mention
