@@ -1,0 +1,212 @@
+{
+    "fights": [
+        {
+            "id": "0",
+            "content": "{0} failed to specify a target so they attacked themselves and won."
+        },
+        {
+            "id": "1",
+            "content": "{1} tries to ban {0}. It fails, {1} does not have sufficient permissions."
+        },
+        {
+            "id": "2",
+            "content": "{0}, {1} fights you with cotton candy!"
+        },
+        {
+            "id": "3",
+            "content": "{0}, You are attacked by a horde of cute puppies released by {1}"
+        },
+        {
+            "id": "4",
+            "content": "{0}, {1} throws Jelly Beans at you"
+        },
+        {
+            "id": "5",
+            "content": "{1} attacks {0} but they get rickrolled by airplane instead"
+        },
+        {
+            "id": "6",
+            "content": "{1} attempts to attack {0}, but both end up falling into a man hole."
+        },
+        {
+            "id": "7",
+            "content": "*swoosh* {1} comes from behind {0} as {1} turns on their Lightsaber to strike!"
+        },
+        {
+            "id": "8",
+            "content": "{0} wasn't paying attention and got attacked by {1}!"
+        },
+        {
+            "id": "9",
+            "content": "{1} attacks {0} with puns, but {1} gets muted in revenge by {0}!"
+        },
+        {
+            "id": "10",
+            "content": "{1} sends a horde of wild black cats at {0}, they have... bad luck."
+        },
+        {
+            "id": "11",
+            "content": "{1} tries to hit {0} with a newspaper, but they got distracted by the story on the front page!"
+        },
+        {
+            "id": "12",
+            "content": "{1} throws an apple at {0}, however, {0} catches the apple and eates it. Yum!"
+        },
+        {
+            "id": "13",
+            "content": "{1} turns on the light theme for {0}!"
+        },
+        {
+            "id": "14",
+            "content": "{1} threw millions of muffins at {0}! It's muffin time!"
+        },
+        {
+            "id": "15",
+            "content": "{1} tried to attack {0}, but got confused and launched a Tesla into space instead!"
+        },
+        {
+            "id": "16",
+            "content": "{1} throws a blue shell at {0}. {0} is not in 1rst place anymore."
+        },
+        {
+            "id": "17",
+            "content": "{1} punches {0} taking all of their HP. THE POWER OF THE HIT IS OVER 9000!"
+        },
+        {
+            "id": "18",
+            "content": "{1} tries to attack {0}, but it is Opposite Day so {0} ends up hitting {1} instead!"
+        },
+        {
+            "id": "19",
+            "content": "{1} attempts to hit {0}, but gets 403 forbidden error!"
+        },
+        {
+            "id": "20",
+            "content": "{1} challenges {0} to a Pokemon battle. {1} whimped out and lost $999"
+        },
+        {
+            "id": "21",
+            "content": "{1} tries to fight {0}, but the moderators came to the rescue!"
+        },
+        {
+            "id": "22",
+            "content": "{1} tries to spam {0}'s DMs, but they got ratelimited!"
+        },
+        {
+            "id": "23",
+            "content": "{1} is fighting {0} with fish!"
+        },
+        {
+            "id": "24",
+            "content": "{1} attempts to fight {0}, but {0} vanishes into thin air!"
+        },
+        {
+            "id": "25",
+            "content": "{1} flips a table against {0}."
+        },
+        {
+            "id": "26",
+            "content": "{1}? Who are they? Ooooh, this is the guy who {0} struck down with one hit."
+        },
+        {
+            "id": "27",
+            "content": "{1} attempts to strike down on {0}, but ends up hitting the ground instead!"
+        },
+        {
+            "id": "28",
+            "content": "{1} declares {0} a virus and places them under quarantine!"
+        },
+        {
+            "id": "29",
+            "content": "{1} deletes {0}'s System32 folder!"
+        },
+        {
+            "id": "30",
+            "content": "{1} throws cake into {0}'s face!"
+        },
+        {
+            "id": "31",
+            "content": "Roses are red, Trees are green, better run {0} because {1} is chasing you with a baseball bat!"
+        },
+        {
+            "id": "32",
+            "content": "{1} tries to ban {0}, but got confused and banned themselves instead!"
+        },
+        {
+            "id": "33",
+            "content": "{1} pinged the moderators to mute {0}!"
+        },
+        {
+            "id": "34",
+            "content": "{1} spam-pinged {0}, but {0} warns the moderators who end up banning {1}!"
+        },
+        {
+            "id": "35",
+            "content": "{1} swings the ban hammer onto {0}, which was a critical hit!"
+        },
+        {
+            "id": "36",
+            "content": "{1} ghost-pinged {0}, and {0} ends up getting the notification stuck on their Android device!"
+        },
+        {
+            "id": "37",
+            "content": "{0} opens the box out of curiosity, but {1} comes out and attacks {0} with a bat!"
+        },
+        {
+            "id": "38",
+            "content": "{1} calls {0} the n-word but gets banned by the moderators."
+        },
+        {
+            "id": "39",
+            "content": "{1} tries to fight {0}, but ends up hitting themselves instead!"
+        },
+        {
+            "id": "40",
+            "content": "'*Never gonna give you up, never gonna let you down~*' said {1} as they ran away after punching {0}!"
+        },
+        {
+            "id": "41",
+            "content": "{0} buys a cake for {1}. {1} threw it into {0}'s face while shouting, 'The cake is a lie!!'"
+        },
+        {
+            "id": "42",
+            "content": "{1} starts a food fight with {0}!"
+        },
+        {
+            "id": "43",
+            "content": "{1} stopped the car next to {0} and ends up offending them! {1} got shot as a result."
+        },
+        {
+            "id": "44",
+            "content": "{1} is too drunk to even decide how to fight {0}."
+        },
+        {
+            "id": "45",
+            "content": "{1} tried to post a salty comment about {0}, but they ended up dissing themselves instead!"
+        },
+        {
+            "id": "46",
+            "content": "{1} defeats {0}, but the fight was a dream!"
+        },
+        {
+            "id": "47",
+            "content": "{1} stubs {0}'s toe!"
+        },
+        {
+            "id": "48",
+            "content": "{1} attacks {0} with burnt toast. {0} is toasted!"
+        },
+        {
+            "id": "49",
+            "content": "It's over {0}. {1} has the high ground now!"
+        },
+        {
+            "id": "50",
+            "content": "It's over {0}. {1} has the high grou... oh wait... {1} fell off. Never mind."
+        },
+        {
+            "id": "51",
+            "content": "{1} leans in for a right hook but ends up lightly kissing {0} on the forehead. Awww!"
+        }
+    ]
+}
