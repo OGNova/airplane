@@ -146,7 +146,7 @@
         },
         {
             "id": "36",
-            "content": "{1} thost-pinged {0}, and {0} ends up getting the notification stuck on their Android device!"
+            "content": "{1} ghost-pinged {0}, and {0} ends up getting the notification stuck on their Android device!"
         },
         {
             "id": "37",
