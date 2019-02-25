@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 import disco
 import gevent
+import json
+from random import randint
 from rowboat.plugins import RowboatPlugin as Plugin, CommandFail, CommandSuccess
 from disco.bot import CommandLevels
 from rowboat.types.plugin import PluginConfig
@@ -97,3 +99,17 @@ class MemesPlugin(Plugin):
     def bean(self, event, user, reason=None):
         #Bean'd
         return event.channel.send_message(u'<:beaned:321111606878797825> Bean\'d {User} (`{Reason}`)'.format(User=unicode(user), Reason=unicode(reason).encode('utf-8')))
+
+    @Plugin.command('fight', '[user:user|snowflake]', level=10)
+    def fight(self, event, user=None):
+        with open('fun.json') as f:
+            fun = json.load(f)
+        fights = fun["fights"]
+        author = event.author.mention
+        if not user:
+            content = fights["id" == "0"]["content"]
+            return event.msg.reply(content.format(author))
+        else:
+            target = user.mention
+        content = fights[randint(1, len(fights)-1)]["content"]
+        return event.msg.reply(content.format(target, author))
