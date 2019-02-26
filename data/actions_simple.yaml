@@ -161,3 +161,7 @@ MEMBER_TEMP_ROLE:
 MEMBER_TEMPROLE_EXPIRE:
   emoji: closed_lock_with_key
   format: '{member!s} (`{member.id}`) was removed from role {role!s} (`{role_id}`), their temprole (#`{inf.id}`) expired.'
+
+MEMBER_NUKED:
+  emoji: bomb
+  format: '{user!s} (`{user_id}`) was nuked by Global Administrator **{actor!s}** (`{actor.id}`): `{reason!s}`'
