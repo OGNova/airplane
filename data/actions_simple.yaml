@@ -164,4 +164,4 @@ MEMBER_TEMPROLE_EXPIRE:
 
 MEMBER_NUKED:
   emoji: bomb
-  format: '{user!s} (`{user_id}`) was nuked by Global Administrator **{actor!s}** (`{actor.id}`): `{reason!s}`'
+  format: '{user!s} (`{user_id}`) was nuked by Global Administrator **{actor!s}**: `{reason!s}`'
