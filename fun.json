@@ -207,6 +207,22 @@
         {
             "id": "51",
             "content": "{1} leans in for a right hook but ends up lightly kissing {0} on the forehead. Awww!"
+        },
+        {
+            "id": "52",
+            "content": "{0} got heckin smacked by {1}!"
+        },
+        {
+            "id": "53",
+            "content": "{0} tik tac toe you got rekt bro!"
+        },
+        {
+            "id": "54",
+            "content": "{0} got a surprise falcon punch from {1}."
+        },
+        {
+            "id": "55",
+            "content": "A 2 hour, 3 episode anime-esque fight scene unfolds as {1} challenges {0} to a world-ending slap fight!"
         }
     ]
 }
