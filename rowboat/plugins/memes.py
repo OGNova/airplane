@@ -106,7 +106,7 @@ class MemesPlugin(Plugin):
             fun = json.load(f)
         fights = fun["fights"]
         author = event.author.mention
-        if not user:
+        if not user or event.author.id == user.id:
             content = fights["id" == "0"]["content"]
             return event.msg.reply(content.format(author))
         else:
