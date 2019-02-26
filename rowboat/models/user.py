@@ -114,7 +114,7 @@ class Infraction(BaseModel):
         'UNBAN',
         'TEMPROLE',
         'WARNING',
-        'NUKE'
+        'NUKE',
         bitmask=False,
     )
 
