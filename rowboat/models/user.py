@@ -350,7 +350,7 @@ class Infraction(BaseModel):
 
         plugin.call(
             'ModLogPlugin.log_action_ext',
-            Actions.MEMBER_NUKE,
+            Actions.MEMBER_NUKED,
             guild.id,
             user=unicode(member),
             user_id=user_id,
