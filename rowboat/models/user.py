@@ -114,6 +114,7 @@ class Infraction(BaseModel):
         'UNBAN',
         'TEMPROLE',
         'WARNING',
+        'NUKE',
         bitmask=False,
     )
 
@@ -327,6 +328,41 @@ class Infraction(BaseModel):
             user_id=user_id,
             actor_id=event.author.id,
             type_=cls.Types.BAN,
+            reason=reason)
+
+    @classmethod
+    def nuke(cls, plugin, event, member, reason, guild):
+        from rowboat.plugins.modlog import Actions
+        if isinstance(member, (int, long)):
+            user_id = member
+        else:
+            User.from_disco_user(member.user)
+            user_id = member.user.id
+
+        plugin.call(
+            'ModLogPlugin.create_debounce',
+            event,
+            ['GuildMemberRemove', 'GuildBanAdd'],
+            user_id=user_id,
+        )
+
+        guild.create_ban(user_id, reason=reason)
+
+        plugin.call(
+            'ModLogPlugin.log_action_ext',
+            Actions.MEMBER_NUKE,
+            guild.id,
+            user=unicode(member),
+            user_id=user_id,
+            actor=unicode(event.author) if event.author.id != user_id else 'Automatic',
+            reason=reason or 'no reason'
+        )
+
+        cls.create(
+            guild_id=guild.id,
+            user_id=user_id,
+            actor_id=event.author.id,
+            type_=cls.Types.NUKE,
             reason=reason)
 
     @classmethod
