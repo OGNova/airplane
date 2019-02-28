@@ -2,7 +2,7 @@
 import disco
 import gevent
 import json
-from random import randint
+from random import randint, choice
 from rowboat.plugins import RowboatPlugin as Plugin, CommandFail, CommandSuccess
 from disco.bot import CommandLevels
 from rowboat.types.plugin import PluginConfig
@@ -19,11 +19,11 @@ game_emotes_rps = {
             "id": 550773044696580097,
             "emote": "choose_scissors:550773044696580097"
         },
-        "scissors_won": {
+        "won": {
             "id": 550773044906426378,
             "emote": "scissors_won:550773044906426378"
         },
-        "scissors_lost": {
+        "lost": {
             "id": 550773044927397906,
             "emote": "scissors_lost:550773044927397906"
         }
@@ -33,11 +33,11 @@ game_emotes_rps = {
             "id": 550773044855963677,
             "emote": "choose_rock:550773044855963677"
         },
-        "rock_won": {
+        "won": {
             "id": 550773044923072512,
             "emote": "rock_won:550773044923072512"
         },
-        "rock_lost": {
+        "lost": {
             "id": 550773044914683907,
             "emote": "rock_lost:550773044914683907"
         }
@@ -47,16 +47,49 @@ game_emotes_rps = {
             "id": 550773044277411852,
             "emote": "choose_paper:550773044277411852"
         },
-        "paper_won": {
+        "won": {
             "id": 550773044738654208,
             "emote": "paper_won:550773044738654208"
         },
-        "paper_lost": {
+        "lost": {
             "id": 550773044881129486,
             "emote": "paper_lost:550773044881129486"
         }
     }
 }
+
+def winner_rps(choice_p1, choice_p2):
+    if choice_p1 == choice_p2:
+        outcome_p1 = 'default'
+        outcome_p2 = 'default'
+        return outcome_p1, outcome_p2, "{0} and {3} both chose {1} making this game a tie."
+    elif choice_p1 == 'rock':
+        if choice_p2 == 'paper':
+            outcome_p1 = 'lost'
+            outcome_p2 = 'won'
+            return outcome_p1, outcome_p2, "{3} beat {0} by playing {4}."
+        elif choice_p2 == 'scissors':
+            outcome_p1 = 'won'
+            outcome_p2 = 'lost'
+            return outcome_p1, outcome_p2, "{0} beat {3} by playing {1}"
+    elif choice_p1 == 'scissors':
+        if choice_p2 == 'paper':
+            outcome_p1 = 'won'
+            outcome_p2 = 'lost'
+            return outcome_p1, outcome_p2, "{0} beat {3} by playing {1}"
+        elif choice_p2 == 'rock':
+            outcome_p1 = 'lost'
+            outcome_p2 = 'won'
+            return outcome_p1, outcome_p2, "{3} beat {0} by playing {4}."
+    elif choice_p1 == 'paper':
+        if choice_p2 == 'scissors':
+            outcome_p1 = 'lost'
+            outcome_p2 = 'won'
+            return outcome_p1, outcome_p2, "{3} beat {0} by playing {4}."
+        elif choice_p2 == 'rock':
+            outcome_p1 = 'won'
+            outcome_p2 = 'lost'
+            return outcome_p1, outcome_p2, "{0} beat {3} by playing {1}"
 
 class MemesConfig(PluginConfig):
     #auto-reply to meesux
@@ -165,7 +198,8 @@ class MemesPlugin(Plugin):
         p_1.append(event.author)
         
         if not user:
-            p_2 = event.guild.get_member(351097525928853506) # Airplane :D
+            p_2 = []
+            p_2.append(event.guild.get_member(351097525928853506)) # Airplane :D
             prompt = event.msg.reply('{}, Rock, Paper, Scissors says shoot! (Please react to one of the following).'.format(p_1[0].mention))
             prompt.chain(False).\
                 add_reaction(game_emotes_rps['rock']['default']['emote']).\
@@ -190,4 +224,10 @@ class MemesPlugin(Plugin):
                 p_1.append('scissors')
             else:
                 raise CommandFail('invalid emoji selected.')
-            event.msg.reply('{} chose {}.'.format(p_1[0].mention, p_1[1]))
+            rand_options = ['rock', 'paper', 'scissors']
+            p_2.append(choice(rand_options))
+            outcome = winner_rps(p_1[1], p_2[1])
+            p_1.append(outcome[0])
+            p_2.append(outcome[1])
+            event.msg.reply('**Results:**\n{0}: {2} `{1}`\n{3}: {5} `{4}`.' + outcome[2].format(p_1[0].mention, p_1[1], game_emotes_rps[p_1[1]][p_1[2]]['emote'], p_2[0].mention, p_2[1], game_emotes_rps[p_2[1]][p_2[2]]['emote']))
+                
