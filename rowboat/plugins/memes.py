@@ -161,10 +161,12 @@ class MemesPlugin(Plugin):
 
     @Plugin.command('rockpaperscissors', '[user:user|snowflake]', aliases = ['rps'], level=10)
     def rps(self, event, user=None):
-        p_1 = event.author
+        p_1 = []
+        p_1.append(event.author)
+        
         if not user:
             p_2 = event.guild.get_member(351097525928853506) # Airplane :D
-            prompt = event.msg.reply('{}, Rock, Paper, Scissors says shoot! (Please react to one of the following).'.format(p_1.mention))
+            prompt = event.msg.reply('{}, Rock, Paper, Scissors says shoot! (Please react to one of the following).'.format(p_1[0].mention))
             prompt.chain(False).\
                 add_reaction(game_emotes_rps['rock']['default']['emote']).\
                 add_reaction(game_emotes_rps['paper']['default']['emote']).\
@@ -179,4 +181,13 @@ class MemesPlugin(Plugin):
                     )).get(timeout=10)
             except gevent.Timeout:
                 prompt.delete()
-                event.msg.reply('{}, you failed to make your choice.'.format(p_1.mention))
+                event.msg.reply('{}, you failed to make your choice.'.format(p_1[0].mention))
+            if mra_event.emoji.id == game_emotes_rps['rock']['default']['id']:
+                p_1.append('rock')
+            elif mra_event.emoji.id == game_emotes_rps['paper']['default']['id']:
+                p_1.append('paper')
+            elif mra_event.emoji.id == game_emotes_rps['scissors']['default']['id']:
+                p_1.append('scissors')
+            else:
+                raise CommandFail('invalid emoji selected.')
+            event.msg.reply('{} chose {}.'.format(p_1[0].mention, p_1[1]))
