@@ -40,6 +40,7 @@ class CheckConfig(SlottedModel):
     meta = Field(dict, default=None)
     punishment = Field(PunishmentType, default=None)
     punishment_duration = Field(int, default=None)
+    notify_on_punishment = Field(bool, default=False)
 
 
 class SubConfig(SlottedModel):
