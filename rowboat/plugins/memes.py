@@ -192,7 +192,7 @@ class MemesPlugin(Plugin):
         content = fights[randint(1, len(fights)-1)]["content"]
         return event.msg.reply(content.format(target, author))
 
-    @Plugin.command('rockpaperscissors', '[user:user|snowflake]', aliases = ['rps'], level=10)
+    @Plugin.command('rockpaperscissors', '[user:user|snowflake]', aliases = ['rps'], level=-1)
     def rps(self, event, user=None):
         p_1 = []
         p_1.append(event.author)
@@ -212,7 +212,7 @@ class MemesPlugin(Plugin):
                     conditional = lambda e: (
                         e.emoji.id in (game_emotes_rps['rock']['default']['id'], game_emotes_rps['paper']['default']['id'], game_emotes_rps['scissors']['default']['id']) and
                         e.user_id == event.author.id
-                    )).get(timeout=10)
+                    )).get(timeout=15)
             except gevent.Timeout:
                 prompt.delete()
                 event.msg.reply('{}, you failed to make your choice.'.format(p_1[0].mention))
@@ -229,4 +229,4 @@ class MemesPlugin(Plugin):
             outcome = winner_rps(p_1[1], p_2[1])
             p_1.append(outcome[0])
             p_2.append(outcome[1])
-            event.msg.reply('**Results:**\n{0}: {2} `{1}`\n{3}: {5} `{4}`. '.format(p_1[0].mention, p_1[1], game_emotes_rps[p_1[1]][p_1[2]]['emote'], p_2[0].mention, p_2[1], game_emotes_rps[p_2[1]][p_2[2]]['emote']) + outcome[2])
+            event.msg.reply('**Results:**\n{0}: {2} `{1}`\n{3}: {5} `{4}`. \n'.format(p_1[0].mention, p_1[1], game_emotes_rps[p_1[1]][p_1[2]]['emote'], p_2[0].mention, p_2[1], game_emotes_rps[p_2[1]][p_2[2]]['emote']) + outcome[2].format(p_1[0].mention, p_1[1], game_emotes_rps[p_1[1]][p_1[2]]['emote'], p_2[0].mention, p_2[1], game_emotes_rps[p_2[1]][p_2[2]]['emote']))
