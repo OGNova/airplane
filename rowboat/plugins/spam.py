@@ -151,11 +151,11 @@ class SpamPlugin(Plugin):
                     violation.member,
                     'Spam Detected')
             elif punishment == PunishmentType.TEMPMUTE:
-                if not event.config.notify_on_punishment:
+                if not violation.event.config.notify_on_punishment:
                     pass
                 else:
                     try:
-                        event.guild.get_member(violation.member.id).user.open_dm().send_message('You have been **Temporarily Muted** in the guild **{}** for **{}** for `{}`'.format(event.guild.name, humanize.naturaldelta(punishment_duration - datetime.utcnow()), violation.msg))
+                        violation.member.user.open_dm().send_message('You have been **Temporarily Muted** in the guild **{}** for **{}** for `{}`'.format(event.guild.name, humanize.naturaldelta(punishment_duration - datetime.utcnow()), violation.msg))
                     except:
                         pass
                 Infraction.tempmute(
