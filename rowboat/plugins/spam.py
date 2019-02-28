@@ -152,7 +152,7 @@ class SpamPlugin(Plugin):
                     violation.member,
                     'Spam Detected')
             elif punishment == PunishmentType.TEMPMUTE:
-                if not violation.event.config.notify_on_punishment:
+                if violation.event.config.notify_on_punishment is False:
                     pass
                 else:
                     try:
