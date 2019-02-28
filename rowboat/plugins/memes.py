@@ -229,5 +229,4 @@ class MemesPlugin(Plugin):
             outcome = winner_rps(p_1[1], p_2[1])
             p_1.append(outcome[0])
             p_2.append(outcome[1])
-            event.msg.reply('**Results:**\n{0}: {2} `{1}`\n{3}: {5} `{4}`.' + outcome[2].format(p_1[0].mention, p_1[1], game_emotes_rps[p_1[1]][p_1[2]]['emote'], p_2[0].mention, p_2[1], game_emotes_rps[p_2[1]][p_2[2]]['emote']))
-                
+            event.msg.reply('**Results:**\n{0}: {2} `{1}`\n{3}: {5} `{4}`. '.format(p_1[0].mention, p_1[1], game_emotes_rps[p_1[1]][p_1[2]]['emote'], p_2[0].mention, p_2[1], game_emotes_rps[p_2[1]][p_2[2]]['emote']) + outcome[2])
