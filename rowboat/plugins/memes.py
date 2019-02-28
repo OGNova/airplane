@@ -13,6 +13,51 @@ from rowboat.types import Field, DictField, ListField, snowflake, SlottedModel, 
 from gevent.pool import Pool
 from rowboat.util.gevent import wait_many
 
+game_emotes_rps = {
+    "scissors": {
+        "default": {
+            "id": 550773044696580097,
+            "emote": "choose_scissors:550773044696580097"
+        },
+        "scissors_won": {
+            "id": 550773044906426378,
+            "emote": "scissors_won:550773044906426378"
+        },
+        "scissors_lost": {
+            "id": 550773044927397906,
+            "emote": "scissors_lost:550773044927397906"
+        }
+    },
+    "rock": {
+        "default": {
+            "id": 550773044855963677,
+            "emote": "choose_rock:550773044855963677"
+        },
+        "rock_won": {
+            "id": 550773044923072512,
+            "emote": "rock_won:550773044923072512"
+        },
+        "rock_lost": {
+            "id": 550773044914683907,
+            "emote": "rock_lost:550773044914683907"
+        }
+    },
+    "paper": {
+        "default": {
+            "id": 550773044277411852,
+            "emote": "choose_paper:550773044277411852"
+        },
+        "paper_won": {
+            "id": 550773044738654208,
+            "emote": "paper_won:550773044738654208"
+        },
+        "paper_lost": {
+            "id": 550773044881129486,
+            "emote": "paper_lost:550773044881129486"
+        }
+    }
+}
+
 class MemesConfig(PluginConfig):
     #auto-reply to meesux
     hate_meesux = Field(bool, default=False)
@@ -113,3 +158,25 @@ class MemesPlugin(Plugin):
             target = user.mention
         content = fights[randint(1, len(fights)-1)]["content"]
         return event.msg.reply(content.format(target, author))
+
+    @Plugin.command('rockpaperscissors', '[user:user|snowflake]', aliases = ['rps'], level=10)
+    def rps(self, event, user=None):
+        p_1 = event.author
+        if not user:
+            p_2 = event.guild.get_member(351097525928853506) # Airplane :D
+            prompt = event.msg.reply('{}, Rock, Paper, Scissors says shoot! (Please react to one of the following).'.format(p_1.mention))
+            prompt.chain(False).\
+                add_reaction(game_emotes_rps['rock']['default']['emoji']).\
+                add_reaction(game_emotes_rps['paper']['default']['emoji']).\
+                add_reaction(game_emotes_rps['scissors']['default']['emoji'])
+            try:
+                mra_event = self.wait_for_event(
+                    'MessageReactionAdd',
+                    message_id = msg.id,
+                    conditional = lambda e: (
+                        e.emoji.id in (game_emotes_rps['rock']['default']['id'], game_emotes_rps['paper']['default']['id'], game_emotes_rps['scissors']['default']['id']) and
+                        e.user_id == event.author.id
+                    )).get(timeout=10)
+            except gevent.Timeout:
+                prompt.delete()
+                event.msg.reply('{}, you failed to make your choice.'.format(p_1.mention))
