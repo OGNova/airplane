@@ -2,6 +2,7 @@
 import re
 import time
 import operator
+import humanize
 
 from gevent.lock import Semaphore
 from datetime import datetime, timedelta
@@ -155,14 +156,16 @@ class SpamPlugin(Plugin):
                     pass
                 else:
                     try:
-                        violation.member.user.open_dm().send_message('You have been **Temporarily Muted** in the guild **{}** for **{}** for `{}`'.format(event.guild.name, humanize.naturaldelta(punishment_duration - datetime.utcnow()), violation.msg))
+                        violation.member.user.open_dm().send_message('You have been **Temporarily Muted** in the guild **{}** for **{}** for `{}`'.format(violation.event.guild.name, humanize.naturaldelta(punishment_duration - datetime.utcnow()), violation.msg))
                     except:
                         pass
+                print(violation.msg)
+                print(dir(violation))
                 Infraction.tempmute(
                     self,
                     violation.event,
                     violation.member,
-                    violation.msg,
+                    'Spam Detected',
                     datetime.utcnow() + timedelta(seconds=punishment_duration))
                 self.call('InfractionsPlugin.queue_infractions')
             elif punishment == PunishmentType.KICK:
