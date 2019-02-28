@@ -166,9 +166,9 @@ class MemesPlugin(Plugin):
             p_2 = event.guild.get_member(351097525928853506) # Airplane :D
             prompt = event.msg.reply('{}, Rock, Paper, Scissors says shoot! (Please react to one of the following).'.format(p_1.mention))
             prompt.chain(False).\
-                add_reaction(game_emotes_rps['rock']['default']['emoji']).\
-                add_reaction(game_emotes_rps['paper']['default']['emoji']).\
-                add_reaction(game_emotes_rps['scissors']['default']['emoji'])
+                add_reaction(game_emotes_rps['rock']['default']['emote']).\
+                add_reaction(game_emotes_rps['paper']['default']['emote']).\
+                add_reaction(game_emotes_rps['scissors']['default']['emote'])
             try:
                 mra_event = self.wait_for_event(
                     'MessageReactionAdd',
