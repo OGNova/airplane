@@ -40,6 +40,7 @@ class CheckConfig(SlottedModel):
     meta = Field(dict, default=None)
     punishment = Field(PunishmentType, default=None)
     punishment_duration = Field(int, default=None)
+    notify_on_punishment = Field(bool, default=False)
 
 
 class SubConfig(SlottedModel):
@@ -150,11 +151,18 @@ class SpamPlugin(Plugin):
                     violation.member,
                     'Spam Detected')
             elif punishment == PunishmentType.TEMPMUTE:
+                if not event.config.notify_on_punishment:
+                    pass
+                else:
+                    try:
+                        event.guild.get_member(violation.member.id).user.open_dm().send_message('You have been **Temporarily Muted** in the guild **{}** for **{}** for `{}`'.format(event.guild.name, humanize.naturaldelta(punishment_duration - datetime.utcnow()), violation.msg))
+                    except:
+                        pass
                 Infraction.tempmute(
                     self,
                     violation.event,
                     violation.member,
-                    'Spam Detected',
+                    violation.msg,
                     datetime.utcnow() + timedelta(seconds=punishment_duration))
                 self.call('InfractionsPlugin.queue_infractions')
             elif punishment == PunishmentType.KICK:
