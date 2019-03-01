@@ -237,14 +237,6 @@ class MemesPlugin(Plugin):
         
         else:
             p_2.append(event.guild.get_member(user))
-            try:
-                p_1[0].open_dm()
-            except:
-                event.msg.reply('{0}, your DMs are disabled, therefore you are unable to challenge another user. Please open your DMs and try again.'.format(p_1[0].mention))
-            try:
-                p_2[0].user.open_dm()
-            except:
-                event.msg.reply('{0}, this user is unable to play rock paper scissors as their DMs are disabled.'.format(p_1[0].mention))
             msg = event.msg.reply('{1}, {0} has challanged you to play rock paper scissors. Do you accept?'.format(p_1[0].mention, p_2[0].mention))
             msg.chain(False).\
                 add_reaction(GREEN_TICK_EMOJI).\
@@ -265,7 +257,65 @@ class MemesPlugin(Plugin):
                 msg.delete()
     
             if str(mra_event.emoji.id) != str(GREEN_TICK_EMOJI_ID):
+                event.msg.reply('{}, your partner has declined the challenge.'.format(p_1[0].mention)).after(5).delete()
                 return
             else:
-                event.msg.reply('yee').after(5).delete()
-            
+                try: # Send dm to the first user
+                    prompt_p1 = p_1[0].open_dm().send_message('{}, Rock, Paper, Scissors says shoot! (Please react to one of the following).'.format(p_1[0].mention))
+                except:
+                    event.msg.reply('{0}, your DMs are disabled, therefore you are unable to challenge another user. Please open your DMs and try again.'.format(p_1[0].mention)).after(5).delete()
+                    return
+
+                prompt_p1.chain(False).\
+                    add_reaction(game_emotes_rps['rock']['default']['emote']).\
+                    add_reaction(game_emotes_rps['paper']['default']['emote']).\
+                    add_reaction(game_emotes_rps['scissors']['default']['emote'])
+                try:
+                mra_event = self.wait_for_event(
+                    'MessageReactionAdd',
+                    message_id = prompt_p2.id,
+                    conditional = lambda e: (
+                        e.emoji.id in (game_emotes_rps['rock']['default']['id'], game_emotes_rps['paper']['default']['id'], game_emotes_rps['scissors']['default']['id']) and
+                        e.user_id == p_1[0].id
+                    )).get(timeout=15)
+                except gevent.Timeout:
+                    prompt_p1.delete()
+                    event.msg.reply('Game canceled, {} failed to make their choice.'.format(p_1[0].mention))
+                if mra_event.emoji.id == game_emotes_rps['rock']['default']['id']:
+                    p_1.append('rock')
+                elif mra_event.emoji.id == game_emotes_rps['paper']['default']['id']:
+                    p_1.append('paper')
+                elif mra_event.emoji.id == game_emotes_rps['scissors']['default']['id']:
+                    p_1.append('scissors')
+                else:
+                    raise CommandFail('invalid emoji selected.')
+                try: # Send dm to second user
+                    prompt_p2 = p_2[0].user.open_dm().send_message('{}, Rock, Paper, Scissors says shoot! (Please react to one of the following).'.format(p_2[0].mention))
+                except:
+                    event.msg.reply('{0}, your DMs are disabled, therefore you are unable play other users. Please open your DMs and try again.'.format(p_2[0].mention)).after(5).delete()
+                    return
+                prompt_p2.chain(False).\
+                    add_reaction(game_emotes_rps['rock']['default']['emote']).\
+                    add_reaction(game_emotes_rps['paper']['default']['emote']).\
+                    add_reaction(game_emotes_rps['scissors']['default']['emote'])
+                try:
+                mra_event = self.wait_for_event(
+                    'MessageReactionAdd',
+                    message_id = prompt_p2.id,
+                    conditional = lambda e: (
+                        e.emoji.id in (game_emotes_rps['rock']['default']['id'], game_emotes_rps['paper']['default']['id'], game_emotes_rps['scissors']['default']['id']) and
+                        e.user_id == p_2[0].id
+                    )).get(timeout=15)
+                except gevent.Timeout:
+                    prompt_p2.delete()
+                    event.msg.reply('Game canceled, {} failed to make their choice.'.format(p_2[0].mention))
+                if mra_event.emoji.id == game_emotes_rps['rock']['default']['id']:
+                    p_2.append('rock')
+                elif mra_event.emoji.id == game_emotes_rps['paper']['default']['id']:
+                    p_2.append('paper')
+                elif mra_event.emoji.id == game_emotes_rps['scissors']['default']['id']:
+                    p_2.append('scissors')
+                else:
+                    raise CommandFail('invalid emoji selected.')
+                
+        
