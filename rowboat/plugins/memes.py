@@ -267,7 +267,7 @@ class MemesPlugin(Plugin):
                 except:
                     event.msg.reply('{0}, your DMs are disabled, therefore you are unable to challenge another user. Please open your DMs and try again.'.format(p_1[0].mention)).after(5).delete()
                     return
-                temp = event.msg.reply('{} is selecting their choice, please wait.'.format(p_1[0].username))
+                temp = event.msg.reply('{} is selecting their choice, please wait.'.format(unicode(p_1[0].username)))
                 prompt_p1.chain(False).\
                     add_reaction(game_emotes_rps['rock']['default']['emote']).\
                     add_reaction(game_emotes_rps['paper']['default']['emote']).\
@@ -298,7 +298,7 @@ class MemesPlugin(Plugin):
                 except:
                     event.msg.reply('{0}, your DMs are disabled, therefore you are unable play other users. Please open your DMs and try again.'.format(p_2[0].mention)).after(5).delete()
                     return
-                temp = event.msg.reply('{} is selecting their choice, please wait.'.format(p_2[0].user.username))
+                temp = event.msg.reply('{} is selecting their choice, please wait.'.format(unicode(p_2[0].user.username)))
                 prompt_p2.chain(False).\
                     add_reaction(game_emotes_rps['rock']['default']['emote']).\
                     add_reaction(game_emotes_rps['paper']['default']['emote']).\
