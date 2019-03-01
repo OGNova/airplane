@@ -271,13 +271,13 @@ class MemesPlugin(Plugin):
                     add_reaction(game_emotes_rps['paper']['default']['emote']).\
                     add_reaction(game_emotes_rps['scissors']['default']['emote'])
                 try:
-                mra_event = self.wait_for_event(
-                    'MessageReactionAdd',
-                    message_id = prompt_p2.id,
-                    conditional = lambda e: (
-                        e.emoji.id in (game_emotes_rps['rock']['default']['id'], game_emotes_rps['paper']['default']['id'], game_emotes_rps['scissors']['default']['id']) and
-                        e.user_id == p_1[0].id
-                    )).get(timeout=15)
+                    mra_event = self.wait_for_event(
+                        'MessageReactionAdd',
+                        message_id = prompt_p2.id,
+                        conditional = lambda e: (
+                            e.emoji.id in (game_emotes_rps['rock']['default']['id'], game_emotes_rps['paper']['default']['id'], game_emotes_rps['scissors']['default']['id']) and
+                            e.user_id == p_1[0].id
+                        )).get(timeout=15)
                 except gevent.Timeout:
                     prompt_p1.delete()
                     event.msg.reply('Game canceled, {} failed to make their choice.'.format(p_1[0].mention))
@@ -299,13 +299,13 @@ class MemesPlugin(Plugin):
                     add_reaction(game_emotes_rps['paper']['default']['emote']).\
                     add_reaction(game_emotes_rps['scissors']['default']['emote'])
                 try:
-                mra_event = self.wait_for_event(
-                    'MessageReactionAdd',
-                    message_id = prompt_p2.id,
-                    conditional = lambda e: (
-                        e.emoji.id in (game_emotes_rps['rock']['default']['id'], game_emotes_rps['paper']['default']['id'], game_emotes_rps['scissors']['default']['id']) and
-                        e.user_id == p_2[0].id
-                    )).get(timeout=15)
+                    mra_event = self.wait_for_event(
+                        'MessageReactionAdd',
+                        message_id = prompt_p2.id,
+                        conditional = lambda e: (
+                            e.emoji.id in (game_emotes_rps['rock']['default']['id'], game_emotes_rps['paper']['default']['id'], game_emotes_rps['scissors']['default']['id']) and
+                            e.user_id == p_2[0].id
+                        )).get(timeout=15)
                 except gevent.Timeout:
                     prompt_p2.delete()
                     event.msg.reply('Game canceled, {} failed to make their choice.'.format(p_2[0].mention))
