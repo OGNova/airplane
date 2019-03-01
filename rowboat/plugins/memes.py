@@ -237,7 +237,15 @@ class MemesPlugin(Plugin):
         
         else:
             p_2.append(event.guild.get_member(user))
-            msg = event.msg.reply('{1}, {0} has challanged you to play rock paper scissors. Do you accept?'.format(event.author.mention, p_2[0].mention))
+            try:
+                p_1[0].user.open_dm()
+            except:
+                event.msg.reply('{0}, your DMs are disabled, therefore you are unable to challenge another user. Please open your DMs and try again.'.format(p_1[0].mention))
+            try:
+                p_2[0].user.open_dm()
+            except:
+                event.msg.reply('{0}, this user is unable to play rock paper scissors as their DMs are disabled.'.format(p_1[0].mention))
+            msg = event.msg.reply('{1}, {0} has challanged you to play rock paper scissors. Do you accept?'.format(p_1[0].mention, p_2[0].mention))
             msg.chain(False).\
                 add_reaction(GREEN_TICK_EMOJI).\
                 add_reaction(RED_TICK_EMOJI)
@@ -249,11 +257,12 @@ class MemesPlugin(Plugin):
                     conditional=lambda e: (
                         e.emoji.id in (GREEN_TICK_EMOJI_ID, RED_TICK_EMOJI_ID) and
                         e.user_id == p_2[0].id
-                    )).get(timeout=10)
+                    )).get(timeout=30)
             except gevent.Timeout:
+                msg.edit('Challenge timed out.').after(5).delete()
                 return
             finally:
-                msg.edit('Challenge timed out.').after(5).delete()
+                msg.delete()
     
             if str(mra_event.emoji.id) != str(GREEN_TICK_EMOJI_ID):
                 return
