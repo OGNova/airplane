@@ -239,6 +239,9 @@ class MemesPlugin(Plugin):
         
         else:
             p_2.append(event.guild.get_member(user))
+            if p_1[0].id == p_2[0].id:
+                event.msg.reply('You cannot play against yourself.').after(5).delete()
+                return
             msg = event.msg.reply('{1}, {0} has challanged you to play rock paper scissors. Do you accept?'.format(p_1[0].mention, p_2[0].mention))
             msg.chain(False).\
                 add_reaction(GREEN_TICK_EMOJI).\
