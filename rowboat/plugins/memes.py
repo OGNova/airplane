@@ -317,5 +317,6 @@ class MemesPlugin(Plugin):
                     p_2.append('scissors')
                 else:
                     raise CommandFail('invalid emoji selected.')
+                event.msg.reply('P_1 chose {} and P_2 chose {}'.format(p_1[1], p_2[1]))
                 
         
