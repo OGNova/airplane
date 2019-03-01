@@ -12,6 +12,9 @@ from disco.types.message import MessageTable, MessageEmbed
 from rowboat.types import Field, DictField, ListField, snowflake, SlottedModel, snowflake
 from gevent.pool import Pool
 from rowboat.util.gevent import wait_many
+from rowboat.constants import (
+    GREEN_TICK_EMOJI_ID, RED_TICK_EMOJI_ID, GREEN_TICK_EMOJI, RED_TICK_EMOJI
+)
 
 game_emotes_rps = {
     "scissors": {
@@ -196,9 +199,9 @@ class MemesPlugin(Plugin):
     def rps(self, event, user=None):
         p_1 = []
         p_1.append(event.author)
+        p_2 = []
         
         if not user:
-            p_2 = []
             p_2.append(event.guild.get_member(351097525928853506)) # Airplane :D
             prompt = event.msg.reply('{}, Rock, Paper, Scissors says shoot! (Please react to one of the following).'.format(p_1[0].mention))
             prompt.chain(False).\
@@ -231,3 +234,29 @@ class MemesPlugin(Plugin):
             p_2.append(outcome[1])
             output = '**Results:**\n{0}: <:{2}> `{1}`\n{3}: <:{5}> `{4}`. \n' + outcome[2]
             event.msg.reply(output.format(p_1[0].mention, p_1[1], game_emotes_rps[p_1[1]][p_1[2]]['emote'], p_2[0].mention, p_2[1], game_emotes_rps[p_2[1]][p_2[2]]['emote']))
+        
+        else:
+            p_2.append = event.guild.get_member(user)
+            msg = event.msg.reply('{1}, {0} has challanged you to play rock paper scissors. Do you accept?'.format(event.author.mention, p_2[0].mention))
+            msg.chain(False).\
+                add_reaction(GREEN_TICK_EMOJI).\
+                add_reaction(RED_TICK_EMOJI)
+    
+            try:
+                mra_event = self.wait_for_event(
+                    'MessageReactionAdd',
+                    message_id=msg.id,
+                    conditional=lambda e: (
+                        e.emoji.id in (GREEN_TICK_EMOJI_ID, RED_TICK_EMOJI_ID) and
+                        e.user_id == p_2[0].id
+                    )).get(timeout=10)
+            except gevent.Timeout:
+                return
+            finally:
+                msg.edit('Challenge timed out.').after(5).delete()
+    
+            if str(mra_event.emoji.id) != str(GREEN_TICK_EMOJI_ID):
+                return
+            else:
+                event.msg.reply('yee').after(5).delete()
+            
