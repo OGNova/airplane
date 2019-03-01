@@ -291,10 +291,10 @@ class MemesPlugin(Plugin):
                 else:
                     temp.delete()
                     raise CommandFail('invalid emoji selected.')
+                temp.delete()
                 try: # Send dm to second user
                     prompt_p2 = p_2[0].user.open_dm().send_message('{}, Rock, Paper, Scissors says shoot! (Please react to one of the following).'.format(p_2[0].mention))
                 except:
-                    temp.delete()
                     event.msg.reply('{0}, your DMs are disabled, therefore you are unable play other users. Please open your DMs and try again.'.format(p_2[0].mention)).after(5).delete()
                     return
                 temp = event.msg.reply('{} is selecting their choice, please wait.'.format(p_2[0].user))
