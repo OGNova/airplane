@@ -219,6 +219,7 @@ class MemesPlugin(Plugin):
             except gevent.Timeout:
                 prompt.delete()
                 event.msg.reply('{}, you failed to make your choice.'.format(p_1[0].mention))
+                return
             if mra_event.emoji.id == game_emotes_rps['rock']['default']['id']:
                 p_1.append('rock')
             elif mra_event.emoji.id == game_emotes_rps['paper']['default']['id']:
@@ -227,6 +228,7 @@ class MemesPlugin(Plugin):
                 p_1.append('scissors')
             else:
                 raise CommandFail('invalid emoji selected.')
+            prompt.delete()
             rand_options = ['rock', 'paper', 'scissors']
             p_2.append(choice(rand_options))
             outcome = winner_rps(p_1[1], p_2[1])
