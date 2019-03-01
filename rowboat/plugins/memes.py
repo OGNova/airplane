@@ -280,6 +280,7 @@ class MemesPlugin(Plugin):
                         )).get(timeout=15)
                 except gevent.Timeout:
                     prompt_p1.delete()
+                    temp.delete()
                     event.msg.reply('Game canceled, {} failed to make their choice.'.format(p_1[0].mention)).after(5).delete()
                     return
                 if mra_event.emoji.id == game_emotes_rps['rock']['default']['id']:
@@ -310,6 +311,7 @@ class MemesPlugin(Plugin):
                         )).get(timeout=15)
                 except gevent.Timeout:
                     prompt_p2.delete()
+                    temp.delete()
                     event.msg.reply('Game canceled, {} failed to make their choice.'.format(p_2[0].mention)).after(5).delete()
                     return
                 if mra_event.emoji.id == game_emotes_rps['rock']['default']['id']:
