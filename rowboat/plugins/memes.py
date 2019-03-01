@@ -195,7 +195,7 @@ class MemesPlugin(Plugin):
         content = fights[randint(1, len(fights)-1)]["content"]
         return event.msg.reply(content.format(target, author))
 
-    @Plugin.command('rockpaperscissors', '[user:user|snowflake]', aliases = ['rps'], level=-1)
+    @Plugin.command('rockpaperscissors', '[user:user|snowflake]', aliases = ['rps'], level=10)
     def rps(self, event, user=None):
         p_1 = []
         p_1.append(event.author)
