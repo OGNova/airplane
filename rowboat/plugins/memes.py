@@ -251,8 +251,7 @@ class MemesPlugin(Plugin):
                         e.user_id == p_2[0].id
                     )).get(timeout=20)
             except gevent.Timeout:
-                msg.delete()
-                event.msg.reply('Challenge timed out.').after(6).delete()
+                msg.edit('Challenge timed out.')
                 return
             finally:
                 msg.delete()
