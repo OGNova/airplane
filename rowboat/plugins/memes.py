@@ -236,7 +236,7 @@ class MemesPlugin(Plugin):
             event.msg.reply(output.format(p_1[0].mention, p_1[1], game_emotes_rps[p_1[1]][p_1[2]]['emote'], p_2[0].mention, p_2[1], game_emotes_rps[p_2[1]][p_2[2]]['emote']))
         
         else:
-            p_2.append = event.guild.get_member(user)
+            p_2.append(event.guild.get_member(user))
             msg = event.msg.reply('{1}, {0} has challanged you to play rock paper scissors. Do you accept?'.format(event.author.mention, p_2[0].mention))
             msg.chain(False).\
                 add_reaction(GREEN_TICK_EMOJI).\
