@@ -273,7 +273,7 @@ class MemesPlugin(Plugin):
                 try:
                     mra_event = self.wait_for_event(
                         'MessageReactionAdd',
-                        message_id = prompt_p2.id,
+                        message_id = prompt_p1.id,
                         conditional = lambda e: (
                             e.emoji.id in (game_emotes_rps['rock']['default']['id'], game_emotes_rps['paper']['default']['id'], game_emotes_rps['scissors']['default']['id']) and
                             e.user_id == p_1[0].id
