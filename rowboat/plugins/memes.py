@@ -249,9 +249,10 @@ class MemesPlugin(Plugin):
                     conditional=lambda e: (
                         e.emoji.id in (GREEN_TICK_EMOJI_ID, RED_TICK_EMOJI_ID) and
                         e.user_id == p_2[0].id
-                    )).get(timeout=30)
+                    )).get(timeout=20)
             except gevent.Timeout:
-                msg.edit('Challenge timed out.').after(5).delete()
+                msg.delete()
+                event.msg.reply('Challenge timed out.').after(6).delete()
                 return
             finally:
                 msg.delete()
