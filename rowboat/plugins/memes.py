@@ -265,7 +265,7 @@ class MemesPlugin(Plugin):
                 except:
                     event.msg.reply('{0}, your DMs are disabled, therefore you are unable to challenge another user. Please open your DMs and try again.'.format(p_1[0].mention)).after(5).delete()
                     return
-
+                temp = event.msg.reply('{} is selecting their choice, please wait.'.format(p_1[0]))
                 prompt_p1.chain(False).\
                     add_reaction(game_emotes_rps['rock']['default']['emote']).\
                     add_reaction(game_emotes_rps['paper']['default']['emote']).\
@@ -279,6 +279,7 @@ class MemesPlugin(Plugin):
                             e.user_id == p_1[0].id
                         )).get(timeout=15)
                 except gevent.Timeout:
+                    temp.delete()
                     prompt_p1.delete()
                     event.msg.reply('Game canceled, {} failed to make their choice.'.format(p_1[0].mention))
                 if mra_event.emoji.id == game_emotes_rps['rock']['default']['id']:
@@ -288,12 +289,15 @@ class MemesPlugin(Plugin):
                 elif mra_event.emoji.id == game_emotes_rps['scissors']['default']['id']:
                     p_1.append('scissors')
                 else:
+                    temp.delete()
                     raise CommandFail('invalid emoji selected.')
                 try: # Send dm to second user
                     prompt_p2 = p_2[0].user.open_dm().send_message('{}, Rock, Paper, Scissors says shoot! (Please react to one of the following).'.format(p_2[0].mention))
                 except:
+                    temp.delete()
                     event.msg.reply('{0}, your DMs are disabled, therefore you are unable play other users. Please open your DMs and try again.'.format(p_2[0].mention)).after(5).delete()
                     return
+                temp = event.msg.reply('{} is selecting their choice, please wait.'.format(p_2[0].user))
                 prompt_p2.chain(False).\
                     add_reaction(game_emotes_rps['rock']['default']['emote']).\
                     add_reaction(game_emotes_rps['paper']['default']['emote']).\
@@ -307,6 +311,7 @@ class MemesPlugin(Plugin):
                             e.user_id == p_2[0].id
                         )).get(timeout=15)
                 except gevent.Timeout:
+                    temp.delete()
                     prompt_p2.delete()
                     event.msg.reply('Game canceled, {} failed to make their choice.'.format(p_2[0].mention))
                 if mra_event.emoji.id == game_emotes_rps['rock']['default']['id']:
@@ -316,7 +321,12 @@ class MemesPlugin(Plugin):
                 elif mra_event.emoji.id == game_emotes_rps['scissors']['default']['id']:
                     p_2.append('scissors')
                 else:
+                    temp.delete()
                     raise CommandFail('invalid emoji selected.')
-                event.msg.reply('P_1 chose {} and P_2 chose {}'.format(p_1[1], p_2[1]))
-                
+                temp.delete()
+                outcome = winner_rps(p_1[1], p_2[1])
+                p_1.append(outcome[0])
+                p_2.append(outcome[1])
+                output = '**Results:**\n{0}: <:{2}> `{1}`\n{3}: <:{5}> `{4}`. \n' + outcome[2]
+                return event.msg.reply(output.format(p_1[0].mention, p_1[1], game_emotes_rps[p_1[1]][p_1[2]]['emote'], p_2[0].mention, p_2[1], game_emotes_rps[p_2[1]][p_2[2]]['emote']))               
         
