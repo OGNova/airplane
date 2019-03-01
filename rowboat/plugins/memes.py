@@ -238,7 +238,7 @@ class MemesPlugin(Plugin):
         else:
             p_2.append(event.guild.get_member(user))
             try:
-                p_1[0].user.open_dm()
+                p_1[0].open_dm()
             except:
                 event.msg.reply('{0}, your DMs are disabled, therefore you are unable to challenge another user. Please open your DMs and try again.'.format(p_1[0].mention))
             try:
