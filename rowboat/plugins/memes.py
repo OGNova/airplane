@@ -218,7 +218,7 @@ class MemesPlugin(Plugin):
                     )).get(timeout=15)
             except gevent.Timeout:
                 prompt.delete()
-                event.msg.reply('{}, you failed to make your choice.'.format(p_1[0].mention))
+                event.msg.reply('{}, you failed to make your choice.'.format(p_1[0].mention)).after(5).delete()
                 return
             if mra_event.emoji.id == game_emotes_rps['rock']['default']['id']:
                 p_1.append('rock')
