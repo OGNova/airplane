@@ -1290,6 +1290,9 @@ class InfractionsPlugin(Plugin):
                 # GuildBan.get(user_id=user, guild_id=event.guild.id)
                 # event.guild.delete_ban(user)
                 self.bot.client.api.guilds_bans_delete(gid, user, reason)
+                contents.append(u'<:approve:470283598600208394> {} - Ban Removed'.format(
+                    guild.name
+                ))
             except APIException as e:
                 if e.code == 10026: # Unknown Ban
                     contents.append(u'<:deny:470285164313051138> {} - Ban Not Found'.format(
@@ -1310,9 +1313,7 @@ class InfractionsPlugin(Plugin):
                 reason=reason
             )
 
-            contents.append(u'<:approve:470283598600208394> {} - Ban Removed'.format(
-                guild.name
-            ))
+            
 
         event.msg.reply('Results:\n' + '\n'.join(contents))
     
