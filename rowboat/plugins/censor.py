@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import re
 import json
 import urlparse
@@ -22,6 +23,7 @@ CensorReason = Enum(
     'DOMAIN',
     'WORD',
     'ZALGO',
+    'NICKNAME'
 )
 
 
@@ -40,6 +42,10 @@ class CensorSubConfig(SlottedModel):
     blocked_words = ListField(lower, default=[])
     blocked_tokens = ListField(lower, default=[])
 
+    blocked_nicknames = ListField(lower, default=[])
+    blocked_nickname_tokens = ListField(lower, default=[])
+    blocked_nickname_rename = Field(str, default='')
+    
     @cached_property
     def blocked_re(self):
         return re.compile(u'({})'.format(u'|'.join(
@@ -83,6 +89,10 @@ class Censorship(Exception):
         elif self.reason is CensorReason.ZALGO:
             return u'found zalgo at position `{}` in text'.format(
                 self.ctx['position']
+            )
+        elif self.reason is CensorReason.NICKNAME:
+            return u'censored {}\'s nickname change, found offensive text {}'.format(
+                self.ctx['member'], self.ctx['nickname']
             )
 
 
@@ -257,3 +267,23 @@ class CensorPlugin(Plugin):
             raise Censorship(CensorReason.WORD, event, ctx={
                 'words': blocked_words,
             })
+
+    @Plugin.listen('GuildMemberUpdate')
+    def on_member_update(self, event):
+        if event.member.nickname in event.config.blocked_nicknames:
+            if event.config.blocked_nickname_rename:
+                event.member.set_nickname('{}'.format(event.config.blocked_nickname_rename))
+                raise Censorship(CensorReason.NICKNAME, event, ctx={
+                    'hit': 'nickname',
+                    'member': event.member,
+                    'nickname': event.member.nickname
+                })
+            else:
+                event.member.set_nickname('🐱 I AM A LAMEFACE 🐱')
+                raise Censorship(CensorReason.NICKNAME, event, ctx={
+                    'hit': 'nickname',
+                    'member': event.member,
+                    'nickname': event.member.nickname
+                })
+        else:
+            return

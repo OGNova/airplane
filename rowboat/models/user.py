@@ -103,6 +103,22 @@ class User(BaseModel):
 
 
 @BaseModel.register
+class ServerManagers(BaseModel):
+    user_id = BigIntegerField()
+    server = TextField(null=True)
+
+    class Meta:
+        db_table = 'managers'
+
+@BaseModel.register
+class ServerOwners(BaseModel):
+    user_id = BigIntegerField()
+    server = TextField(null=True)
+
+    class Meta:
+        db_table = 'owners'
+
+@BaseModel.register
 class Infraction(BaseModel):
     Types = Enum(
         'MUTE',

@@ -180,7 +180,11 @@ class MemesPlugin(Plugin):
     def bean(self, event, user, reason=None):
         #Bean'd
         return event.channel.send_message(u'<:beaned:321111606878797825> Bean\'d {User} (`{Reason}`)'.format(User=unicode(user), Reason=unicode(reason).encode('utf-8')))
-
+      
+    @Plugin.command('smack', '<user:user|snowflake> [reason:str...]', level=-1)
+    def smack(self, event, user, reason=None):
+        return event.channel.send_message(u':clap: Smacked {User} (`{Reason}`)'.format(User=unicode(user), Reason=unicode(reason).encode('utf-8')))
+      
     @Plugin.command('fight', '[user:user|snowflake]', level=10)
     def fight(self, event, user=None):
         with open('./fun.json') as f:

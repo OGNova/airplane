@@ -3,12 +3,17 @@ import axios from 'axios';
 
 import User from './models/user';
 
+/* Big thanks to Dooley for a lot of this implementation */
+
 class State {
   constructor() {
     this.events = new EventEmitter();
     this.user = null;
     this.ready = false;
     this.stats = null;
+    this.name = 'Airplane (Beta Dashboard)';
+    this.docsLink = 'https://aetherya.stream';
+    this.supportServer = 'https://discord.gg/Gu7jRdW'
 
     this._currentGuild = null;
   }
@@ -89,64 +94,14 @@ class State {
     })
   }
 
-  getArchive(archiveID) {
-    return new Promise((resolve, reject) => {
-      axios.get(`/api/archive/${archiveID}.json`).then((res) => {
-        resolve(res.data);
-      }).catch((err) => {
-        reject();
-      });
-    });
-  }
-
   deploy() {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       axios.post('/api/deploy').then((res) => {
         resolve();
       }).catch((err) => {
         reject();
       });
     });
-  }
-
-  restartBot() {
-    return new Promise((resolve, reject) => {
-      axios.post('/api/bot/restart').then((res) => {
-        resolve();
-      }).catch((err) => {
-        reject();
-      });
-    });
-  }
-
-  shutdownBot() {
-    return new Promise((resolve, reject) => {
-      axios.post('/api/bot/shutdown').then((res) => {
-        resolve();
-      }).catch((err) => {
-        reject();
-      })
-    })
-  }
-
-  restartFrontend() {
-    return new Promise((resolve, reject) => {
-      axios.post('/api/frontend/restart').then((res) => {
-        resolve();
-      }).catch((err) => {
-        reject();
-      });
-    });
-  }
-
-  shutdownFrontend() {
-    return new Promise((resolve, reject) => {
-      axios.post('/api/frontend/shutdown').then((res) => {
-        resolve();
-      }).catch((err) => {
-        reject();
-      })
-    })
   }
 
   logout() {
@@ -160,4 +115,12 @@ class State {
   }
 };
 
-export var globalState = new State;
+var debug = function(msg) {
+    if ("production" !== process.env.NODE_ENV) console.log(msg);
+}
+
+var globalState = new State;
+
+export {
+    debug, globalState
+}

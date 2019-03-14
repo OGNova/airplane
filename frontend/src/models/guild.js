@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { globalState } from '../state';
+import {globalState} from '../state';
 import BaseModel from './base';
 import moment from 'moment';
 
@@ -19,7 +19,7 @@ export default class Guild extends BaseModel {
     this.region = obj.region;
     this.enabled = obj.enabled;
     this.whitelist = obj.whitelist;
-    this.premium = obj.premium;
+    this.features = obj.features;
     this.role = obj.role;
     this.events.emit('update', this);
   }
@@ -51,15 +51,13 @@ export default class Guild extends BaseModel {
     });
   }
 
-
-  getConfigHistory(id) {
+  getConfigHistory() {
     return new Promise((resolve, reject) => {
-      axios.get(`/api/guilds/${id}/config/history`).then((res) => {
+      axios.get(`/api/guilds/${this.id}/config/history`).then((res) => {
         let data = res.data
         data = data.map(obj => {
-          obj.created_at = obj.created_at + '+00:00';
-          obj.created_timestamp = +moment(obj.created_at);
-          obj.created_diff = moment(obj.created_at).fromNow();
+          obj.created_timestamp = Math.floor(new Date(obj.created_at).getTime() / 1000);
+          obj.created = new Date(obj.created_at).toLocaleString();
           obj.user.discriminator = String(obj.user.discriminator).padStart(4, "0");
           return obj;
         });
@@ -70,6 +68,25 @@ export default class Guild extends BaseModel {
     });
   }
 
+  getMessageStats() {
+    return new Promise((resolve, reject) => {
+      axios.get(`/api/guilds/${this.id}/stats/messages`).then((res) => {
+        resolve(res.data);
+      }).catch((err) => {
+        reject();
+      });
+    });
+  }
+
+  getSelfStats() {
+    return new Promise((resolve, reject) => {
+      axios.get(`/api/guilds/${this.id}/stats`).then((res) => {
+        resolve(res.data);
+      }).catch((err) => {
+        reject();
+      });
+    });
+  }
 
   putConfig(config) {
     return new Promise((resolve, reject) => {
@@ -101,9 +118,19 @@ export default class Guild extends BaseModel {
     });
   }
 
+  delete() {
+    return new Promise((resolve, reject) => {
+      axios.delete(`/api/guilds/${this.id}`).then((res) => {
+        resolve();
+      }).catch((err) => {
+        reject(err.response.data);
+      })
+    });
+  }
+
   givePremium() {
     return new Promise((resolve, reject) => {
-      axios.post(`/api/guilds/${this.id}/premium`).then((res) => {
+      axios.post(`/api/guilds/${this.id}/premium/enable`).then((res) => {
         this.update().then(() => {
           resolve()
         });
@@ -115,23 +142,13 @@ export default class Guild extends BaseModel {
 
   cancelPremium() {
     return new Promise((resolve, reject) => {
-      axios.delete(`/api/guilds/${this.id}/premium`).then((res) => {
+      axios.delete(`/api/guilds/${this.id}/premium/disable`).then((res) => {
         this.update().then(() => {
           resolve()
         });
       }).catch((err) => {
         reject(err.response.data);
       });
-    });
-  }
-
-  delete() {
-    return new Promise((resolve, reject) => {
-      axios.delete(`/api/guilds/${this.id}`).then((res) => {
-        resolve();
-      }).catch((err) => {
-        reject(err.response.data);
-      })
     });
   }
 }

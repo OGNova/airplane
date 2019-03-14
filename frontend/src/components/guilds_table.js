@@ -1,53 +1,99 @@
 import React, { Component } from 'react';
-import { state, VIEWS } from '../state';
 import { Link } from 'react-router-dom';
-import {globalState} from '../state';
 import sortBy from 'lodash/sortBy';
+import {STATS_ENABLED, CONFIG_HISTORY} from 'config';
 
-function getIcon(GID, GICON) {
-  if (GICON == null) {
-    return ('https://discordapp.com/assets/2c21aeda16de354ba5334551a883b481.png')
-  }
-  return (`https://cdn.discordapp.com/icons/${GID}/${GICON}.png`)
-}
+import { globalState } from '../state';
+import Tooltip from './tooltip';
+import GuildIcon from './guild_icon';
 
-function getFeatures(guild) {
-  if (guild.region.startsWith('VIP')) {
-    return ('https://discordapp.com/assets/33fedf082addb91d88abc272b4b18daa.svg')
+function partnerOrVerified(features){
+  if (!features) return;
+
+  let type;
+  if (features.indexOf('VERIFIED') > -1) {
+    type = 'verified';
+  } else if (features.length >= 3) {
+    type = 'partner';
   }
+
+  switch (type) {
+    case 'verified':
+      return <Tooltip position='right' text='Verified' trigger={<img src='https://cdn.discordapp.com/emojis/452956251253374976.png' height={24} />} />;
+    case 'partner':
+      return <Tooltip position='right' text='Discord Partner' trigger={<img src='https://canary.discordapp.com/assets/33fedf082addb91d88abc272b4b18daa.svg'height={24} />} />
+    default:
+      break;
+  }
+  return null;
 }
 
 class GuildTableRowActions extends Component {
-  render(props, state) {
+  render() {
     let parts = [];
 
     parts.push(
-      <Link key="1" to={`/guilds/${this.props.guild.id}`} style={{ paddingLeft: '4px' }}>
-        <button type="button" className="btn btn-success btn-circle">
-          <i className="fa fa-info"></i></button>
+      <Link key='1' to={`/guilds/${this.props.guild.id}`} style={{paddingLeft: '4px'}}>
+        <Tooltip position='top' text='Information' trigger={
+          <button type='button' className='btn btn-success btn-circle'>
+            <i className='fa fa-info'></i>
+          </button>
+        } />
       </Link>
     );
 
     parts.push(
-      <Link key="2" to={`/guilds/${this.props.guild.id}/config`} style={{ paddingLeft: '4px' }}>
-        <button type="button" className="btn btn-info btn-circle">
-          <i className="fa fa-edit"></i></button>
+      <Link key='2' to={`/guilds/${this.props.guild.id}/config`} style={{paddingLeft: '4px'}}>
+        <Tooltip position='top' text='Configuration' trigger={
+          <button type='button' className='btn btn-info btn-circle'>
+            <i className='fa fa-cog'></i>
+          </button>
+        } />
       </Link>
     );
+
+    if (CONFIG_HISTORY) {
+      parts.push(
+        <Link key='3' to={`/guilds/${this.props.guild.id}/config/history`} style={{paddingLeft: '4px'}}>
+          <Tooltip position='top' text='Configuration History' trigger={
+            <button type='button' className='btn btn-info btn-circle'>
+              <i className='fa fa-history'></i>
+            </button>
+          } />
+        </Link>
+      );
+    }
+
+    if (STATS_ENABLED) {
+      parts.push(
+        <Link key='4' to={`/guilds/${this.props.guild.id}/stats`} style={{paddingLeft: '4px'}}>
+          <Tooltip position='top' text='Statistics' trigger={
+            <button type='button' className='btn btn-primary btn-circle'>
+              <i className='fas fa-chart-bar'></i>
+            </button>
+          } />
+        </Link>
+      );
+  }
 
     parts.push(
-      <Link key="3" to={`/guilds/${this.props.guild.id}/infractions`} style={{ paddingLeft: '4px' }}>
-        <button type="button" className="btn btn-warning btn-circle">
-          <i className="fa fa-ban"></i></button>
+      <Link key='5' to={`/guilds/${this.props.guild.id}/infractions`} style={{paddingLeft: '4px'}}>
+        <Tooltip position='top' text='Infractions' trigger={
+          <button type='button' className='btn btn-warning btn-circle'>
+            <i className='fa fa-gavel'></i>
+          </button>
+        } />
       </Link>
     );
 
-    
     if (globalState.user && globalState.user.admin) {
       parts.push(
-        <a key="4" href="#" style={{ paddingLeft: '4px' }} onClick={this.onDelete.bind(this)}>
-          <button type="button" className="btn btn-danger btn-circle">
-            <i className="fa fa-trash-o"></i></button>
+        <a key='6' href='#' style={{paddingLeft: '4px'}} onClick={this.onDelete.bind(this)}>
+          <Tooltip position='top' text='Remove Server' trigger={
+            <button type='button' className='btn btn-danger btn-circle'>
+              <i className='fas fa-trash-alt'></i>
+            </button>
+          } />
         </a>
       );
     }
@@ -72,7 +118,7 @@ class GuildTableRowPremiumActions extends Component {
 
     if (globalState.user && globalState.user.admin) {
       parts.push(
-        <a key="5" href="#" style={{ paddingLeft: '4px' }} onClick={this.givePremium.bind(this)}>
+        <a key="7" href="#" style={{ paddingLeft: '4px' }} onClick={this.givePremium.bind(this)}>
           <button type="button" className="btn btn-success btn-circle">
             <i className="fa fa-credit-card" aria-hidden="true"></i></button>
         </a>
@@ -81,9 +127,9 @@ class GuildTableRowPremiumActions extends Component {
 
     if (globalState.user && globalState.user.admin) {
       parts.push(
-        <a key="6" href="#" style={{ paddingLeft: '4px' }} onClick={this.cancelPremium.bind(this)}>
+        <a key="8" href="#" style={{ paddingLeft: '4px' }} onClick={this.cancelPremium.bind(this)}>
           <button type="button" className="btn btn-danger btn-circle">
-            <i className="fa fa-trash-o"></i></button>
+            <i className="fas fa-trash-alt"></i></button>
         </a>
       )
     }
@@ -112,11 +158,14 @@ class GuildTableRow extends Component {
   render() {
     return (
       <tr>
+        <td>
+          <GuildIcon guildID={this.props.guild.id} guildIcon={this.props.guild.icon} scale={26} className='guild-circle' />
+          {this.props.guild.name}
+        </td>
         <td>{this.props.guild.id}</td>
-        <td><img src={getIcon(this.props.guild.id, this.props.guild.icon)} height={24} className='guild-circle' alt={null}></img> {this.props.guild.name}</td>
         <td><GuildTableRowActions guild={this.props.guild} /></td>
         <td><GuildTableRowPremiumActions guild={this.props.guild} /></td>
-        <td><img src={getFeatures(this.props.guild)} height={24} className='vanity-features' alt={null}></img></td>
+        <td>{partnerOrVerified(this.props.guild.features)}</td>
       </tr>
     );
   }
@@ -131,20 +180,22 @@ class GuildsTable extends Component {
     let guilds = sortBy(Object.values(this.props.guilds), (i) => i.id);
 
     var rows = [];
-    guilds.map((guild) => {
-      rows.push(<GuildTableRow guild={guild} key={guild.id} />);
+    guilds.forEach((guild) => {
+      if (guild.enabled) {
+        rows.push(<GuildTableRow guild={guild} key={guild.id} />);
+      }
     });
 
     return (
-      <div className="table-responsive">
-        <table className="table table-sriped table-bordered table-hover">
+      <div className='table-responsive'>
+        <table className='table table-hover'>
           <thead>
             <tr>
-              <th>ID</th>
               <th>Name</th>
+              <th>ID</th>
               <th>Actions</th>
               <th>Premium</th>
-              <th>Features</th>
+              <th>Special</th>
             </tr>
           </thead>
           <tbody>

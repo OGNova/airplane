@@ -212,7 +212,7 @@ class SQLPlugin(Plugin):
             return
         event.msg.reply(u'{}: {}'.format(entity, sentence))
 
-    @Plugin.command('many', '<entity:user|channel> [count|int]', level=-1, group='markov', global_=True)
+    @Plugin.command('many', '<entity:user|channel> [count:int]', level=-1, group='markov', global_=True)
     def command_markov_many(self, event, entity, count=5):
         if entity.id not in self.models:
             return event.msg.reply(':warning: no model created yet for {}'.format(entity))

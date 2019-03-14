@@ -1,0 +1,22 @@
+.codeMarker {
+  background: #1B1ECE;
+  position: absolute;
+  z-index: 20;
+}
+
+div:not(.ace_editor) + .ace_editor.ace-monokai::before {
+  content: "before";
+}
+
+.ace_editor + .ace_editor.ace-monokai::before {
+  content: "after";
+}
+
+.ace_editor.ace-monokai::before {
+
+  color: #008bdc;
+  font-size: 25px;
+  position: absolute;
+  z-index: 200;
+  right: 25px;
+}

@@ -1,0 +1,53 @@
+/* Snakbar from https://www.w3schools.com/howto/howto_js_snackbar.asp */
+
+.snackbar {
+  visibility: hidden;
+  min-width: 66%;
+  background-color: #23272A;
+  color: #fff;
+  position: fixed;
+  z-index: 1;
+  left: 19%;
+  bottom: 30px;
+  -webkit-box-shadow: 0 2px 10px 0 rgba(0,0,0,.2);
+  box-shadow: 0 2px 10px 0 rgba(0,0,0,.2);
+  border-radius: 5px;
+  overflow: hidden;
+  padding: 10px 2px 10px 2px;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+.snackbar > .message {
+  flex: 1 1 auto;
+  color: rgb(255, 255, 255);
+  font-size: 16px;
+  padding: 0 20px 0;
+  margin-top: 5px;
+}
+
+.snackbar.show {
+  visibility: visible;
+  -webkit-animation: snack-fadein 0.5s, snack-fadeout 1.5s 2.5s;
+  animation: snack-fadein 0.5s, snack-fadeout 1.5s 2.5s;
+}
+
+@-webkit-keyframes snack-fadein {
+  from {bottom: 0; opacity: 0;}
+  to {bottom: 30px; opacity: 1;}
+}
+
+@keyframes snack-fadein {
+  from {bottom: 0; opacity: 0;}
+  to {bottom: 30px; opacity: 1;}
+}
+
+@-webkit-keyframes snack-fadeout {
+  from {bottom: 30px; opacity: 1;}
+  to {bottom: 0; opacity: 0;}
+}
+
+@keyframes snack-fadeout {
+  from {bottom: 30px; opacity: 1;}
+  to {bottom: 0; opacity: 0;}
+}

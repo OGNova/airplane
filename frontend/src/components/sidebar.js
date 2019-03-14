@@ -1,17 +1,22 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router-dom';
+import sortBy from 'lodash/sortBy';
+
 import {globalState} from '../state';
-import {STATS_ENABLED} from 'config';
+import {STATS_ENABLED, CONFIG_HISTORY} from 'config';
+import GuildIcon from './guild_icon';
+import Tooltip from './tooltip'
 
 class SidebarLink extends Component {
   render () {
-    const iconClass = `fa fa-${this.props.icon} fa-fw`;
-
+    const iconClass = `fas fa-${this.props.icon} sidebar-icon`;
     return (
-      <li>
-        <Link to={this.props.to}>
-          <i className={iconClass}></i> {this.props.text}
-        </Link>
+      <li className={this.props.activePage && this.props.activePage === this.props.text.toLowerCase() ? 'active' : undefined}>
+        <Tooltip position='right-end' text={this.props.text} interactive={false} distance={200} trigger={
+          <Link to={this.props.to}>
+            <i className={iconClass}></i>
+          </Link>
+        } />
       </li>
     );
   }
@@ -23,29 +28,46 @@ class GuildLinks extends Component {
     let links = [];
 
     if (this.props.active) {
+      let activePage = '';
+      switch (this.props.page) {
+        case String(this.props.guild.id):
+          activePage = 'info';
+          break;
+        default:
+          activePage = this.props.page;
+          break;
+      }
+
       links.push(
-        <SidebarLink icon='info' to={'/guilds/' + this.props.guild.id} text='Information' key='info' />
+        <SidebarLink icon='info' to={'/guilds/' + this.props.guild.id} activePage={activePage} text='Info' key='info' />
       );
 
       links.push(
-        <SidebarLink icon='cog' to={'/guilds/' + this.props.guild.id + '/config'} text='Config' key='config' />
+        <SidebarLink icon='cog' to={'/guilds/' + this.props.guild.id + '/config'} activePage={activePage} text='Config' key='config' />
       );
 
+      if (CONFIG_HISTORY) {
+        links.push(
+          <SidebarLink icon='history' to={'/guilds/' + this.props.guild.id + '/config/history'} activePage={activePage} text='History' key='history' />
+        );
+      }
+
       links.push(
-        <SidebarLink icon='ban' to={'/guilds/' + this.props.guild.id + '/infractions'} text='Infractions' key='infractions' />
+        <SidebarLink icon='gavel' to={'/guilds/' + this.props.guild.id + '/infractions'} activePage={activePage} text='Infractions' key='infractions' />
       );
 
       if (STATS_ENABLED) {
         links.push(
-          <SidebarLink icon='bar-chart-o' to={'/guilds/' + this.props.guild.id + '/stats'} text='Stats' key='stats' />
+          <SidebarLink icon='chart-bar' to={'/guilds/' + this.props.guild.id + '/stats'} activePage={activePage} text='Stats' key='stats' />
         );
       }
     }
-
     return (
-      <li>
+      <li className={this.props.active ? 'active-guild active' : ''}>
         <Link to={'/guilds/' + this.props.guild.id}>
-          {this.props.guild.name}
+          <Tooltip position='right-end' text={this.props.guild.name}interactive={false} trigger={
+            <GuildIcon guildID={this.props.guild.id} guildIcon={this.props.guild.icon} className='guild-circle' scale={40} />
+          } />
         </Link>
         <ul className="nav nav-second-level collapse in">
           {links}
@@ -82,29 +104,29 @@ class Sidebar extends Component {
   render() {
     let sidebarLinks = [];
 
-    sidebarLinks.push(
-      <SidebarLink icon='dashboard' to='/' text='Dashboard' key='dashboard' />
-    );
-
     if (this.state.guilds) {
-      for (let guild of Object.values(this.state.guilds)) {
+      const guilds = sortBy(Object.values(this.state.guilds), (i) => i.name);
+
+      for (let guild of guilds) {
         // Only show the active guild for users with a lot of them
         if (
           !this.state.showAllGuilds &&
           Object.keys(this.state.guilds).length > 10 &&
           guild.id != this.state.currentGuildID
         ) continue;
-        sidebarLinks.push(<GuildLinks guild={guild} active={guild.id == this.state.currentGuildID} key={guild.id} />);
+        sidebarLinks.push(<GuildLinks guild={guild} active={guild.id == this.state.currentGuildID} page={window.location.href.split('/').pop()} key={guild.id}/>);
       }
     }
 
-    return (<div className="navbar-default sidebar" role="navigation">
-      <div className="sidebar-nav navbar-collapse">
-        <ul className="nav in" id="side-menu">
-          {sidebarLinks}
-        </ul>
+    return (
+      <div className="navbar-default sidebar" role="navigation">
+        <div className="sidebar-nav navbar-collapse">
+          <ul className="nav in" id="side-menu">
+            {sidebarLinks}
+          </ul>
+        </div>
       </div>
-    </div>);
+    );
   }
 }
 

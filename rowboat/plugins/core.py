@@ -25,9 +25,8 @@ from rowboat.plugins import CommandResponse
 from rowboat.sql import init_db
 from rowboat.redis import rdb
 
-#adding to try and make work
 from rowboat.plugins import RowboatPlugin as Plugin, CommandFail, CommandSuccess
-from rowboat.util.input import parse_duration #fingers crossed this is the one that fixes
+from rowboat.util.input import parse_duration
 from rowboat.util.timing import Eventual
 from rowboat.types import Field, snowflake
 from rowboat.types.plugin import PluginConfig
@@ -464,6 +463,12 @@ class CorePlugin(Plugin):
         if rdb.sismember('ignored_channels', event.message.channel_id):
             return
 
+        if event.message.content.startswith('gh/'):
+            event.message.reply('https://github.com/{}/{}'.format(
+                event.message.content.split('/')[1], event.message.content.split('/')[2]
+            ))
+            return
+
         # If this is message for a guild, grab the guild object
         if hasattr(event, 'guild') and event.guild:
             guild_id = event.guild.id
@@ -666,7 +671,7 @@ class CorePlugin(Plugin):
                 event.msg.reply(PY_CODE_BLOCK.format(type(e).__name__ + ': ' + str(e)))
                 return
 
-        if len(result) > 1990:
+        if len(result) > 1990:  
             event.msg.reply('', attachments=[('result.txt', result)])
         else:
             event.msg.reply(PY_CODE_BLOCK.format(result))
@@ -714,6 +719,42 @@ class CorePlugin(Plugin):
 
         msg.edit(u'Ok, here is a temporary invite for you: {}'.format(
             invite.code,
+        ))
+
+    @Plugin.command('locate', '<user:user|snowflake>', level=-1)
+    def command_locate(self, event, user):
+        if isinstance(user, (int, long)):
+            uid = user
+            user = self.state.users.get(uid)
+            if not user:
+                return event.msg.reply('User {} not found.'.format(uid))
+
+        buff = ''
+        count = 0
+        guilds = self.state.guilds.values()
+        guilds = sorted(guilds, key=lambda g: g.name)
+        for guild in guilds:
+            member = guild.members.get(user.id)
+            if not member:
+                continue
+            guild = S(u'{} - {} (level: {})\n'.format(
+                guild.id,
+                guild.name,
+                self.get_level(guild, user.id)
+            ), escape_codeblocks=True)
+            if len(guild) + len(buff) > 1920:
+                event.msg.reply(u'```{}```'.format(buff))
+                buff = ''
+            buff += guild
+            count += 1
+
+        user = u'{} ({} - {})'.format(user, user.mention, user.id)
+
+        if not count:
+            return event.msg.reply(u'User {} not found.'.format(user))
+
+        event.msg.reply(u'```{}```*User {} found in {} server{}.*'.format(
+            buff, user, count, 's' if count > 1 else ''
         ))
 
     @Plugin.command('wh', '<guild:snowflake>', group='guilds', level=-1)
@@ -770,11 +811,9 @@ class CorePlugin(Plugin):
             embed.set_author(name='{} ({})'.format(msg.author, author_id), icon_url=avatar)
             embed.set_thumbnail(url=avatar)
 
-            # embed.title = "Message Content:"
             content.append(u'**\u276F New DM:**')
             content.append(u'Content: ```{}```'.format(message_content))
             embed.description = '\n'.join(content)
-            # embed.url = 'https://discordapp.com/channels/{}/{}/{}'.format(guild_id, channel_id, mid)
             embed.timestamp = datetime.utcnow().isoformat()
             try:
                 embed.color = get_dominant_colors_user(msg.author, avatar)

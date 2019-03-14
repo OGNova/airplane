@@ -88,8 +88,8 @@ def invite_finder(guildid):
         201548045664387072: "https://discord.gg/donutoperator",
         296379525686624256: "http://discord.gg/black-site",
         469566508838682644: "https://discord.gg/Gu7jRdW"
-
     }
+    
     return switcher.get(guildid, "No stored invite for this server.")
 
 @Plugin.with_config(InfractionsConfig)
@@ -576,15 +576,13 @@ class InfractionsPlugin(Plugin):
             self.log.exception('Failed to send control message.')
             return
 
-    @Plugin.command('delete', '<infraction:int> [reason:str...]', group='infractions')
+    @Plugin.command('delete', '<infraction:int|str> [reason:str...]', group='infractions')
     def infraction_delete(self, event, infraction):
-        MODIFIER_GRAVE_ACCENT = u'\u02CB'
-        try:
-            inf = Infraction.select(Infraction).where(
-                (Infraction.id == infraction)
-            ).get()
-        except Infraction.DoesNotExist:
-            raise CommandFail('cannot find an infraction with ID `{}`'.format(infraction))
+        inf = self.find_infraction(event, infraction)
+
+        if inf is None:
+            event.msg.reply('Unknown infraction ID')
+            return
 
         if event.user_level < event.config.infraction_deletion_level:
             raise CommandFail('you do not have the permissions required to delete infractions.')
@@ -592,7 +590,7 @@ class InfractionsPlugin(Plugin):
         if inf.guild_id != event.guild.id and not rdb.sismember('global_admins', event.msg.author.id):
             raise CommandFail('you do not have the permissions to delete infractions from other servers.')
 
-        msg = event.msg.reply('Ok, delete infraction #`{}`?'.format(infraction))
+        msg = event.msg.reply('Ok, delete infraction #`{}`?'.format(inf.id))
         msg.chain(False).\
             add_reaction(GREEN_TICK_EMOJI).\
             add_reaction(RED_TICK_EMOJI)
@@ -751,10 +749,7 @@ class InfractionsPlugin(Plugin):
                     u=member.user,
                 ))
         else:
-            CommandFail('invalid user')
-        # except APIException as e:
-        #     if e.code == 10007:
-        #         raise CommandFail('I can\'t find that user, are you sure it isn\'t a message id?')
+            raise CommandFail('invalid user')
 
     @Plugin.command(
         'temprole',
@@ -877,10 +872,7 @@ class InfractionsPlugin(Plugin):
                     pass
         else:
             raise CommandFail('invalid user')
-        # except APIException as e:
-        #     if e.code == 10007:
-        #         raise CommandFail('I can\'t find that member, are you sure it\'s not a message id?')
-
+                              
     @Plugin.command('unmuteall', level=CommandLevels.ADMIN)
     def unmuteall(self, event):
         completed_ids = []
@@ -1538,3 +1530,20 @@ class InfractionsPlugin(Plugin):
             u':ok_hand: warned {u}',
             u=member.user if member else user,
         ))
+
+    @Plugin.command('revive', '<infraction:int|str> [duration:str]')
+    def revive(self, event, infraction, type, duration=None):
+        inf = self.find_infraction(event, infraction)
+
+        if inf is None or inf.guild_id != event.guild.id:
+            event.msg.reply('Unknown infraction ID')
+            return
+
+        if duration:
+            expires_dt = parse_duration(duration, inf.created_at)
+            inf.expires_at = expires_dt
+            inf.save()
+            raise CommandSuccess('ok, I\'ve revived that infraction, it will now expire at {}'.format(
+                inf.expires_at.isoformat()
+            ))
+        

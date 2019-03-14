@@ -80,11 +80,9 @@ class UtilitiesPlugin(Plugin):
         self.reminder_task = Eventual(self.trigger_reminders)
         self.spawn_later(10, self.queue_reminders)
         self.server_owners = {
-            '158200017906171904': "Xen's Streamerino Disco", # Xentiran#0007
             '166304313004523520': "airplane, PokeBlobs", # OGNovuh#0003
             '175805198017626114': "Swagger's Hangout", # SwaggerSouls#4295
             '127060170802069505': "Hotel Fitz", # Fitz#9588
-            '152626930250678273': "Ollybits!", # Q__Q#8008
             '107941250228830208': "Jameskii", # Jameskii#0001
             '197316087879172096': "Daniel's Discord", # danielharrison#0001
             '226912511302041601': "xd Official Discord", # McCreamy#6793
@@ -95,6 +93,7 @@ class UtilitiesPlugin(Plugin):
             '158200017906171904': "Hotel Fitz", # Xentiran#0007
             '191793155685744640': "Hotel Fitz, Jameskii, Swagger's Hangout", # Terminator966#0966
             '227888061353164810': "Hotel Fitz", # emily#2900
+            '166304313004523520': "Jameskii", # OGNovuh#0003
             '324645959265157120': "Swagger's Hangout", # Mushy The Wizard#2319
             '285238487618420737': "Swagger's Hangout", # Boubie#0305
             '244907038667177984': "Swagger's Hangout", # Kata#7886

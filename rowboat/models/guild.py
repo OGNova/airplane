@@ -246,6 +246,18 @@ class GuildConfigChange(BaseModel):
             config=yaml.load(self.before_raw)
         ).where(Guild.guild_id == self.guild_id).execute()
 
+@BaseModel.register
+class GuildMember(BaseModel):
+    user_id = BigIntegerField()
+    guild_id = BigIntegerField()
+
+    level = BigIntegerField()
+    points = BigIntegerField()
+
+    class Meta:
+        db_table = 'guild_members'
+        primary_key = CompositeKey('user_id', 'guild_id')
+
 
 @BaseModel.register
 class GuildMemberBackup(BaseModel):

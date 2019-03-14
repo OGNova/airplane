@@ -6,9 +6,12 @@ import Dashboard from './dashboard';
 import Login from './login';
 import GuildOverview from './guild_overview';
 import GuildConfigEdit from './guild_config_edit';
+import GuildConfigHistory from './guild_config_history';
 import GuildInfractions from './guild_infractions';
 import GuildStats from './guild_stats';
 import { BrowserRouter, Route, Switch, Redirect } from 'react-router-dom';
+
+import 'react-tippy/dist/tippy.css';
 
 class AppWrapper extends Component {
   constructor() {
@@ -45,6 +48,7 @@ class AppWrapper extends Component {
       return <Redirect to='/login' />;
     }
 
+    document.title = `${globalState.name} Dashboard`;
     return (
       <div id="wrapper">
         <Topbar />
