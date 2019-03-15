@@ -131,7 +131,12 @@ class MemesPlugin(Plugin):
     @Plugin.command('smack', '<user:user|snowflake> [reason:str...]', level=-1)
     def smack(self, event, user, reason=None):
         return event.channel.send_message(u':clap: Smacked {User} (`{Reason}`)'.format(User=unicode(user), Reason=unicode(reason).encode('utf-8')))
-      
+    
+    @Plugin.command('gay', '<user:user|snowflake>', aliases=['gey'], level=-1)
+    def gay(self, event, user):
+        member = event.guild.get_member(user)
+        return event.channel.send_message(u'{Member}, ur gey'.format(Member=member.mention))
+
     @Plugin.command('fight', '[user:user|snowflake]', level=10)
     def fight(self, event, user=None):
         with open('./fun.json') as f:
