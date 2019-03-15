@@ -135,7 +135,7 @@ class MemesPlugin(Plugin):
     @Plugin.command('gay', '<user:user|snowflake>', aliases=['gey', 'ani'], level=-1)
     def gay(self, event, user):
         member = event.guild.get_member(user)
-        return event.channel.send_message(u'{Member}, ur gey'.format(Member=member.mention))
+        return event.channel.send_message(u':rainbow: {Member}, ur gey'.format(Member=member.mention))
 
     @Plugin.command('fight', '[user:user|snowflake]', level=10)
     def fight(self, event, user=None):
