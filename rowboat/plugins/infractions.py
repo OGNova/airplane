@@ -30,6 +30,8 @@ from rowboat.constants import (
     GREEN_TICK_EMOJI_ID, RED_TICK_EMOJI_ID, GREEN_TICK_EMOJI, RED_TICK_EMOJI, ROWBOAT_LOG_CHANNEL
 )
 
+MODIFIER_GRAVE_ACCENT = u'\u02CB'
+
 def clamp(string, size):
     if len(string) > size:
         return string[:size] + '...'
