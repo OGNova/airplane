@@ -7,7 +7,7 @@ function init() {
 	// HMR requires that this be a require()
 	let App = require('./components/app').default;
 	const archive = document.getElementById('archive');
-	ReactDOM.render(<App />, archive || document.getElementById('app'));
+	ReactDOM.render(<App />, archive ? archive : document.getElementById('app'));
 }
 
 init();
