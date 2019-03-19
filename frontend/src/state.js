@@ -94,6 +94,16 @@ class State {
     })
   }
 
+  getArchive(archiveID) {
+    return new Promise((resolve, reject) => {
+      axios.get(`/api/archive/${archiveID}.json`).then((res) => {
+        resolve(res.data);
+      }).catch((err) => {
+        reject();
+      });
+    });
+  }
+
   deploy() {
     return new Promise((resolve) => {
       axios.post('/api/deploy').then((res) => {
