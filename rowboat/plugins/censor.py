@@ -268,22 +268,3 @@ class CensorPlugin(Plugin):
                 'words': blocked_words,
             })
 
-    @Plugin.listen('GuildMemberUpdate')
-    def on_member_update(self, event):
-        if event.member.nickname in event.config.blocked_nicknames:
-            if event.config.blocked_nickname_rename:
-                event.member.set_nickname('{}'.format(event.config.blocked_nickname_rename))
-                raise Censorship(CensorReason.NICKNAME, event, ctx={
-                    'hit': 'nickname',
-                    'member': event.member,
-                    'nickname': event.member.nickname
-                })
-            else:
-                event.member.set_nickname('🐱 I AM A LAMEFACE 🐱')
-                raise Censorship(CensorReason.NICKNAME, event, ctx={
-                    'hit': 'nickname',
-                    'member': event.member,
-                    'nickname': event.member.nickname
-                })
-        else:
-            return
