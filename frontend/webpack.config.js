@@ -20,10 +20,12 @@ module.exports = {
     rules: [
       {
         test: /\.css$/,
+        exclude: /\.html$/,
         loader: 'style-loader'
       },
       {
         test: /\.css$/,
+        exclude: /\.html$/,
         loader: 'css-loader',
         query: {
           modules: true,
@@ -32,6 +34,7 @@ module.exports = {
       },
       {
         test: /\.jsx?/i,
+        exclude: /\.html$/,
         loader: 'babel-loader',
         options: {
           presets: [
