@@ -66,6 +66,8 @@ class InfractionsConfig(PluginConfig):
 
     # The mute role
     mute_role = Field(snowflake, default=None)
+    vc_mute = Field(bool, default=False)
+    vc_mute_channel = Field(snowflake, default=None)
 
     # The channel to log message deletions to
     infraction_deletion_channel = Field(snowflake, default=None)

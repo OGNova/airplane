@@ -18,7 +18,7 @@ from rowboat.models.user import User, Infraction
 from rowboat.models.message import Message, Command
 from rowboat.sql import database
 from rowboat.redis import rdb
-from rowboat.constants import ROWBOAT_LOG_CHANNEL
+from rowboat.constants import ROWBOAT_LOG_CHANNEL, USER_MENTION_RE
 
 guilds = Blueprint('guilds', __name__, url_prefix='/api/guilds')
 
@@ -63,6 +63,33 @@ def with_guild(f=None):
 
     return deco
 
+
+def search_users(query=None):
+    queries = []
+
+    if query.isdigit():
+        queries.append((User.user_id == query))
+
+    q = USER_MENTION_RE.findall(query)
+    if len(q) and q[0].isdigit():
+        ids = []
+        ids.append(q[0])
+        return ids
+    else:
+        queries.append((User.username ** u'%{}%'.format(query.replace('%', ''))))
+
+    if '#' in query:
+        username, discrim = query.rsplit('#', 1)
+        if discrim.isdigit():
+            queries.append((
+                (User.username == username) &
+                (User.discriminator == int(discrim))))
+
+    users = User.select().where(reduce(operator.or_, queries))
+    if len(users) == 0:
+        return []
+
+    return map(lambda i: i.user_id, users[:25])
 
 @guilds.route('/<gid>')
 @with_guild
@@ -110,7 +137,7 @@ def guild_z_config_update(guild):
         return 'Invalid Data: %s' % e, 400
 
 
-CAN_FILTER = ['id', 'user_id', 'actor_id', 'type', 'reason']
+CAN_FILTER = ['id', 'user_id', 'actor_id', 'type', 'reason', 'actor', 'user']
 CAN_SORT = ['id', 'user_id', 'actor_id', 'created_at', 'expires_at', 'type']
 
 
@@ -196,9 +223,11 @@ def guild_infractions(guild):
     )
 
     results["infractions"] = [i.serialize(guild=guild, user=i.user, actor=i.actor) for i in q]
-
+   
     return jsonify(results)
 
+
+    return jsonify(results)
 
 @guilds.route('/<gid>/config/history')
 @with_guild

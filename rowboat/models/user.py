@@ -418,6 +418,8 @@ class Infraction(BaseModel):
 
         member.add_role(admin_config.mute_role, reason=reason)
 
+        cls.move_vc(plugin, event, member)
+
         plugin.call(
             'ModLogPlugin.log_action_ext',
             Actions.MEMBER_MUTED,
@@ -454,6 +456,8 @@ class Infraction(BaseModel):
 
         member.add_role(admin_config.mute_role, reason=reason)
 
+        cls.move_vc(plugin, event, member)
+
         plugin.call(
             'ModLogPlugin.log_action_ext',
             Actions.MEMBER_TEMP_MUTED,
@@ -487,6 +491,39 @@ class Infraction(BaseModel):
             (cls.type_ << types) &
             (cls.active == 1)
         ).execute() >= 1
+
+    @classmethod
+    def move_vc(cls, plugin, event, member):
+        if isinstance(member, (int, long)):
+            user_id = member
+        else:
+            User.from_disco_user(member.user)
+            user_id = member.user.id
+
+        state = event.guild.get_member(user_id).get_voice_state()
+        if not state:
+            return
+
+        config = plugin.call('CorePlugin.get_config', event.guild.id)
+        c = getattr(config.plugins, 'infractions')
+
+        if not c.vc_mute:
+            return
+
+        channel = None
+        if event.guild.afk_channel_id:
+            channel = event.guild.afk_channel_id
+        if hasattr(c, 'vc_mute_channel'):
+            if hasattr(c.vc_mute_channel, 'real'):
+                channel = c.vc_mute_channel
+        if not channel:
+            return
+
+        try:
+            # Moving the muted user to the AFK channel since they have been muted
+            event.guild.get_member(user_id).modify(channel_id=channel)
+        except:
+            return
 
 
 @BaseModel.register

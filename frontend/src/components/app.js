@@ -9,6 +9,7 @@ import GuildConfigEdit from './guild_config_edit';
 import GuildConfigHistory from './guild_config_history';
 import GuildInfractions from './guild_infractions';
 import GuildStats from './guild_stats';
+import Archive from './archive';
 import { BrowserRouter, Route, Switch, Redirect } from 'react-router-dom';
 
 import 'react-tippy/dist/tippy.css';
@@ -77,6 +78,7 @@ export default function router() {
         <Route exact path='/guilds/:gid/config' component={wrapped(GuildConfigEdit)} />
         <Route exact path='/guilds/:gid/config/:timestamp?' component={wrapped(GuildConfigEdit)} />
         <Route exact path='/guilds/:gid' component={wrapped(GuildOverview)} />
+        <Route exact path='/api/archive/:aid.html' component={Archive} />
         <Route exact path='/' component={wrapped(Dashboard)} />
       </Switch>
     </BrowserRouter>

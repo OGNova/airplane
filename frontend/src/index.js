@@ -1,10 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
+require('@babel/polyfill');
+
 function init() {
 	// HMR requires that this be a require()
 	let App = require('./components/app').default;
-  ReactDOM.render(<App />, document.getElementById('app'));
+	const archive = document.getElementById('archive');
+	ReactDOM.render(<App />, archive || document.getElementById('app'));
 }
 
 init();

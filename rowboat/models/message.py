@@ -8,6 +8,7 @@ from peewee import (
     BigIntegerField, ForeignKeyField, TextField, DateTimeField,
     BooleanField, UUIDField
 )
+from yaml import load
 from datetime import datetime, timedelta
 from playhouse.postgres_ext import BinaryJSONField, ArrayField
 from disco.types.base import UNSET
@@ -15,7 +16,7 @@ from disco.types.base import UNSET
 from rowboat import REV
 from rowboat.util import default_json
 from rowboat.models.user import User
-from rowboat.sql import BaseModel
+from rowboat.sql import BaseModel, database
 
 EMOJI_RE = re.compile(r'<:.+:([0-9]+)>')
 
@@ -175,7 +176,7 @@ class Reaction(BaseModel):
 
 @BaseModel.register
 class MessageArchive(BaseModel):
-    FORMATS = ['txt', 'csv', 'json']
+    FORMATS = ['txt', 'csv', 'json', 'html']
 
     archive_id = UUIDField(primary_key=True, default=uuid.uuid4)
 
@@ -198,8 +199,10 @@ class MessageArchive(BaseModel):
 
     @property
     def url(self):
-        # TODO: use web endpoint here
-        return 'https://dash.airplane.gg/api/archive/{}.txt'.format(self.archive_id)
+        with open('config.yaml', 'r') as f:
+            config = load(f)
+
+        return '{}/api/archive/{}.html'.format(config['web']['DOMAIN'], self.archive_id)
 
     def encode(self, fmt='txt'):
         from rowboat.models.user import User
@@ -233,11 +236,16 @@ class MessageArchive(BaseModel):
             return json.dumps({
                 'messages': map(self.encode_message_json, q)
             })
+        elif fmt == 'html':
+            return q
 
     @staticmethod
     def encode_message_text(msg):
-        return u'{m.timestamp} ({m.id} / {m.channel_id} / {m.author.id}) {m.author}: {m.content} ({attach})'.format(
-            m=msg, attach=', '.join(map(unicode, msg.attachments or [])))
+        attachments = msg.attachments or []
+        return u'{m.timestamp} ({m.id} / {m.channel_id} / {m.author.id}) {m.author}: {m.content}{attach}'.format(
+            m=msg,
+            attach=' ({})'.format(', '.join(unicode(i).replace('cdn.discordapp.com', 'media.discordapp.net', 1) for i in attachments)) if len(attachments) > 0 else ''
+        )
 
     @staticmethod
     def encode_message_csv(msg):
@@ -256,12 +264,21 @@ class MessageArchive(BaseModel):
 
     @staticmethod
     def encode_message_json(msg):
+        conn = database.obj.get_conn()
+        channel_name = None
+        with conn.cursor() as cur:
+            cur.execute('SELECT name FROM channels WHERE channel_id = {};'.format(int(msg.channel_id)))
+            row = cur.fetchone()
+            channel_name = row[0] if row else None
+
         return dict(
             id=str(msg.id),
             timestamp=str(msg.timestamp),
             author_id=str(msg.author.id),
+            channel=channel_name,
+            channel_id=str(msg.channel_id),
             username=msg.author.username,
-            discriminator=msg.author.discriminator,
+            discriminator=str(msg.author.discriminator).zfill(4),
             content=msg.content,
             deleted=msg.deleted,
             attachments=msg.attachments)
