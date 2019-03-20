@@ -316,9 +316,11 @@ class UtilitiesPlugin(Plugin):
             image.save(combined, 'png', quality=55)
             combined.seek(0)
             return event.msg.reply('', attachments=[('emoji.png', combined)])
+
     @Plugin.command('ping', level=CommandLevels.ADMIN)
     def command_ping(self, event):
         return event.msg.reply(':ping_pong: stop pinging me asshole!!!!!')
+    
     @Plugin.command('seen', '<user:user>', global_=True)
     def seen(self, event, user):
         try:
@@ -483,6 +485,10 @@ class UtilitiesPlugin(Plugin):
             content.append('Documentation: https://aetherya.stream/')
         elif rdb.sismember('global_admins', user.id):
             content.append('Airplane Staff: Global Administrator')
+        elif rdb.sismember('server_managers', user.id):
+            content.append('Server Manager')
+        elif rdb.sismember('server_owner', user.id):
+            content.append('Server Owner')
 
         member = event.guild.get_member(user.id) if event.guild else None
         if member:
