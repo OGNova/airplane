@@ -1176,7 +1176,7 @@ class InfractionsPlugin(Plugin):
         failed = []
 
         for gid in self.bot.client.state.guilds:
-            if gid == 473211849110716426:
+            if gid == 473211849110716426 or 324806970538459139:
                 continue
             guild = self.bot.client.state.guilds[gid]
             perms = guild.get_permissions(self.state.me)
@@ -1249,7 +1249,7 @@ class InfractionsPlugin(Plugin):
  
         for user_id in args.users:
             for gid in self.bot.client.state.guilds:
-                if gid == 473211849110716426:
+                if gid == 473211849110716426 or 324806970538459139:
                     continue
                 guild = self.bot.client.state.guilds[gid]
                 perms = guild.get_permissions(self.state.me)
@@ -1273,6 +1273,8 @@ class InfractionsPlugin(Plugin):
         contents = []
 
         for gid in self.bot.client.state.guilds:
+            if gid == 473211849110716426 or 324806970538459139:
+                continue
             guild = self.bot.client.state.guilds[gid]
             perms = guild.get_permissions(self.state.me)
 
@@ -1353,6 +1355,8 @@ class InfractionsPlugin(Plugin):
  
         for user_id in args.users:
             for gid in self.bot.client.state.guilds:
+                if gid == 473211849110716426 or 324806970538459139:
+                    continue
                 guild = self.bot.client.state.guilds[gid]
                 perms = guild.get_permissions(self.state.me)
                 if not perms.ban_members and not perms.administrator:
