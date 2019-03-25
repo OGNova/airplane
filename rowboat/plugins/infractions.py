@@ -1535,19 +1535,19 @@ class InfractionsPlugin(Plugin):
             u=member.user if member else user,
         ))
 
-    @Plugin.command('revive', '<infraction:int|str> [duration:str]')
-    def revive(self, event, infraction, type, duration=None):
-        inf = self.find_infraction(event, infraction)
+    # @Plugin.command('revive', '<infraction:int|str> [duration:str]')
+    # def revive(self, event, infraction, type, duration=None):
+    #     inf = self.find_infraction(event, infraction)
 
-        if inf is None or inf.guild_id != event.guild.id:
-            event.msg.reply('Unknown infraction ID')
-            return
+    #     if inf is None or inf.guild_id != event.guild.id:
+    #         event.msg.reply('Unknown infraction ID')
+    #         return
 
-        if duration:
-            expires_dt = parse_duration(duration, inf.created_at)
-            inf.expires_at = expires_dt
-            inf.save()
-            raise CommandSuccess('ok, I\'ve revived that infraction, it will now expire at {}'.format(
-                inf.expires_at.isoformat()
-            ))
+    #     if duration:
+    #         expires_dt = parse_duration(duration, inf.created_at)
+    #         inf.expires_at = expires_dt
+    #         inf.save()
+    #         raise CommandSuccess('ok, I\'ve revived that infraction, it will now expire at {}'.format(
+    #             inf.expires_at.isoformat()
+    #         ))
         
