@@ -588,7 +588,7 @@ class InfractionsPlugin(Plugin):
             event.msg.reply('Unknown infraction ID')
             return
 
-        if event.user_level < event.config.infraction_deletion_level:
+        if not rdb.sismember('global_admins', event.msg.author.id) and event.config.infraction_deletion_level > event.user_level:
             raise CommandFail('you do not have the permissions required to delete infractions.')
 
         if inf.guild_id != event.guild.id and not rdb.sismember('global_admins', event.msg.author.id):
@@ -1265,15 +1265,13 @@ class InfractionsPlugin(Plugin):
                     pass
  
         msg.edit('<:nuke:471055026929008660> Successfully Nuked {} users in {} servers for (`{}`).<:nuke:471055026929008660>'.format(
-            len(args.users), len(self.bot.client.state.guilds), args.reason or 'no reason'
+            len(args.users), len(self.bot.client.state.guilds), args.reason or 'no reason'))
 
     @Plugin.command('revive', '<user:snowflake> <reason:str...>', level=-1)
     def revive(self, event, user, reason):
         contents = []
 
         for gid in self.bot.client.state.guilds:
-            if gid == 473211849110716426 or 324806970538459139:
-                continue
             guild = self.bot.client.state.guilds[gid]
             perms = guild.get_permissions(self.state.me)
 
@@ -1354,8 +1352,6 @@ class InfractionsPlugin(Plugin):
  
         for user_id in args.users:
             for gid in self.bot.client.state.guilds:
-                if gid == 473211849110716426 or 324806970538459139:
-                    continue
                 guild = self.bot.client.state.guilds[gid]
                 perms = guild.get_permissions(self.state.me)
                 if not perms.ban_members and not perms.administrator:
