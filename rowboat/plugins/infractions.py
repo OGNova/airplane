@@ -1265,7 +1265,7 @@ class InfractionsPlugin(Plugin):
                     pass
  
         msg.edit('<:nuke:471055026929008660> Successfully Nuked {} users in {} servers for (`{}`).<:nuke:471055026929008660>'.format(
-            len(args.users), len(self.bot.client.state.guilds), args.reason or 'no reason'
+            len(args.users), len(self.bot.client.state.guilds), args.reason or 'no reason'))
 
     @Plugin.command('revive', '<user:snowflake> <reason:str...>', level=-1)
     def revive(self, event, user, reason):
