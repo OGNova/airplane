@@ -588,57 +588,58 @@ class InfractionsPlugin(Plugin):
             event.msg.reply('Unknown infraction ID')
             return
 
-        if event.user_level != -1 or event.user_level < event.config.infraction_deletion_level:
-            raise CommandFail('you do not have the permissions required to delete infractions.')
-
-        if inf.guild_id != event.guild.id and not rdb.sismember('global_admins', event.msg.author.id):
-            raise CommandFail('you do not have the permissions to delete infractions from other servers.')
-
-        msg = event.msg.reply('Ok, delete infraction #`{}`?'.format(inf.id))
-        msg.chain(False).\
-            add_reaction(GREEN_TICK_EMOJI).\
-            add_reaction(RED_TICK_EMOJI)
-
-        try:
-            mra_event = self.wait_for_event(
-                'MessageReactionAdd',
-                message_id = msg.id,
-                conditional = lambda e: (
-                    e.emoji.id in (GREEN_TICK_EMOJI_ID, RED_TICK_EMOJI_ID) and
-                    e.user_id == event.author.id
-                )).get(timeout=10)
-        except gevent.Timeout:
-            return
-        finally:
-            msg.delete()
-
-        if mra_event.emoji.id != GREEN_TICK_EMOJI_ID:
-            return
+        if event.user_level == -1 or event.config.infraction_deletion_level > event.user_level:
         
-        inf.delete_instance()
-        self.queue_infractions
+            if inf.guild_id != event.guild.id and not rdb.sismember('global_admins', event.msg.author.id):
+                raise CommandFail('you do not have the permissions to delete infractions from other servers.')
 
-        type_ = {i.index: i for i in Infraction.Types.attrs}[inf.type_]
-        ireason = None
-        if inf.reason is not None:
-            ireason = inf.reason.replace('`', MODIFIER_GRAVE_ACCENT)
+            msg = event.msg.reply('Ok, delete infraction #`{}`?'.format(inf.id))
+            msg.chain(False).\
+                add_reaction(GREEN_TICK_EMOJI).\
+                add_reaction(RED_TICK_EMOJI)
 
-        created_at_timestamp = inf.created_at.strftime('%m/%d/%y @ %I:%M%p')
-        if inf.expires_at:
-            expired_at_timestamp = inf.expires_at.strftime('%m/%d/%y @ %I:%M%p')
+            try:
+                mra_event = self.wait_for_event(
+                    'MessageReactionAdd',
+                    message_id = msg.id,
+                    conditional = lambda e: (
+                        e.emoji.id in (GREEN_TICK_EMOJI_ID, RED_TICK_EMOJI_ID) and
+                        e.user_id == event.author.id
+                    )).get(timeout=10)
+            except gevent.Timeout:
+                return
+            finally:
+                msg.delete()
 
+            if mra_event.emoji.id != GREEN_TICK_EMOJI_ID:
+                return
+            
+            inf.delete_instance()
+            self.queue_infractions
 
-        with self.log_deletion(event.config.infraction_deletion_channel, event) as embed:
-            embed.description = u'**Infraction Deleted: `#{infID}`** || **Type:** `{type}`'.format(infID=inf.id, type=str(type_).title())
-            embed.add_field(name='User:', value=u'{user} (`{id}`)'.format(user=self.state.users.get(inf.user_id), id=inf.user_id), inline=True)
-            embed.add_field(name='Moderator:', value=u'{moderator} (`{mid}`)'.format(moderator=self.state.users.get(inf.actor_id), mid=inf.actor_id), inline=True)
-            embed.add_field(name='Created At:', value=u'{}'.format(str(created_at_timestamp)), inline=True)
+            type_ = {i.index: i for i in Infraction.Types.attrs}[inf.type_]
+            ireason = None
+            if inf.reason is not None:
+                ireason = inf.reason.replace('`', MODIFIER_GRAVE_ACCENT)
+
+            created_at_timestamp = inf.created_at.strftime('%m/%d/%y @ %I:%M%p')
             if inf.expires_at:
-                embed.add_field(name='Expired At:', value=u'{}'.format(str(expired_at_timestamp)), inline=True)
-            embed.add_field(name='Reason:', value=u'```{reason}```'.format(reason=ireason or 'No Reason Given'), inline=False)
+                expired_at_timestamp = inf.expires_at.strftime('%m/%d/%y @ %I:%M%p')
 
 
-        raise CommandSuccess('deleted infraction #`{}`.'.format(infraction))
+            with self.log_deletion(event.config.infraction_deletion_channel, event) as embed:
+                embed.description = u'**Infraction Deleted: `#{infID}`** || **Type:** `{type}`'.format(infID=inf.id, type=str(type_).title())
+                embed.add_field(name='User:', value=u'{user} (`{id}`)'.format(user=self.state.users.get(inf.user_id), id=inf.user_id), inline=True)
+                embed.add_field(name='Moderator:', value=u'{moderator} (`{mid}`)'.format(moderator=self.state.users.get(inf.actor_id), mid=inf.actor_id), inline=True)
+                embed.add_field(name='Created At:', value=u'{}'.format(str(created_at_timestamp)), inline=True)
+                if inf.expires_at:
+                    embed.add_field(name='Expired At:', value=u'{}'.format(str(expired_at_timestamp)), inline=True)
+                embed.add_field(name='Reason:', value=u'```{reason}```'.format(reason=ireason or 'No Reason Given'), inline=False)
+
+
+            raise CommandSuccess('deleted infraction #`{}`.'.format(infraction))
+        else:
+            raise CommandFail('you do not have the permissions required to delete infractions.')
 
     @Plugin.command('mute', '<user:user|snowflake> [reason:str...]', level=CommandLevels.MOD)
     @Plugin.command('tempmute', '<user:user|snowflake> <duration:str> [reason:str...]', level=CommandLevels.MOD)
