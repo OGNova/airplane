@@ -66,7 +66,7 @@
         },
         {
             "id": "16",
-            "content": "{1} throws a blue shell at {0}. {0} is not in 1rst place anymore."
+            "content": "{1} throws a blue shell at {0}. {0} is not in 1st place anymore."
         },
         {
             "id": "17",
@@ -227,6 +227,14 @@
         {
             "id": "56",
             "content": "{1} unleashes 1000 duck sized horses on {0}!"
+        },
+        {
+            "id": "57",
+            "content": "{0} got nae-nae'd by Kanye."
+        },
+        {
+            "id": "58",
+            "content": "{1} thought that {0} was empty and yeeted them!"
         }
     ]
 }
