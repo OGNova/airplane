@@ -7,13 +7,17 @@ import { globalState } from '../state';
 import Tooltip from './tooltip';
 import GuildIcon from './guild_icon';
 
-function partnerOrVerified(features){
-  if (!features) return;
+function partnerOrVerified(guild) {
+  if (guild.id == '469566508838682644') {
+    return <Tooltip position='right' text='Airplane' trigger={<img src='https://cdn.airplane.gg/static/transparent_airplane.png' height={24} />} />;
+  }
+  
+  if (!guild.features) return;
 
   let type;
-  if (features.indexOf('VERIFIED') > -1) {
+  if (guild.features.indexOf('VERIFIED') > -1) {
     type = 'verified';
-  } else if (features.length >= 3) {
+  } else if (guild.features.length >= 3) {
     type = 'partner';
   }
 
@@ -165,7 +169,7 @@ class GuildTableRow extends Component {
         <td>{this.props.guild.id}</td>
         <td><GuildTableRowActions guild={this.props.guild} /></td>
         <td><GuildTableRowPremiumActions guild={this.props.guild} /></td>
-        <td>{partnerOrVerified(this.props.guild.features)}</td>
+        <td>{partnerOrVerified(this.props.guild)}</td>
       </tr>
     );
   }

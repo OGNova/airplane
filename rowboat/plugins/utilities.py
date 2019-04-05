@@ -23,7 +23,7 @@ from rowboat.sql import database
 
 from disco.api.http import Routes, APIException
 
-from rowboat.plugins import RowboatPlugin as Plugin, CommandFail
+from rowboat.plugins import RowboatPlugin as Plugin, CommandFail, CommandSuccess
 from disco.bot import CommandLevels
 from rowboat.util.timing import Eventual
 from rowboat.util.input import parse_duration
@@ -790,3 +790,32 @@ class UtilitiesPlugin(Plugin):
         except:
             embed.color = '00000000'
         event.msg.reply('', embed=embed)
+
+    @Plugin.command('manager add', '<user:user> <item:str...>', level=-1, context={'mode': 'add'})
+    @Plugin.command('manager remove', '<user:user> <item:str...>', level=-1, context={'mode': 'remove'})
+    def manager_info(self, event, user, mode, item):
+        user = self.state.users.get(user)
+        if mode == 'add':
+            special_list = rdb.hget('ServerManagers', '{}'.format(user.id))
+            temp_list = []
+            temp_list.append(item)
+            final_list = str(temp_list).strip('[]')
+            new = str('{}, {}'.format(special_list, final_list))
+            rdb.hset('ServerManagers', '{}'.format(user.id), new)
+            raise CommandSuccess('{} has been added to the list of server managers'.format(user))
+        if mode == 'remove':
+            special_list = rdb.hget('ServerManagers', '{}'.format(user.id))
+            if special_list == None:
+                raise CommandFail('User is not a manager on any Airplane protected servers.')
+            temp_list = special_list.split(', ')
+            found = False
+            for x in temp_list:
+                if x == item:
+                    found = True
+                    temp_list.remove(item)
+            if found == False:
+                raise CommandFail('something went wrong, please try again later')
+            else:
+                new = str(temp_list).strip('[]')
+                rdb.hset('ServerManagers', '{}'.format(user.id), new)
+                raise CommandSuccess('The server has been removed from the list of servers the user manages.')

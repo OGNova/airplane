@@ -7,7 +7,7 @@ import axios from 'axios';
 class GuildWidget extends Component {
   render() {
     const source = `https://discordapp.com/api/guilds/${this.props.guildID}/widget.png?style=banner2`;
-    return (<img src={source} onError={(e) => { e.target.onerror = null; e.target.src ="https://cdn.aetherya.stream/static/banner.png"}} alt="(Guild must have widget enabled)" width='1760' height='422' />);
+    return (<img src={source} onError={(e) => { e.target.onerror = null; e.target.src ="https://cdn.airplane.gg/static/banner.png"}} alt="(Guild must have widget enabled)" />);
   }
 }
 

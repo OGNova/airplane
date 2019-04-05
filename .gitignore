@@ -13,3 +13,5 @@ src/disco-py
 src/peewee
 src/pip-delete-this-directory.py
 rowboat/plugins/levels.py
+test.py
+img

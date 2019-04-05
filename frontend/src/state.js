@@ -11,8 +11,8 @@ class State {
     this.user = null;
     this.ready = false;
     this.stats = null;
-    this.name = 'Airplane (Beta Dashboard)';
-    this.docsLink = 'https://aetherya.stream';
+    this.name = 'Airplane';
+    this.docsLink = 'https://airplane.gg';
     this.supportServer = 'https://discord.gg/Gu7jRdW'
 
     this._currentGuild = null;

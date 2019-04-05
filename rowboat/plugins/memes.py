@@ -2,15 +2,19 @@
 import disco
 import gevent
 import json
+import requests
+
 from random import randint, choice
-from rowboat.plugins import RowboatPlugin as Plugin, CommandFail, CommandSuccess
+from gevent.pool import Pool
+
 from disco.bot import CommandLevels
-from rowboat.types.plugin import PluginConfig
-from rowboat.redis import rdb
 from disco.types.user import User as DiscoUser
 from disco.types.message import MessageTable, MessageEmbed
+
 from rowboat.types import Field, DictField, ListField, snowflake, SlottedModel, snowflake
-from gevent.pool import Pool
+from rowboat.plugins import RowboatPlugin as Plugin, CommandFail, CommandSuccess
+from rowboat.types.plugin import PluginConfig
+from rowboat.redis import rdb
 from rowboat.util.gevent import wait_many
 from rowboat.constants import (
     GREEN_TICK_EMOJI_ID, RED_TICK_EMOJI_ID, GREEN_TICK_EMOJI, RED_TICK_EMOJI
@@ -136,6 +140,32 @@ class MemesPlugin(Plugin):
     def gay(self, event, user):
         member = event.guild.get_member(user)
         return event.channel.send_message(u':rainbow: {Member}, ur gey'.format(Member=member.mention))
+
+    @Plugin.command('hug', '<user:user|snowflake>', level=-1)
+    def hug(self, event, user):
+        member = event.guild.get_member(user)
+        try:
+            r = requests.get('https://nekos.life/api/v2/img/hug')
+            url = r.text.split('"')[3]
+        except:
+            event.msg.reply('404 hug not found')
+        
+        r = requests.get(url, stream=True)
+
+        event.msg.reply('{}'.format(member.mention), attachments=[('hug.gif', r.raw)])
+
+    @Plugin.command('pat', '<user:user|snowflake>', level=-1)
+    def pat(self, event, user):
+        member = event.guild.get_member(user)
+        try:
+            r = requests.get('https://nekos.life/api/v2/img/pat')
+            url = r.text.split('"')[3]
+        except:
+            event.msg.reply('404 pat not found')
+        
+        r = requests.get(url, stream=True)
+
+        event.msg.reply('{}'.format(member.mention), attachments=[('pat.gif', r.raw)])
 
     @Plugin.command('fight', '[user:user|snowflake]', level=10)
     def fight(self, event, user=None):

@@ -625,18 +625,6 @@ body .ReactTable .-pagination .-btn {
   margin-right: 16px;
 }
 
-.navbar-default.sidebar:hover {
-  width: auto;
-  animation: 0.5s;
-  animation-direction: initial;
-}
-
-.navbar-default.sidebar:hover .side-caption {
-  display: inline;
-  -webkit-animation: slide-left 2s ease-out;
-  -moz-animation: slide-left 2s ease-out;
-}
-
 @-webkit-keyframes slide-left {
       0% { display: none; -webkit-transform: translateX(-100%); }
     100% { display: inline; -webkit-transform: translateX(0); }
@@ -766,4 +754,50 @@ body .ReactTable .-pagination .-btn {
 
 .col-xs-7 {
   display: inline !important;
+}
+
+.navbar-default.sidebar::-webkit-scrollbar-thumb {
+  background: #666;
+  border-radius: 20px;
+}
+
+.navbar-default.sidebar::-webkit-scrollbar-track {
+  background: #2C2F33;
+  border-radius: 20px;
+}
+
+.navbar-default.sidebar::-webkit-scrollbar {
+  width: 5px;
+}
+
+.navbar-default.sidebar::-webkit-scrollbar-thumb {
+  background: #666;
+}
+
+.ace_scrollbar-h::-webkit-scrollbar-thumb {
+  background: #666;
+  border-radius: 20px;
+}
+
+.ace_scrollbar-h::-webkit-scrollbar-track {
+  background: #2C2F33;
+  border-radius: 20px;
+}
+
+.ace_scrollbar-h::-webkit-scrollbar {
+  width: 5px;
+}
+
+.ace_scrollbar-v::-webkit-scrollbar-thumb {
+  background: #666;
+  border-radius: 20px;
+}
+
+.ace_scrollbar-v::-webkit-scrollbar-track {
+  background: #2C2F33;
+  border-radius: 20px;
+}
+
+.ace_scrollbar-v::-webkit-scrollbar {
+  width: 5px;
 }
