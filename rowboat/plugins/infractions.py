@@ -640,6 +640,21 @@ class InfractionsPlugin(Plugin):
 
         raise CommandSuccess('deleted infraction #`{}`.'.format(infraction))
 
+    @Plugin.command('type', '<infraction:int|str> <inftype:str>', group='infractions', level=CommandLevels.MOD)
+    def typechange(self, event, infraction, inftype):
+        inf = self.find_infraction(event, infraction)
+
+        if inf is None:
+            raise CommandFail('Unknown infraction ID')
+
+        infType = int(Infraction.Types['{}'.format(inftype.upper())])
+
+        inf.type_ = infType
+        inf.save()
+        self.queue_infractions()
+
+        raise CommandSuccess('updated infraction {}'.format(inf.id))
+
     @Plugin.command('mute', '<user:user|snowflake> [reason:str...]', level=CommandLevels.MOD)
     @Plugin.command('tempmute', '<user:user|snowflake> <duration:str> [reason:str...]', level=CommandLevels.MOD)
     def tempmute(self, event, user, duration=None, reason=None):
