@@ -669,10 +669,10 @@ class InfractionsPlugin(Plugin):
                 actor=unicode(event.author) if event.author.id != member.id else 'Automatic',
             )
 
-        infType = int(Infraction.Types['{}'.format(inftype.upper())])
-
-        if infType is None:
+        if int(Infraction.Types['{}'.format(inftype.upper())]) is None:
             raise CommandFail('Unknown infraction type, check your spelling and try again.')
+
+        infType = int(Infraction.Types['{}'.format(inftype.upper())])
 
         inf.type_ = infType
         inf.save()
