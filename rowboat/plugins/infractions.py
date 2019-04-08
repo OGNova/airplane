@@ -647,7 +647,7 @@ class InfractionsPlugin(Plugin):
         if inf is None:
             raise CommandFail('Unknown infraction ID')
 
-        if inf.type_ = 0:
+        if inf.type_ == 0:
             member = event.guild.get_member(inf.user_id)
             
             inf.clear_active(event, inf.user_id, [Infraction.Types.MUTE, Infraction.Types.TEMPMUTE])
