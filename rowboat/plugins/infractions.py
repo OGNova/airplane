@@ -647,7 +647,32 @@ class InfractionsPlugin(Plugin):
         if inf is None:
             raise CommandFail('Unknown infraction ID')
 
+        if inf.type_ = 0:
+            member = event.guild.get_member(inf.user_id)
+            
+            inf.clear_active(event, inf.user_id, [Infraction.Types.MUTE, Infraction.Types.TEMPMUTE])
+
+            self.call(
+                'ModLogPlugin.create_debounce',
+                event,
+                ['GuildMemberUpdate'],
+                role_id=event.config.mute_role,
+            )
+
+            member.remove_role(event.config.mute_role)
+
+            self.call(
+                'ModLogPlugin.log_action_ext',
+                Actions.MEMBER_UNMUTED,
+                event.guild.id,
+                member=member,
+                actor=unicode(event.author) if event.author.id != member.id else 'Automatic',
+            )
+
         infType = int(Infraction.Types['{}'.format(inftype.upper())])
+
+        if infType is None:
+            raise CommandFail('Unknown infraction type, check your spelling and try again.')
 
         inf.type_ = infType
         inf.save()
