@@ -69,7 +69,8 @@ class MusicPlugin(Plugin):
             raise CommandFail('Sorry you are not allowed to play songs over 2 hours.')
         if song['duration'] > event.config.max_song_length:
             raise CommandFail('Sorry, you may not go over the server time limit.')
-        self.get_player(event.guild.id).queue.append(item.pipe(BufferedOpusEncoderPlayable))
+        item2 = item.pipe(BufferedOpusEncoderPlayable)
+        self.get_player(event.guild.id).queue.append(item2)
         song = item.info
         if song['extractor'] is 'youtube':
             if song['artist']:
