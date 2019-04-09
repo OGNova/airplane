@@ -1,13 +1,17 @@
 import os
 import logging
 import subprocess
+import yaml
+
+with open('config.yaml', 'r') as config:
+    cfg = yaml.load(config)
 
 from disco.util.logging import LOG_FORMAT
 from raven import Client
 from raven.transport.gevent import GeventedHTTPTransport
 
 ENV = os.getenv('ENV', 'prod')
-DSN = os.getenv('DSN')
+DSN = cfg['DSN']
 REV = subprocess.check_output(['git', 'rev-parse', 'HEAD']).strip()
 
 VERSION = '2.0.0'
